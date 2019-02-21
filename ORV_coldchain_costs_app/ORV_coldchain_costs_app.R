@@ -90,13 +90,14 @@ observeEvent(input$add_site_info, {
 
 # When user clicks the add site button, update the old data frame with the new information
 observeEvent(input$add_site, {
-      site_table$data = bind_rows(site_table$data, tibble(
-        dist_from_base = input$dist_from_base_new,
-        near_pop = input$near_pop_new,
-        far_pop = input$far_pop_new,
-        team_days_fixed = input$team_days_fixed_new,
-        team_days_mobile = input$team_days_mobile_new
-        ))
+  site_new$data <- tibble(
+    dist_from_base = input$dist_from_base_new,
+    near_pop = input$near_pop_new,
+    far_pop = input$far_pop_new,
+    team_days_fixed = input$team_days_fixed_new,
+    team_days_mobile = input$team_days_mobile_new
+  )
+site_table$data = bind_rows(site_table$data, site_new$data)
    # site_info_table <- bind_rows(site_info_table, site_new$data)
     removeModal()
   })
