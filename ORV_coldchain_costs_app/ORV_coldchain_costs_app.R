@@ -1,16 +1,16 @@
 library(shiny)
 library(dplyr)
+library(DT)
 
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-
   # Application title
   titlePanel("Estimating cold chain needs per outbreak response vaccination strategy"),
 
   # Sidebar with a slider input for number of bins
-  sidebarLayout(
-    sidebarPanel(
+  fluidRow(
+    column(4,
       tags$b("Site information"),
 
       br(),
@@ -28,29 +28,47 @@ ui <- fluidPage(
     ),
 
 
-    mainPanel(
-      tabsetPanel(
-        tabPanel(title = "Table of sites added", tableOutput("all_sites")),
+    column(8, 
+       tabsetPanel(
+        tabPanel(title = "Table of sites added", DT::dataTableOutput("all_sites", width = '90%', height = '100%')),
         tabPanel(title = "Strategy comparison plots", plotOutput("plot"))
+      )))
+  , fluidRow(column(8, 
+                    hr(), 
+                    offset = 4,
+        tabsetPanel(
+       # title = "Individual strategy results",
+        tabPanel(
+          title = "Monodose FCC",
+          tags$h4("Initial volume of ice required for transport"),
+          wellPanel(htmlOutput("ice_vol_init_dose1_FCC")),
+          tags$h4("Quantity of ice packs required"),
+          wellPanel(htmlOutput("ice_packs_required_dose1_FCC")),
+          tags$h4("Time needed to freeze initial ice"),
+          wellPanel(htmlOutput("Init_ice_freezeTime_dose1_FCC"))
+        ),
+        tabPanel(
+          title = "10-dose FCC",
+          tags$h4("Initial volume of ice required for transport"),
+          wellPanel(htmlOutput("ice_vol_init_dose10_FCC")),
+          tags$h4("Quantity of ice packs required"),
+          wellPanel(htmlOutput("ice_packs_required_dose10_FCC")),
+          tags$h4("Time needed to freeze initial ice"),
+          wellPanel(htmlOutput("Init_ice_freezeTime_dose10_FCC"))
+          ),
+          tabPanel(
+            title = "Mixed FCC",
+            tags$h4("Initial volume of ice required for transport"),
+            wellPanel(htmlOutput("ice_vol_init_mixedFCC")),
+            tags$h4("Quantity of ice packs required"),
+            wellPanel(htmlOutput("ice_packs_required_mixedFCC")),
+            tags$h4("Time needed to freeze initial ice"),
+            wellPanel(htmlOutput("Init_ice_freezeTime_mixedFCC"))
+        )
       )
-      # ,
-      #
-      # hr(), #horizontal rule
-      # tabsetPanel(
-      #   #    title = "Individual strategy results",
-      #   tabPanel(
-      #     title = "Monodose FCC",
-      #     tags$h4("Initial volume of ice required for transport"),
-      #     wellPanel(htmlOutput("ice_vol_init_monodoseFCC")),
-      #     tags$h4("Quantity of ice packs required"),
-      #     wellPanel(htmlOutput("ice_packs_required_monodoseFCC")),
-      #     tags$h4("Time needed to freeze initial ice"),
-      #     wellPanel(htmlOutput("Init_ice_freezeTime_monodoseFCC"))
-      #   )
-      # )
-    ) # main panel closing bracket
-  )
-)
+      ))
+    )
+
 
 
 
@@ -100,7 +118,7 @@ server <- function(input, output, session) {
 
 
   # Output the table of all sites added
-  output$all_sites <- renderTable(site_table$data)
+  output$all_sites <- DT::renderDT(site_table$data)
 }
 
 
