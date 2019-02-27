@@ -103,6 +103,15 @@ server <- function(input, output, session) {
 
   # When user clicks the add site button, update the old data frame with the new information
   observeEvent(input$add_site, {
+    if(input$dist_from_base_new == 0 & 
+       input$near_pop_new == 0 & 
+       input$far_pop_new == 0 & 
+       input$team_days_fixed_new == 0 
+       & input$team_days_mobile_new == 0){
+      showModal(modalDialog(title  = 'warning!', "No information was added. So, no site will be added")) #if user doesn't change the default values, but mistakenly clicks on add site, no site will be added.
+      site_new$data <- NULL
+      site_table$data <- bind_rows(site_table$data, site_new$data) 
+    }else{
     site_new$data <- tibble(
       dist_from_base = input$dist_from_base_new,
       near_pop = input$near_pop_new,
@@ -113,6 +122,7 @@ server <- function(input, output, session) {
     site_table$data <- bind_rows(site_table$data, site_new$data)
     # site_info_table <- bind_rows(site_info_table, site_new$data)
     removeModal()
+    }
   })
 
 
