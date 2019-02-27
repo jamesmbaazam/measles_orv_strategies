@@ -123,11 +123,11 @@ ui <- fluidPage(
       tabPanel(
         title = "Mixed FCC",
         tags$h4("Initial volume of ice required for transport"),
-        wellPanel(htmlOutput("ice_vol_init_mixedFCC")),
+        wellPanel(htmlOutput("ice_vol_init_mixed_FCC")),
         tags$h4("Quantity of ice packs required"),
-        wellPanel(htmlOutput("ice_packs_required_mixedFCC")),
+        wellPanel(htmlOutput("ice_packs_required_mixed_FCC")),
         tags$h4("Time needed to freeze initial ice"),
-        wellPanel(htmlOutput("Init_ice_freezeTime_mixedFCC"))
+        wellPanel(htmlOutput("Init_ice_freezeTime_mixed_FCC"))
       )
     )
   ))
@@ -254,7 +254,7 @@ server <- function(input, output, session) {
     # outputs for monodose FCC calculations
     ###
     output$ice_packs_required_monodose_FCC <- renderText({
-      paste(monodose_FCC_RCW25_icepack_needs_total + monodose_FCC_vaxCarr_icepack_needs_total, "L")
+      paste(monodose_FCC_RCW25_icepack_needs_total + monodose_FCC_vaxCarr_icepack_needs_total)
     })
 
 
@@ -302,38 +302,142 @@ server <- function(input, output, session) {
 
 
 
-    # outputs for 10-dose FCC calculations
-    dose10_FCC_init_iceVol <- dose10_FCC_RCW25_icepack_needs_total + dose10_FCC_vaxCarr_icepack_needs_total
+    # Initial number of icepacks required
+    dose10_FCC_init_icepack_quant <- dose10_FCC_RCW25_icepack_needs_total + dose10_FCC_vaxCarr_icepack_needs_total
     output$ice_packs_required_dose10_FCC <- renderText({
-      paste(dose10_FCC_init_iceVol, "L")
+      paste(dose10_FCC_init_icepack_quant)
     })
 
 
     dose10_FCC_ft <- ceiling((dose10_FCC_RCW25_icepack_needs_total) / (mf314_quant * mf314_largepack_capacity))
-    # output
+    # freezing time
     output$Init_ice_freezeTime_dose10_FCC <- renderText({
       paste(dose10_FCC_ft, "day(s)")
     }) # Time it takes to freeze depends on how many freezers are available and their capacity. I currently assume that we only use the MF314 freezer, which is the largest, and I specify the quantity at the beginning of this script
 
+    #Initial volume of ice required 
+    dose10_FCC_init_iceVol <- dose10_FCC_RCW25_icepack_vol + dose10_FCC_vaxCarr_icepack_vol
     output$ice_vol_init_dose10_FCC <- renderText({
       paste(as.numeric(dose10_FCC_RCW25_icepack_vol), "L")
     }) # we only need 0.6L ice packs to transport the vaccines in the RCW25s. The 0.4L ones don't to play here yet
 
+    
+    
+    
     ##########################################
-    # Calculations for mixed strategy, i.e 10-dose for near population and monodose for far population
+    #' Calculations for mixed strategy, i.e 10-dose for near population and monodose for far population
     ##########################################
 
-
+    mixed_FCC_dose10_quant <- site_table$added_sites %>%
+      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+      .$near_pop/10
+    
+    mixed_FCC_monodose_quant <- site_table$added_sites %>%
+      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+      .$far_pop 
+    
+    
+    mixed_FCC_doses <- mixed_FCC_dose10_quant + mixed_FCC_monodose_quant
+    
+    mixed_FCC_dose10_final <- mixed_FCC_dose10_quant* (1 + input$buffer_stock / 100)
+    
+    mixed_FCC_monodose_final <- mixed_FCC_monodose_quant* (1 + input$buffer_stock / 100)
+    
+    mixed_FCC_doses_needed <- mixed_FCC_dose10_final + mixed_FCC_monodose_final # apply buffer. This formula doesn't seem to be making any impact
+    
+    
+    # passive cold chain needed, based on the volume of the vaccine indicated (1 RCW25 can transport 3300 doses if vax vol = 3cm3 and 5000 doses if vax vol = 2cm3)
+    if (input$vaccine_vol_dose10 == 2.1) {
+      mixed_FCC_dose10_RCW25_needs <- ceiling(mixed_FCC_dose10_final / 5000) # these numbers refer to the doses along with the diluents
+      mixed_FCC_dose10_vaxCarr_needs <- ceiling(mixed_FCC_dose10_final / 750) # vaccine carrier
+    } else if (input$vaccine_vol_dose10 == 3) {
+      mixed_FCC_dose10_RCW25_needs <- ceiling(mixed_FCC_dose10_final / 3300)
+      mixed_FCC_dose10_vaxCarr_needs <- ceiling(mixed_FCC_dose10_final / 500) # vaccine carrier
+    }
+    
+    
+    #passive cold chain required for monodose vials
+    mixed_FCC_monodose_RCW25_needs <- ceiling(mixed_FCC_monodose_final/1301)
+    mixed_FCC_monodose_vaxCarr_needs <- ceiling(mixed_FCC_monodose_final/283)
+    
+    
+    #total passive cold chain needs
+    
+    #RCW25
+    mixed_FCC_RCW25_needs <- mixed_FCC_dose10_RCW25_needs + mixed_FCC_monodose_RCW25_needs
+    
+    #vaccine carriers
+    mixed_FCC_vaxCarr_needs <- mixed_FCC_dose10_vaxCarr_needs + mixed_FCC_monodose_vaxCarr_needs
+    
+    # mixed FCC quantity of icepack needs
+    
+    #0.6L ice packs for RCW 25
+    mixed_FCC_RCW25_icepack_needs <- mixed_FCC_RCW25_needs * RCW25_icepack_needs
+    
+    
+    #0.4L ice packs for vaccine carriers
+    mixed_FCC_vaxCarr_icepack_needs <- mixed_FCC_vaxCarr_needs * vaxCarr_icepack_needs
+    
+    #total icepack needs
+    mixed_FCC_icepack_needs <- mixed_FCC_vaxCarr_icepack_needs + mixed_FCC_RCW25_icepack_needs
+    
+    #total volume of ice packs
+    
+    #0.4L
+    mixed_FCC_vaxCarr_icepack_vol <- mixed_FCC_vaxCarr_icepack_needs * 0.4
+    #0.6L
+    mixed_FCC_RCW25_icepack_vol <- mixed_FCC_RCW25_icepack_needs * 0.6
+    
+ 
+    
+    
+    
+    ###
+    #' outputs for the mixed strategy
+    ###
+    
+    #initial volume of ice required 
+    mixed_FCC_init_iceVol <- mixed_FCC_vaxCarr_icepack_vol + mixed_FCC_RCW25_icepack_vol
+    output$ice_vol_init_mixed_FCC <- renderText({
+      paste(as.numeric(mixed_FCC_init_iceVol), "L")
+    }) # we only need 0.6L ice packs to transport the vaccines in the RCW25s. The 0.4L ones don't to play here yet
+    
+   
+    mixed_FCC_ft <- ceiling((1/mf314_quant) * ((mixed_FCC_RCW25_icepack_needs / mf314_largepack_capacity) + (mixed_FCC_vaxCarr_icepack_needs / mf314_smallpack_capacity)))
+    # freezing time
+    output$Init_ice_freezeTime_mixed_FCC <- renderText({
+      paste(mixed_FCC_ft, "day(s)")
+    }) # 
+    
+    
+    # Initial number of icepacks required
+    mixed_FCC_init_icepack_quant <- mixed_FCC_RCW25_icepack_needs + mixed_FCC_vaxCarr_icepack_needs
+    output$ice_packs_required_mixed_FCC <- renderText({
+      paste(mixed_FCC_init_icepack_quant)
+    })
+    
+    
+    
+    
+    
+    
+    
+    
+    
+   ################################################################
+    #' Plots
+    #' 
+   #####################################################################
     # Results of required freezing time per strategy
     freezing_time_results <- tibble(
-      Strategy = c("monodose FCC", "10-dose FCC"),
-      time = c(monodose_FCC_ft, dose10_FCC_ft)
+      Strategy = c("monodose FCC", "10-dose FCC", "mixed FCC"),
+      time = c(monodose_FCC_ft, dose10_FCC_ft, mixed_FCC_ft)
     )
 
     # Results of initial required volume of ice per strategy
     Init_iceVol_results <- tibble(
-      Strategy = c("monodose FCC", "10-dose FCC"),
-      iceVol = c(monodose_FCC_init_iceVol, dose10_FCC_init_iceVol)
+      Strategy = c("monodose FCC", "10-dose FCC", "mixed FCC"),
+      iceVol = c(monodose_FCC_init_iceVol, dose10_FCC_init_iceVol, mixed_FCC_init_iceVol)
     )
     output$plot <- renderPlot({
       ft_plot <- ggplot(data = freezing_time_results, aes(x = Strategy, y = time)) + 
@@ -343,7 +447,7 @@ server <- function(input, output, session) {
       
       iceVol_plot <- ggplot(data = Init_iceVol_results, aes(x = Strategy, y = iceVol)) + 
         geom_bar(stat = "identity", fill = "steelblue") + 
-        ylab("Initial ice volume required (Litres)") + 
+        ylab("Initial volume of ice required (Litres)") + 
         coord_flip()
       
       #arrange the plots on a grid
