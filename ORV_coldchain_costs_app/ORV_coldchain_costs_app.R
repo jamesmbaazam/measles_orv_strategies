@@ -2,6 +2,7 @@ library(shiny)
 library(dplyr)
 library(readr)
 library(readxl)
+library(gridExtra)
 library(ggplot2)
 library(shinythemes)
 library(DT)
@@ -196,56 +197,82 @@ server <- function(input, output, session) {
     }
   })
 
-  
-  
-  
+
+
+
   # Output the table of all sites added
-  output$all_sites <- DT::renderDT(site_table$added_sites)  
-  
-  ##########################################
-  # Calculations for monodose-only FCC
-  ##########################################
-  
-  monodose_FCC_doses <- site_table$added_sites %>%
-    dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
-    dplyr::summarise(sum(near_pop, far_pop)) # number of doses needed
-  
-  monodose_FCC_doses_needed <- monodose_FCC_doses * (1 + input$buffer_stock / 100) # apply buffer. This formula doesn't seem to be making any impact
-  
-  # number of RCW25s needed, based on the volume of the vaccine indicated (1 RCW25 can transport 1301 vials/doses and a vaccine carrier can transport 283 vials/doses)
-  
-  monodose_FCC_RCW25_needs <- ceiling(monodose_FCC_doses_needed / 1301) # these numbers refer to the doses along with the diluents
-  monodose_vaxCarr_needs <- ceiling(dose10_FCC_doses_needed / 283) # vaccine carrier
-  
-  
-  # Monodose FCC RCW25 icepack needs
-  monodose_FCC_vaxCarr_icepack_needs_total <- vaxCarr_icepack_needs * monodose_vaxCarr_needs # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
-  monodose_FCC_vaxCarr_icepack_vol <- monodose_FCC_vaxCarr_icepack_needs_total * 0.4 # total volume of ice packs needed is simply the above calculation * 0.6L
-  
-  
-  # Monodose FCC Vaccine carrier icepack needs
-  monodose_FCC_RCW25_icepack_needs_total <- RCW25_icepack_needs * monodose_FCC_RCW25_needs # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
-  monodose_FCC_RCW25_icepack_vol <- monodose_FCC_RCW25_icepack_needs_total * 0.4 # total volume of ice packs needed is simply the above calculation * 0.6L
-  
-  ###
-  # outputs for monodose FCC calculations
-  ###
-  output$ice_packs_required_monodose_FCC <- renderText({
-    paste(monodose_FCC_RCW25_icepack_needs_total + monodose_FCC_vaxCarr_icepack_needs_total, "L")
-  })
-  
-  output$Init_ice_freezeTime_monodose_FCC <- renderText({
-    paste(ceiling(monodose_FCC_RCW25_icepack_needs_total / (mf314_quant * mf314_largepack_capacity)), "day(s)")
-  }) # Time it takes to freeze depends on how many freezers are available and their capacity. I currently assume that we only use the MF314 freezer, which is the largest, and I specify the quantity at the beginning of this script
-  
-  output$ice_vol_init_monodose_FCC <- renderText({
-    paste(as.numeric(monodose_FCC_RCW25_icepack_vol), "L")
-  }) # we only need 0.6L ice packs to tra
-  
-  
-  
-#calculate and show results
+  output$all_sites <- DT::renderDT(site_table$added_sites)
+
+
+
+  # calculate and show results
   observeEvent(input$show_results, {
+
+
+    # how many 0.6L ice packs will be needed for the quantity of RCW25s calculated?
+    if (input$temp == "below 40") {
+      RCW25_icepack_needs <- 12
+    } else if (input$temp == "above 40") {
+      RCW25_icepack_needs <- 18
+    }
+
+
+    # how many 0.4L ice packs will be needed for the quantity of vax carriers calculated?
+    if (input$temp == "below 40") {
+      vaxCarr_icepack_needs <- 6
+    } else if (input$temp == "above 40") {
+      vaxCarr_icepack_needs <- 8
+    }
+
+
+    ##########################################
+    # Calculations for monodose-only FCC
+    ##########################################
+
+    monodose_FCC_doses <- site_table$added_sites %>%
+      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+      dplyr::summarise(sum(near_pop, far_pop)) # number of doses needed
+
+    monodose_FCC_doses_needed <- monodose_FCC_doses * (1 + input$buffer_stock / 100) # apply buffer. This formula doesn't seem to be making any impact
+
+    # number of RCW25s needed, based on the volume of the vaccine indicated (1 RCW25 can transport 1301 vials/doses and a vaccine carrier can transport 283 vials/doses)
+
+    monodose_FCC_RCW25_needs <- ceiling(monodose_FCC_doses_needed / 1301) # these numbers refer to the doses along with the diluents
+    monodose_vaxCarr_needs <- ceiling(monodose_FCC_doses_needed / 283) # vaccine carrier
+
+
+    # Monodose FCC RCW25 icepack needs
+    monodose_FCC_vaxCarr_icepack_needs_total <- vaxCarr_icepack_needs * monodose_vaxCarr_needs # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
+    monodose_FCC_vaxCarr_icepack_vol <- monodose_FCC_vaxCarr_icepack_needs_total * 0.4 # total volume of ice packs needed is simply the above calculation * 0.6L
+
+
+    # Monodose FCC Vaccine carrier icepack needs
+    monodose_FCC_RCW25_icepack_needs_total <- RCW25_icepack_needs * monodose_FCC_RCW25_needs # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
+    monodose_FCC_RCW25_icepack_vol <- monodose_FCC_RCW25_icepack_needs_total * 0.6 # total volume of ice packs needed is simply the above calculation * 0.6L
+
+    ###
+    # outputs for monodose FCC calculations
+    ###
+    output$ice_packs_required_monodose_FCC <- renderText({
+      paste(monodose_FCC_RCW25_icepack_needs_total + monodose_FCC_vaxCarr_icepack_needs_total, "L")
+    })
+
+
+    monodose_FCC_ft <- ceiling(monodose_FCC_RCW25_icepack_needs_total / (mf314_quant * mf314_largepack_capacity)) # freezing time for icepacks
+
+    # output
+    output$Init_ice_freezeTime_monodose_FCC <- renderText({
+      paste(monodose_FCC_ft, "day(s)")
+    }) # Time it takes to freeze depends on how many freezers are available and their capacity. I currently assume that we only use the MF314 freezer, which is the largest, and I specify the quantity at the beginning of this script
+
+    monodose_FCC_init_iceVol <- monodose_FCC_RCW25_icepack_vol + monodose_FCC_vaxCarr_icepack_vol
+    output$ice_vol_init_monodose_FCC <- renderText({
+      paste(as.numeric(monodose_FCC_init_iceVol), "L")
+    }) # we only need 0.6L ice packs to tra
+
+
+
+
     ##########################################
     # Calculations for 10-dose only FCC
     ##########################################
@@ -263,20 +290,6 @@ server <- function(input, output, session) {
       dose10_FCC_vaxCarr_needs <- ceiling(dose10_FCC_doses_needed / 500) # vaccine carrier
     }
 
-    # how many 0.6L ice packs will be needed for the quantity of RCW25s calculated?
-    if (input$temp == "below 40") {
-      RCW25_icepack_needs <- 12
-    } else if (input$temp == "above 40") {
-      RCW25_icepack_needs <- 18
-    }
-
-
-    # how many 0.4L ice packs will be needed for the quantity of vax carriers calculated?
-    if (input$temp == "below 40") {
-      vaxCarr_icepack_needs <- 6
-    } else if (input$temp == "above 40") {
-      vaxCarr_icepack_needs <- 8
-    }
 
     # 10-dose FCC RCW25 icepack needs
     dose10_FCC_vaxCarr_icepack_needs_total <- vaxCarr_icepack_needs * dose10_FCC_vaxCarr_needs # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
@@ -290,25 +303,53 @@ server <- function(input, output, session) {
 
 
     # outputs for 10-dose FCC calculations
+    dose10_FCC_init_iceVol <- dose10_FCC_RCW25_icepack_needs_total + dose10_FCC_vaxCarr_icepack_needs_total
     output$ice_packs_required_dose10_FCC <- renderText({
-      paste(dose10_FCC_RCW25_icepack_needs_total + dose10_FCC_vaxCarr_icepack_needs_total, "L")
+      paste(dose10_FCC_init_iceVol, "L")
     })
 
+
+    dose10_FCC_ft <- ceiling((dose10_FCC_RCW25_icepack_needs_total) / (mf314_quant * mf314_largepack_capacity))
+    # output
     output$Init_ice_freezeTime_dose10_FCC <- renderText({
-      paste(ceiling((dose10_FCC_RCW25_icepack_needs_total) / (mf314_quant * mf314_largepack_capacity)), "day(s)")
-      }) # Time it takes to freeze depends on how many freezers are available and their capacity. I currently assume that we only use the MF314 freezer, which is the largest, and I specify the quantity at the beginning of this script
+      paste(dose10_FCC_ft, "day(s)")
+    }) # Time it takes to freeze depends on how many freezers are available and their capacity. I currently assume that we only use the MF314 freezer, which is the largest, and I specify the quantity at the beginning of this script
 
     output$ice_vol_init_dose10_FCC <- renderText({
       paste(as.numeric(dose10_FCC_RCW25_icepack_vol), "L")
     }) # we only need 0.6L ice packs to transport the vaccines in the RCW25s. The 0.4L ones don't to play here yet
 
+    ##########################################
+    # Calculations for mixed strategy, i.e 10-dose for near population and monodose for far population
+    ##########################################
 
 
-  
+    # Results of required freezing time per strategy
+    freezing_time_results <- tibble(
+      Strategy = c("monodose FCC", "10-dose FCC"),
+      time = c(monodose_FCC_ft, dose10_FCC_ft)
+    )
 
-
-})
-
+    # Results of initial required volume of ice per strategy
+    Init_iceVol_results <- tibble(
+      Strategy = c("monodose FCC", "10-dose FCC"),
+      iceVol = c(monodose_FCC_init_iceVol, dose10_FCC_init_iceVol)
+    )
+    output$plot <- renderPlot({
+      ft_plot <- ggplot(data = freezing_time_results, aes(x = Strategy, y = time)) + 
+        geom_bar(stat = "identity", fill = "steelblue") + 
+        ylab("Freezing time required (days)") +
+        coord_flip()
+      
+      iceVol_plot <- ggplot(data = Init_iceVol_results, aes(x = Strategy, y = iceVol)) + 
+        geom_bar(stat = "identity", fill = "steelblue") + 
+        ylab("Initial ice volume required (Litres)") + 
+        coord_flip()
+      
+      #arrange the plots on a grid
+      grid.arrange(ft_plot, iceVol_plot, ncol = 2)
+    })
+  })
 }
 
 # Run the application
