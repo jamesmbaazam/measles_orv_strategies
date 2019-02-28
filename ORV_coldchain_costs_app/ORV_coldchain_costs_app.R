@@ -15,12 +15,13 @@ library(DT)
 # FIXED PARAMETERS
 
 # active cold chain
-mf314_quant <- 20
 mf314_largepack_capacity <- 323 # large pack refers to 0.6L icepacks
 mf314_smallpack_capacity <- 450 # small pack refers to 0.4L icepacks
 
-
-
+mf314_largepack_fr <- 54 #fr = freezing rate per day for large icepacks
+mf314_smallpack_fr <- 81 #fr = freezing rate per day for large icepacks
+  
+  
 # Passive cold chain gross volume
 rcw25_grossVol <- 43735.296 / 1E3 # convert to litres
 vax_carrier_grossVol <- 9504 / 1E3
@@ -82,8 +83,8 @@ ui <- fluidPage(
       br(),
       selectInput("vaccine_vol_monodose", "Monodose vaccine volume (cm3)", choices = c(21.09)),
 
-      # br(),
-      # selectInput('site_to_analyse', 'Row number of site to analyse', selected = 1, choices = c(1, nrow(site_table$added_sites))),
+       br(),
+      numericInput('mf314_quant', 'Number of MF314 available', value = 1, min = 1, step = 1),
 
       br(),
       actionButton("show_results", "Display results")
@@ -250,6 +251,8 @@ server <- function(input, output, session) {
     monodose_FCC_RCW25_icepack_needs_total <- RCW25_icepack_needs * monodose_FCC_RCW25_needs # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
     monodose_FCC_RCW25_icepack_vol <- monodose_FCC_RCW25_icepack_needs_total * 0.6 # total volume of ice packs needed is simply the above calculation * 0.6L
 
+    #total needs
+    monodose_FCC_init_icepack_quant <- monodose_FCC_RCW25_icepack_needs_total + monodose_FCC_vaxCarr_icepack_needs_total
     ###
     # outputs for monodose FCC calculations
     ###
@@ -258,7 +261,7 @@ server <- function(input, output, session) {
     })
 
 
-    monodose_FCC_ft <- ceiling(monodose_FCC_RCW25_icepack_needs_total / (mf314_quant * mf314_largepack_capacity)) # freezing time for icepacks
+    monodose_FCC_ft <- ceiling(monodose_FCC_init_icepack_quant / (input$mf314_quant * (mf314_largepack_fr + mf314_smallpack_fr))) # freezing time for icepacks
 
     # output
     output$Init_ice_freezeTime_monodose_FCC <- renderText({
@@ -309,7 +312,7 @@ server <- function(input, output, session) {
     })
 
 
-    dose10_FCC_ft <- ceiling((dose10_FCC_RCW25_icepack_needs_total) / (mf314_quant * mf314_largepack_capacity))
+    dose10_FCC_ft <- ceiling((dose10_FCC_init_icepack_quant) / (input$mf314_quant * (mf314_largepack_fr + mf314_smallpack_fr)))
     # freezing time
     output$Init_ice_freezeTime_dose10_FCC <- renderText({
       paste(dose10_FCC_ft, "day(s)")
@@ -403,7 +406,7 @@ server <- function(input, output, session) {
     }) # we only need 0.6L ice packs to transport the vaccines in the RCW25s. The 0.4L ones don't to play here yet
     
    
-    mixed_FCC_ft <- ceiling((1/mf314_quant) * ((mixed_FCC_RCW25_icepack_needs / mf314_largepack_capacity) + (mixed_FCC_vaxCarr_icepack_needs / mf314_smallpack_capacity)))
+    mixed_FCC_ft <- ceiling(mixed_FCC_icepack_needs/(input$mf314_quant * (mf314_largepack_fr + mf314_smallpack_fr)))
     # freezing time
     output$Init_ice_freezeTime_mixed_FCC <- renderText({
       paste(mixed_FCC_ft, "day(s)")
