@@ -1,7 +1,14 @@
 library(shiny)
+library(dplyr)
+library(readr)
+library(readxl)
+library(gridExtra)
+library(ggplot2)
+library(shinythemes)
+library(DT)
 
 #source helper scripts
-source('./calculation_functions.R')
+source('./params.R')
 
 # Note: Throughout the code, FCC means Full Cold Chain, dose10 means 10-dose
 
@@ -234,6 +241,29 @@ server <- function(input, output, session) {
       paste(as.numeric(monodose_FCC_init_iceVol), "L")
     }) # we only need 0.6L ice packs to tra
     
+    
+    ##team days calculations
+    #size of near population 
+    near_pop_monodoseFCC <- site_table$added_sites %>%
+      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+      .$near_pop # number of doses needed
+    
+    team_days_fixed_monodoseFCC <- near_pop_monodoseFCC / tp_fixed
+    
+    #size of near population 
+    far_pop_monodoseFCC <- site_table$added_sites %>%
+      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+      .$far_pop # number of doses needed
+    
+    #output for team days required for fixed teams
+    output$tdf_monodoseFCC <- renderText({
+      paste0(as.numeric(round(near_pop_monodoseFCC / tp_fixed), digits = 1))
+    })
+    
+    #output for team days required for mobile teams
+    output$tdm_monodoseFCC <- renderText({
+      paste0(as.numeric(round(far_pop_monodoseFCC / tp_mobile), digits = 1))
+    })
     
     
     
