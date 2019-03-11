@@ -1,12 +1,3 @@
-library(dplyr)
-library(readr)
-library(readxl)
-library(gridExtra)
-library(ggplot2)
-library(shinythemes)
-library(DT)
-
-
 # FIXED PARAMETERS
 
 # active cold chain
@@ -34,6 +25,21 @@ vax_carrier_ice_capacity <- vax_carrier_grossVol - vax_carrier_netVol
 # Vaccines are assumed to have a volume of 2.5cm^3 per dose
 monodose_pvd <- 33.618 / 1E3
 dose_10_pvd <- 2.42324 / 1E3 # multi-dose refers to 10 doses
+
+
+
+#expected vaccination rate per team type
+tp_fixed <- 450 #tp= team performance, in other words, how many people a fixed team is expected to vax per day (unit = people per day)
+tp_mobile <- 250
+
+
+
+#wastage factors
+#Wastage here refers to open vial wastage. Other forms of wastage haven't been accounted for yet.
+#we assume the monodose has no wastage.
+dose10_wastage_ft <- 1.17 #wastage factor for fixed teams, ft, 15% wastage of every 100 doses; known/commonly used by MSF for all campaigns across all strategies
+dose10_wastage_mt <- 1.43 #wastage factor for mobile teams, mt, 30% (twice, compared to fixed teams); I'm assuming this 
+
 
 
 # DATA
