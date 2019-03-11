@@ -248,21 +248,24 @@ server <- function(input, output, session) {
       dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
       .$near_pop # number of doses needed
     
-    team_days_fixed_monodoseFCC <- near_pop_monodoseFCC / tp_fixed
+    team_days_fixed_monodoseFCC <- (near_pop_monodoseFCC * (1 + input$buffer_stock / 100)) / tp_fixed
     
     #size of near population 
     far_pop_monodoseFCC <- site_table$added_sites %>%
       dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
       .$far_pop # number of doses needed
     
+    
+    team_days_mobile_monodoseFCC <- (far_pop_monodoseFCC * (1 + input$buffer_stock / 100)) / tp_mobile
+    
     #output for team days required for fixed teams
     output$tdf_monodoseFCC <- renderText({
-      paste0(as.numeric(round(near_pop_monodoseFCC / tp_fixed), digits = 1))
+      paste0(as.numeric(round(team_days_fixed_monodoseFCC, digits = 1))) 
     })
     
     #output for team days required for mobile teams
     output$tdm_monodoseFCC <- renderText({
-      paste0(as.numeric(round(far_pop_monodoseFCC / tp_mobile), digits = 1))
+      paste0(as.numeric(round(team_days_mobile_monodoseFCC, digits = 1)))
     })
     
     
@@ -270,11 +273,31 @@ server <- function(input, output, session) {
     ##########################################
     # Calculations for 10-dose only FCC
     ##########################################
-    dose10_FCC_doses <- site_table$added_sites %>%
-      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
-      dplyr::summarise(sum(near_pop, far_pop) / 10) # number of doses needed
     
-    dose10_FCC_doses_needed <- dose10_FCC_doses * (1 + input$buffer_stock / 100) # apply buffer. This formula doesn't seem to be making any impact
+    
+    # dose10_FCC_doses <- site_table$added_sites %>%
+    #   dplyr::slice(1)  # for now, we are only going to concentrate on one site. User indicates which site to analyse
+    #   dplyr::summarise(sum(near_pop, far_pop) / 10) # number of doses needed
+    #   
+      
+    dose10_FCC_doses_near_pop <-  site_table$added_sites %>%
+      dplyr::slice(1) %>% 
+      .$near_pop/10
+    
+    dose10_FCC_doses_far_pop <-  site_table$added_sites %>%
+      dplyr::slice(1) %>% 
+      .$far_pop/10
+    
+    #doses required for near population after wastage penalty
+    dose10_FCC_doses_near_pop_req <- dose10_FCC_doses_near_pop * dose10_wastage_ft
+    
+    #doses required for far population after wastage penalty
+    dose10_FCC_doses_far_pop_req <- dose10_FCC_doses_far_pop * dose10_wastage_mt
+    
+    #number of doses required after buffer 
+    dose10_FCC_doses_needed <- (dose10_FCC_doses_near_pop_req + dose10_FCC_doses_far_pop_req) * (1 + input$buffer_stock / 100)
+    
+   # dose10_FCC_doses_needed <- dose10_FCC_doses * (1 + input$buffer_stock / 100) # apply buffer. This formula doesn't seem to be making any impact
     # number of RCW25s needed, based on the volume of the vaccine indicated (1 RCW25 can transport 3300 doses if vax vol = 3cm3 and 5000 doses if vax vol = 2cm3)
     if (input$vaccine_vol_dose10 == 2.1) {
       dose10_FCC_RCW25_needs <- ceiling(dose10_FCC_doses_needed / 5000) # these numbers refer to the doses along with the diluents
@@ -315,6 +338,21 @@ server <- function(input, output, session) {
       paste(as.numeric(dose10_FCC_RCW25_icepack_vol), "L")
     }) # we only need 0.6L ice packs to transport the vaccines in the RCW25s. The 0.4L ones don't to play here yet
     
+    ##team days calculations
+    #size of near population 
+    
+    team_days_fixed_dose10_FCC <- dose10_FCC_doses_near_pop_req / tp_fixed #computationally, we see the number doses as the number of expected people
+    team_days_mobile_dose10_FCC <- dose10_FCC_doses_far_pop_req / tp_mobile
+    
+    #output for team days required for fixed teams
+    output$tdf_dose10_FCC <- renderText({
+      paste0(as.numeric(round(team_days_fixed_dose10_FCC, digits = 1)))
+    })
+    
+    #output for team days required for mobile teams
+    output$tdm_dose10_FCC <- renderText({
+      paste0(as.numeric(round(team_days_mobile_dose10_FCC, digits = 1)))
+    })
     
     
     
