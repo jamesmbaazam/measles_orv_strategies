@@ -450,7 +450,21 @@ server <- function(input, output, session) {
     
     
     
+    ##team days calculations
+    #size of near population 
     
+    team_days_fixed_mixedFCC_near_pop <- (mixed_FCC_dose10_final * dose10_wastage_ft) / tp_fixed #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
+    team_days_mobile_mixedFCC_far <- mixed_FCC_monodose_final / tp_mobile
+    
+    #output for team days required for fixed teams
+    output$tdf_mixed_FCC <- renderText({
+      paste0(as.numeric(round(team_days_fixed_mixedFCC_near_pop, digits = 1)))
+    })
+    
+    #output for team days required for mobile teams
+    output$tdm_mixed_FCC <- renderText({
+      paste0(as.numeric(round(team_days_mobile_mixedFCC_far, digits = 1)))
+    })
     
     
     
