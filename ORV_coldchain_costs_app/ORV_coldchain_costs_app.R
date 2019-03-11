@@ -35,10 +35,10 @@ ui <- fluidPage(
       numericInput("buffer_stock", "Buffer stock (out of 100)", value = 1, min = 1, step = 0.01),
       
       br(),
-      selectInput("vaccine_vol_dose10", "10-dose vaccine volume (cm3)", choices = c(2.1, 3), selected = 2.1),
+      selectInput("vaccine_vol_dose10", "10-dose: Volume per dose (cm3)", choices = c(2.1, 3), selected = 2.1),
       
       br(),
-      selectInput("vaccine_vol_monodose", "Monodose vaccine volume (cm3)", choices = c(21.09)),
+      selectInput("vaccine_vol_monodose", "Monodose Volume per dose (cm3)", choices = c(21.09)),
       
       br(),
       numericInput('mf314_quant', 'Number of MF314 available', value = 1, min = 1, step = 1),
@@ -107,12 +107,12 @@ server <- function(input, output, session) {
   
   # empty data frame for storing results
   
-  results <- reactiveValues(
-    monodose_FCC = NULL,
-    dose10_FCC = NULL,
-    mixed_FCC = NULL
-  ) # mixed_FCC means, in the Full Cold Chain, we'll vax near with 10-dose, and far with monodose
-  
+  # results <- reactiveValues(
+  #   monodose_FCC = NULL,
+  #   dose10_FCC = NULL,
+  #   mixed_FCC = NULL
+  # ) # mixed_FCC means, in the Full Cold Chain, we'll vax near with 10-dose, and far with monodose
+  # 
   
   
   
@@ -123,9 +123,7 @@ server <- function(input, output, session) {
       numericInput("dist_from_base_new", "Distance from field base to site (km)?", value = 0, min = 0, step = 0.01),
       numericInput("near_pop_new", "On site, how many people can be served with a fixed post?", value = 0, min = 0, step = 1),
       numericInput("far_pop_new", "On site, how many people should be served by mobile teams?", value = 0, min = 0, step = 1),
-      numericInput("site_team_req", "How many teams are available for this site?", value = 0, min = 0, step = 1),
-      #numericInput("team_days_fixed_new", "How long does a fixed post need to serve target near population (days)?", value = 0, min = 0, step = 0.1),
-      #numericInput("team_days_mobile_new", "How long does a mobile team need to serve target far population (days)?", value = 0, min = 0, step = 0.1),
+      numericInput("site_team_alloc_new", "How many teams are available for this site?", value = 0, min = 0, step = 1),
       fade = TRUE,
       footer = tagList(
         modalButton("Dismiss"),
@@ -140,21 +138,21 @@ server <- function(input, output, session) {
     if (input$dist_from_base_new == 0 &
         input$near_pop_new == 0 &
         input$far_pop_new == 0 &
-        input$team_days_fixed_new == 0
-        & input$team_days_mobile_new == 0) {
-      showModal(modalDialog(title = "warning!", "No information was added. So, no site will be added")) # if user doesn't change the default values, but mistakenly clicks on add site, no site will be added.
-      site_new$data <- NULL
-      site_table$added_sites <- bind_rows(site_table$added_sites, site_new$data)
+        input$site_team_alloc_new == 0
+        )
+      {
+      showModal(
+        modalDialog(
+        title = "warning!", "No information was added. So, no site will be added")
+                ) # if user doesn't change the default values, but mistakenly clicks on add site, no site will be added.
     } else {
-      site_new$data <- tibble(
+        site_new$data <- tibble(
         dist_from_base = input$dist_from_base_new,
         near_pop = input$near_pop_new,
         far_pop = input$far_pop_new,
-        team_days_fixed = input$team_days_fixed_new,
-        team_days_mobile = input$team_days_mobile_new
+        site_team_alloc = input$site_team_alloc_new
       )
       site_table$added_sites <- bind_rows(site_table$added_sites, site_new$data)
-      # site_info_table <- bind_rows(site_info_table, site_new$data)
       removeModal()
     }
   })
@@ -182,22 +180,6 @@ server <- function(input, output, session) {
                                      "above 40" = 8
     )
     
-    
-    # 
-    # if (input$temp == "below 40") {
-    #   RCW25_icepack_needs <- 12
-    # } else if (input$temp == "above 40") {
-    #   RCW25_icepack_needs <- 18
-    # }
-    
-    
-    # how many 0.4L ice packs will be needed for the quantity of vax carriers calculated?
-    # if (input$temp == "below 40") {
-    #   vaxCarr_icepack_needs <- 6
-    # } else if (input$temp == "above 40") {
-    #   vaxCarr_icepack_needs <- 8
-    # }
-    # 
     
     ##########################################
     # Calculations for monodose-only FCC
