@@ -68,8 +68,10 @@ ui <- fluidPage(
                          wellPanel(htmlOutput("ice_packs_required_monodose_FCC")),
                          tags$h4("Time needed to freeze initial ice"),
                          wellPanel(htmlOutput("Init_ice_freezeTime_monodose_FCC")),
-                         tags$h4("Total required team days (over all sites)"),
-                         wellPanel(htmlOutput("teamDays_req_monodoseFCC"))
+                         tags$h4("Fixed team days required (over all sites)"),
+                         wellPanel(htmlOutput("tdf_monodoseFCC")), #tdf = team days fixed
+                         tags$h4("Mobile team days required (over all sites)"),
+                         wellPanel(htmlOutput("tdm_monodoseFCC")) #tdm = team days mobile
                        ),
                        tabPanel(
                          title = "10-dose FCC",
@@ -79,8 +81,10 @@ ui <- fluidPage(
                          wellPanel(htmlOutput("ice_packs_required_dose10_FCC")),
                          tags$h4("Time needed to freeze initial ice"),
                          wellPanel(htmlOutput("Init_ice_freezeTime_dose10_FCC")),
-                         tags$h4("Total required team days (over all sites)"),
-                         wellPanel(htmlOutput("teamDays_req_dose10_FCC"))
+                         tags$h4("Fixed team days required (over all sites)"),
+                         wellPanel(htmlOutput("tdf_dose10_FCC")), #tdf = team days fixed
+                         tags$h4("Mobile team days required (over all sites)"),
+                         wellPanel(htmlOutput("tdm_dose10_FCC")) #tdm = team days mobile
                        ),
                        tabPanel(
                          title = "Mixed FCC",
@@ -90,8 +94,10 @@ ui <- fluidPage(
                          wellPanel(htmlOutput("ice_packs_required_mixed_FCC")),
                          tags$h4("Time needed to freeze initial ice"),
                          wellPanel(htmlOutput("Init_ice_freezeTime_mixed_FCC")),
-                         tags$h4("Total required team days (over all sites)"),
-                         wellPanel(htmlOutput("teamDays_req_mixedFCC"))
+                         tags$h4("Fixed team days required (over all sites)"),
+                         wellPanel(htmlOutput("tdf_mixed_FCC")), #tdf = team days fixed
+                         tags$h4("Mobile team days required (over all sites)"),
+                         wellPanel(htmlOutput("tdm_mixed_FCC")) #tdm = team days mobile
                        )
                      )
   ))
