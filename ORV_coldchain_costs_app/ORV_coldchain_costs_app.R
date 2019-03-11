@@ -248,24 +248,26 @@ server <- function(input, output, session) {
       dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
       .$near_pop # number of doses needed
     
-    team_days_fixed_monodoseFCC <- (near_pop_monodoseFCC * (1 + input$buffer_stock / 100)) / tp_fixed
+    team_days_fixed_monodose_FCC <- round((near_pop_monodoseFCC * (1 + input$buffer_stock / 100)) / tp_fixed, 1)
     
-    #size of near population 
+  
+    #output for team days required for fixed teams
+    output$tdf_monodoseFCC <- renderText({
+      paste0(as.numeric(team_days_fixed_monodose_FCC)) 
+    })
+    
+    
+    #size of far population 
     far_pop_monodoseFCC <- site_table$added_sites %>%
       dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
       .$far_pop # number of doses needed
     
     
-    team_days_mobile_monodoseFCC <- (far_pop_monodoseFCC * (1 + input$buffer_stock / 100)) / tp_mobile
-    
-    #output for team days required for fixed teams
-    output$tdf_monodoseFCC <- renderText({
-      paste0(as.numeric(round(team_days_fixed_monodoseFCC, digits = 1))) 
-    })
+    team_days_mobile_monodose_FCC <- round((far_pop_monodoseFCC * (1 + input$buffer_stock / 100)) / tp_mobile, 1)
     
     #output for team days required for mobile teams
     output$tdm_monodoseFCC <- renderText({
-      paste0(as.numeric(round(team_days_mobile_monodoseFCC, digits = 1)))
+      paste0(as.numeric(team_days_mobile_monodose_FCC))
     })
     
     
@@ -339,19 +341,21 @@ server <- function(input, output, session) {
     }) # we only need 0.6L ice packs to transport the vaccines in the RCW25s. The 0.4L ones don't to play here yet
     
     ##team days calculations
-    #size of near population 
-    
-    team_days_fixed_dose10_FCC <- dose10_FCC_doses_near_pop_req / tp_fixed #computationally, we see the number doses as the number of expected people
-    team_days_mobile_dose10_FCC <- dose10_FCC_doses_far_pop_req / tp_mobile
+    #size of near population
+   
+    team_days_fixed_dose10_FCC <- round(dose10_FCC_doses_near_pop_req / tp_fixed, 1) #computationally, we see the number doses as the number of expected people
     
     #output for team days required for fixed teams
     output$tdf_dose10_FCC <- renderText({
-      paste0(as.numeric(round(team_days_fixed_dose10_FCC, digits = 1)))
+      paste0(as.numeric(team_days_fixed_dose10_FCC))
     })
+    
+    
+    team_days_mobile_dose10_FCC <- round(dose10_FCC_doses_far_pop_req / tp_mobile, 1)
     
     #output for team days required for mobile teams
     output$tdm_dose10_FCC <- renderText({
-      paste0(as.numeric(round(team_days_mobile_dose10_FCC, digits = 1)))
+      paste0(as.numeric(team_days_mobile_dose10_FCC))
     })
     
     
@@ -453,17 +457,17 @@ server <- function(input, output, session) {
     ##team days calculations
     #size of near population 
     
-    team_days_fixed_mixedFCC_near_pop <- (mixed_FCC_dose10_final * dose10_wastage_ft) / tp_fixed #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
-    team_days_mobile_mixedFCC_far <- mixed_FCC_monodose_final / tp_mobile
+    team_days_fixed_mixed_FCC <- round((mixed_FCC_dose10_final * dose10_wastage_ft) / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
+    team_days_mobile_mixed_FCC <- round(mixed_FCC_monodose_final / tp_mobile, 1)
     
     #output for team days required for fixed teams
     output$tdf_mixed_FCC <- renderText({
-      paste0(as.numeric(round(team_days_fixed_mixedFCC_near_pop, digits = 1)))
+      paste0(as.numeric(team_days_fixed_mixed_FCC))
     })
     
     #output for team days required for mobile teams
     output$tdm_mixed_FCC <- renderText({
-      paste0(as.numeric(round(team_days_mobile_mixedFCC_far, digits = 1)))
+      paste0(as.numeric(team_days_mobile_mixed_FCC))
     })
     
     
@@ -471,33 +475,90 @@ server <- function(input, output, session) {
     
     
     ################################################################
-    #' Plots
+    #' Combining the results and plotting
     #' 
     #####################################################################
+    
+    Strategy_list <- c("monodose FCC", "10-dose FCC", "mixed FCC")
+    team_type_list <- c('fixed post', 'mobile team')
+    
+    #plot theme
+    plot_theme <-  theme(title = element_text(size = 12,
+                                              face = 'bold'
+    )
+    )
+    
+    #Making the tibbles!!!!
     # Results of required freezing time per strategy
     freezing_time_results <- tibble(
-      Strategy = c("monodose FCC", "10-dose FCC", "mixed FCC"),
+      Strategy = Strategy_list,
       time = c(monodose_FCC_ft, dose10_FCC_ft, mixed_FCC_ft)
     )
     
     # Results of initial required volume of ice per strategy
     Init_iceVol_results <- tibble(
-      Strategy = c("monodose FCC", "10-dose FCC", "mixed FCC"),
+      Strategy = Strategy_list,
       iceVol = c(monodose_FCC_init_iceVol, dose10_FCC_init_iceVol, mixed_FCC_init_iceVol)
     )
+    
+    
+    #Results of team days calculations
+    td_results <- tibble(
+      Strategy = rep(Strategy_list, each = 2),
+      team_type = rep(team_type_list, times = 3),
+      team_days = c(team_days_fixed_monodose_FCC, 
+                    team_days_mobile_monodose_FCC, 
+                    team_days_fixed_dose10_FCC, 
+                    team_days_mobile_dose10_FCC, 
+                    team_days_fixed_mixed_FCC, 
+                    team_days_mobile_mixed_FCC
+                    )
+    )
+    
+    
+    #Making the plots!!!
     output$plot <- renderPlot({
-      ft_plot <- ggplot(data = freezing_time_results, aes(x = Strategy, y = time)) + 
+      ft_plot <- ggplot(data = freezing_time_results, 
+                        aes(x = Strategy, y = time)
+                        ) + 
         geom_bar(stat = "identity", fill = "steelblue") + 
-        ylab("Freezing time required (days)") +
-        coord_flip()
+        labs(title = 'Freezing time required per strategy', 
+             y = "Freezing time required (days)"
+             ) + 
+       plot_theme
       
-      iceVol_plot <- ggplot(data = Init_iceVol_results, aes(x = Strategy, y = iceVol)) + 
+      iceVol_plot <- ggplot(data = Init_iceVol_results, 
+                            aes(x = Strategy, 
+                                y = iceVol)
+                            ) + 
         geom_bar(stat = "identity", fill = "steelblue") + 
-        ylab("Initial volume of ice required (Litres)") + 
-        coord_flip()
+        labs(title = 'Initial volume of ice required per strategy', 
+             y = "Initial volume of ice required (Litres)"
+             ) + 
+        plot_theme
+      
+      td_plot <- ggplot(data = td_results, 
+                        aes(x = Strategy, 
+                            y = team_days,
+                            fill = team_type
+                            )
+                        ) + 
+        geom_bar(stat = 'identity',
+                 position = 'dodge'
+                 ) + 
+        labs(title = 'Number of days per team type and strategy', 
+             y = "Team days"
+             ) +
+        scale_fill_manual(values = c("royalblue4", "tomato3"), 
+                          name = "Team type",
+                          breaks = team_type_list) +
+        plot_theme
       
       #arrange the plots on a grid
-      grid.arrange(ft_plot, iceVol_plot, ncol = 2)
+      grid.arrange(ft_plot, 
+                   iceVol_plot, 
+                   td_plot,
+                   ncol = 3)
     })
   })
 }
