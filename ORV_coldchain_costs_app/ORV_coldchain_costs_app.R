@@ -78,7 +78,9 @@ ui <- fluidPage(
                          tags$h4("Fixed team days required (over all sites)"),
                          wellPanel(htmlOutput("tdf_monodoseFCC")), #tdf = team days fixed
                          tags$h4("Mobile team days required (over all sites)"),
-                         wellPanel(htmlOutput("tdm_monodoseFCC")) #tdm = team days mobile
+                         wellPanel(htmlOutput("tdm_monodoseFCC")), 
+                         tags$h4("Team duration on site"),
+                         wellPanel(htmlOutput("team_dur_monodoseFCC")) 
                        ),
                        tabPanel(
                          title = "10-dose FCC",
@@ -242,7 +244,10 @@ server <- function(input, output, session) {
     }) # we only need 0.6L ice packs to tra
     
     
-    ##team days calculations
+    #######
+    #team days calculations
+    #######
+    
     #size of near population 
     near_pop_monodoseFCC <- site_table$added_sites %>%
       dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
@@ -265,12 +270,56 @@ server <- function(input, output, session) {
     
     team_days_mobile_monodose_FCC <- round((far_pop_monodoseFCC * (1 + input$buffer_stock / 100)) / tp_mobile, 1)
     
-    #output for team days required for mobile teams
+    
     output$tdm_monodoseFCC <- renderText({
       paste0(as.numeric(team_days_mobile_monodose_FCC))
     })
     
     
+    #######
+    # Calculations and output for team days required for mobile teams
+    #######
+    
+    #Extract size of allocated team from the sites table
+    site_teams_monodoseFCC <- site_table$added_sites %>%
+      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+      .$site_team_alloc # number of teams allocated to site
+
+    #output for the duration that each team type will spend on site
+    if (site_teams_monodoseFCC == 0) {
+      output$team_dur_monodoseFCC <- renderText(
+        print('<b> No teams were allocated </b>')
+      )
+    }else if (site_teams_monodoseFCC == 1) {
+      output$team_dur_monodoseFCC <- renderText({
+        paste(
+          "In sequence,"
+          , "<b> Fixed post </b> team will spend"
+          , team_days_fixed_monodose_FCC
+          , "days"
+          , "<br>"
+          , "<b> Mobile </b> team will spend"
+          , team_days_mobile_monodose_FCC
+          , "<br>"
+          , "<b> Total: </b>"
+          , team_days_fixed_monodose_FCC + team_days_mobile_monodose_FCC
+        )
+      })
+    } else{
+      output$team_dur_monodoseFCC <- renderText({
+        paste(
+          site_teams_monodoseFCC - 1
+          , "<b> Fixed post </b> teams will spend"
+          , round((team_days_fixed_monodose_FCC / (site_teams_monodoseFCC - 1)), digits = 1)
+          , "days."
+          , "<br>"
+          , "1"
+          , "<b> Mobile </b> team will spend"
+          , team_days_mobile_monodose_FCC
+          , "days."
+        )
+      })
+    }
     
     ##########################################
     # Calculations for 10-dose only FCC
