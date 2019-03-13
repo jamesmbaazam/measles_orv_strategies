@@ -79,7 +79,7 @@ ui <- fluidPage(
                          wellPanel(htmlOutput("tdf_monodoseFCC")), #tdf = team days fixed
                          tags$h4("Mobile team days required (over all sites)"),
                          wellPanel(htmlOutput("tdm_monodoseFCC")), 
-                         tags$h4("Team duration on site"),
+                         tags$h4("Duration of team types on site"),
                          wellPanel(htmlOutput("team_dur_monodoseFCC")) 
                        ),
                        tabPanel(
@@ -93,7 +93,9 @@ ui <- fluidPage(
                          tags$h4("Fixed team days required (over all sites)"),
                          wellPanel(htmlOutput("tdf_dose10_FCC")), #tdf = team days fixed
                          tags$h4("Mobile team days required (over all sites)"),
-                         wellPanel(htmlOutput("tdm_dose10_FCC")) #tdm = team days mobile
+                         wellPanel(htmlOutput("tdm_dose10_FCC")), #tdm = team days mobile
+                         tags$h4("Duration of team types on site"),
+                         wellPanel(htmlOutput("team_dur_dose10_FCC"))  
                        ),
                        tabPanel(
                          title = "Mixed FCC",
@@ -106,7 +108,9 @@ ui <- fluidPage(
                          tags$h4("Fixed team days required (over all sites)"),
                          wellPanel(htmlOutput("tdf_mixed_FCC")), #tdf = team days fixed
                          tags$h4("Mobile team days required (over all sites)"),
-                         wellPanel(htmlOutput("tdm_mixed_FCC")) #tdm = team days mobile
+                         wellPanel(htmlOutput("tdm_mixed_FCC")), #tdm = team days mobile
+                         tags$h4("Duration of team types on site"),
+                         wellPanel(htmlOutput("team_dur_mixed_FCC"))  
                        )
                      )
   ))
@@ -277,7 +281,7 @@ server <- function(input, output, session) {
     
     
     #######
-    # Calculations and output for team days required for mobile teams
+    # Team allocation calculations and output
     #######
     
     #Extract size of allocated team from the sites table
@@ -309,7 +313,7 @@ server <- function(input, output, session) {
       output$team_dur_monodoseFCC <- renderText({
         paste(
           site_teams_monodoseFCC - 1
-          , "<b> Fixed post </b> teams will spend"
+          , "<b> Fixed post </b> teams will each spend"
           , round((team_days_fixed_monodose_FCC / (site_teams_monodoseFCC - 1)), digits = 1)
           , "days."
           , "<br>"
@@ -407,7 +411,50 @@ server <- function(input, output, session) {
       paste0(as.numeric(team_days_mobile_dose10_FCC))
     })
     
+    #######
+    # Team allocation calculations and output
+    #######
     
+    #Extract size of allocated team from the sites table
+    site_teams_dose10_FCC <- site_table$added_sites %>%
+      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+      .$site_team_alloc # number of teams allocated to site
+    
+    #output for the duration that each team type will spend on site
+    if (site_teams_dose10_FCC == 0) {
+      output$team_dur_dose10_FCC <- renderText(
+        print('<b> No teams were allocated </b>')
+      )
+    }else if (site_teams_dose10_FCC == 1) {
+      output$team_dur_dose10_FCC <- renderText({
+        paste(
+          "In sequence,"
+          , "<b> Fixed post </b> team will spend"
+          , team_days_fixed_dose10_FCC
+          , "days"
+          , "<br>"
+          , "<b> Mobile </b> team will spend"
+          , team_days_fixed_dose10_FCC
+          , "<br>"
+          , "<b> Total: </b>"
+          , team_days_fixed_dose10_FCC + team_days_mobile_dose10_FCC
+        )
+      })
+    } else{
+      output$team_dur_dose10_FCC <- renderText({
+        paste(
+          site_teams_dose10_FCC - 1
+          , "<b> Fixed post </b> teams will each spend"
+          , round((team_days_fixed_dose10_FCC / (site_teams_dose10_FCC - 1)), digits = 1)
+          , "days."
+          , "<br>"
+          , "1"
+          , "<b> Mobile </b> team will spend"
+          , team_days_mobile_dose10_FCC
+          , "days."
+        )
+      })
+    }
     
     ##########################################
     #' Calculations for mixed strategy, i.e 10-dose for near population and monodose for far population
