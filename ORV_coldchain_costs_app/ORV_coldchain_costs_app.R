@@ -9,6 +9,7 @@ library(DT)
 
 #source helper scripts
 source('./params.R')
+source('./calculator_functions.R')
 
 # Note: Throughout the code, FCC means Full Cold Chain, dose10 means 10-dose
 
@@ -285,45 +286,14 @@ server <- function(input, output, session) {
     #######
     
     #Extract size of allocated team from the sites table
-    site_teams_monodoseFCC <- site_table$added_sites %>%
-      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
-      .$site_team_alloc # number of teams allocated to site
+    site_teams_monodoseFCC <- extract_site_team_size(site_table$added_sites)
 
-    #output for the duration that each team type will spend on site
-    if (site_teams_monodoseFCC == 0) {
-      output$team_dur_monodoseFCC <- renderText(
-        print('<b> No teams were allocated </b>')
-      )
-    }else if (site_teams_monodoseFCC == 1) {
-      output$team_dur_monodoseFCC <- renderText({
-        paste(
-          "In sequence,"
-          , "<b> Fixed post </b> team will spend"
-          , team_days_fixed_monodose_FCC
-          , "days"
-          , "<br>"
-          , "<b> Mobile </b> team will spend"
-          , team_days_mobile_monodose_FCC
-          , "<br>"
-          , "<b> Total: </b>"
-          , team_days_fixed_monodose_FCC + team_days_mobile_monodose_FCC
-        )
-      })
-    } else{
-      output$team_dur_monodoseFCC <- renderText({
-        paste(
-          site_teams_monodoseFCC - 1
-          , "<b> Fixed post </b> teams will each spend"
-          , round((team_days_fixed_monodose_FCC / (site_teams_monodoseFCC - 1)), digits = 1)
-          , "days."
-          , "<br>"
-          , "1"
-          , "<b> Mobile </b> team will spend"
-          , team_days_mobile_monodose_FCC
-          , "days."
-        )
-      })
-    }
+# output for the duration that each team type will spend on site
+output$team_dur_monodoseFCC <- print_site_team_dur(site_team_quant = site_teams_monodoseFCC
+                                                   , td_fixed = team_days_fixed_monodose_FCC
+                                                   , td_mobile = team_days_mobile_monodose_FCC
+                                                   )
+ 
     
     ##########################################
     # Calculations for 10-dose only FCC
@@ -416,45 +386,15 @@ server <- function(input, output, session) {
     #######
     
     #Extract size of allocated team from the sites table
-    site_teams_dose10_FCC <- site_table$added_sites %>%
-      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
-      .$site_team_alloc # number of teams allocated to site
+    site_teams_dose10_FCC <- extract_site_team_size(site_table$added_sites)
     
-    #output for the duration that each team type will spend on site
-    if (site_teams_dose10_FCC == 0) {
-      output$team_dur_dose10_FCC <- renderText(
-        print('<b> No teams were allocated </b>')
-      )
-    }else if (site_teams_dose10_FCC == 1) {
-      output$team_dur_dose10_FCC <- renderText({
-        paste(
-          "In sequence,"
-          , "<b> Fixed post </b> team will spend"
-          , team_days_fixed_dose10_FCC
-          , "days"
-          , "<br>"
-          , "<b> Mobile </b> team will spend"
-          , team_days_fixed_dose10_FCC
-          , "<br>"
-          , "<b> Total: </b>"
-          , team_days_fixed_dose10_FCC + team_days_mobile_dose10_FCC
-        )
-      })
-    } else{
-      output$team_dur_dose10_FCC <- renderText({
-        paste(
-          site_teams_dose10_FCC - 1
-          , "<b> Fixed post </b> teams will each spend"
-          , round((team_days_fixed_dose10_FCC / (site_teams_dose10_FCC - 1)), digits = 1)
-          , "days."
-          , "<br>"
-          , "1"
-          , "<b> Mobile </b> team will spend"
-          , team_days_mobile_dose10_FCC
-          , "days."
-        )
-      })
-    }
+    # output for the duration that each team type will spend on site
+    output$team_dur_dose10_FCC <- print_site_team_dur(site_team_quant = site_teams_dose10_FCC
+                                                       , td_fixed = team_days_fixed_dose10_FCC
+                                                       , td_mobile = team_days_mobile_dose10_FCC
+    )
+    
+    
     
     ##########################################
     #' Calculations for mixed strategy, i.e 10-dose for near population and monodose for far population
@@ -566,8 +506,56 @@ server <- function(input, output, session) {
       paste0(as.numeric(team_days_mobile_mixed_FCC))
     })
     
+    #######
+    # Team allocation calculations and output
+    #######
     
+    #Extract size of allocated team from the sites table
+    site_teams_mixed_FCC <- extract_site_team_size(site_table$added_sites)
     
+    # output for the duration that each team type will spend on site
+    output$team_dur_mixed_FCC <- print_site_team_dur(site_team_quant = site_teams_mixed_FCC
+                                                       , td_fixed = team_days_fixed_mixed_FCC
+                                                       , td_mobile = team_days_mobile_mixed_FCC
+    )
+    
+   
+    # #output for the duration that each team type will spend on site
+    # if (site_teams_mixed_FCC == 0) {
+    #   output$team_dur_mixed_FCC <- renderText(
+    #     print('<b> No teams were allocated </b>')
+    #   )
+    # }else if (site_teams_mixed_FCC == 1) {
+    #   output$team_dur_mixed_FCC <- renderText({
+    #     paste(
+    #       "In sequence,"
+    #       , "<b> Fixed post </b> team will spend"
+    #       , team_days_fixed_mixed_FCC
+    #       , "days"
+    #       , "<br>"
+    #       , "<b> Mobile </b> team will spend"
+    #       , team_days_fixed_mixed_FCC
+    #       , "<br>"
+    #       , "<b> Total: </b>"
+    #       , team_days_fixed_mixed_FCC + team_days_mobile_mixed_FCC
+    #     )
+    #   })
+    # } else{
+    #   output$team_dur_mixed_FCC <- renderText({
+    #     paste(
+    #       site_teams_mixed_FCC - 1
+    #       , "<b> Fixed post </b> teams will each spend"
+    #       , round((team_days_fixed_mixed_FCC / (site_teams_mixed_FCC - 1)), digits = 1)
+    #       , "days."
+    #       , "<br>"
+    #       , "1"
+    #       , "<b> Mobile </b> team will spend"
+    #       , team_days_mobile_mixed_FCC
+    #       , "days."
+    #     )
+    #   })
+    # }
+    # 
     
     
     ################################################################
