@@ -2,7 +2,7 @@
 
 We intend to use this app as a strategic tool to assess various outbreak response vaccination strategies. The assessment will mostly be done based on the cold chain needs in terms of ice, freezing times, and passive cold chain requirements.
 
-## Modelling assumptions
+## Modelling assumptions and clarification questions
 
     1.  We assume a _wastage factor of 1.17 (15%)_ for fixed post vaccination using the 10-dose vials and 1.43 (equivalent to 30% wastage rate) for using 10-dose vials for vaccinating far children. The former is gotten from MSF resources but the latter is arbitrary.
     2.  Currently, we assume that only the *MF314* freezer is used at the base to freeze the icepacks:
@@ -21,6 +21,7 @@ We intend to use this app as a strategic tool to assess various outbreak respons
     8. How are the vaccines transported from the field base to the vaccination sites? are they transported in both the RCW25s and vaccine carriers or are the vaccine carriers initially transported empty?
     9.  How are the ice packs replaced during a campaign, especially, when there are vaccines remaining in the storage equipment?
     10. On the matter of team allocation and repurposing between being mobile or fixed, we assume that the two team types are sent to the site at the same time and work in parallel. The team days required by each team type depends on the size of the target population. Hence, the number of team days required on a site is the maximum of the the team days required by both team types.
-    11. Currently, we assume that given a number of teams allocated to a site, if there is only one team and there are far and near children, then that team will first mount a fixed post and when done, go on to perform a mobile campaign. If there is more than one team allocated, then the ratio will be 1 mobile team to the remainder being fixed. 
-
-## Clarification questions for MSF
+    11. Currently, we assume that given a number of teams allocated to a site, if there is only one team and there are far and near children, then that team will first mount a fixed post and when done, go on to perform a mobile campaign. If there is more than one team allocated, then the ratio will be 1 mobile team to the remainder being fixed.
+    12. We assume that the volume of doses to be transported to the fixed site should not be a constraint. 
+    13. We calculate the team days as the number of expected kids divided by the vaccination rate (team performance).
+    14. Do fixed and mobile teams return to the base daily? 
