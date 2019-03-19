@@ -145,7 +145,6 @@ server <- function(input, output, session) {
   source('./params.R', local = TRUE)
   source('./calculator_functions.R', local = TRUE)
   
-  
   # empty data frame for storing all the sites added
   site_table <- reactiveValues(added_sites = NULL)
   
@@ -193,6 +192,7 @@ server <- function(input, output, session) {
       site_table$added_sites <- bind_rows(site_table$added_sites, site_new$data)
       removeModal()
     }
+    output$all_sites <- DT::renderDT(site_table$added_sites)
   })
   
   
@@ -274,32 +274,48 @@ server <- function(input, output, session) {
     #######
     
     #size of near population 
-    near_pop_monodoseFCC <- site_table$added_sites %>%
-      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
-      .$near_pop # number of doses needed
+    # near_pop_monodoseFCC <- site_table$added_sites %>%
+    #   dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+    #   .$near_pop # number of doses needed
+    # 
+    # team_days_fixed_monodose_FCC <- round((near_pop_monodoseFCC * (1 + input$buffer_stock / 100)) / tp_fixed, 1)
+    # 
+    # 
+    # #output for team days required for fixed teams
+    # output$tdf_monodoseFCC <- renderText({
+    #   paste0(as.numeric(team_days_fixed_monodose_FCC)) 
+    # })
+    # 
+    # 
+    # #size of far population 
+    # far_pop_monodoseFCC <- site_table$added_sites %>%
+    #   dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+    #   .$far_pop # number of doses needed
+    # 
+    # 
+    # team_days_mobile_monodose_FCC <- round((far_pop_monodoseFCC * (1 + input$buffer_stock / 100)) / tp_mobile, 1)
+    # 
+    # 
+    # output$tdm_monodoseFCC <- renderText({
+    #   paste0(as.numeric(team_days_mobile_monodose_FCC))
+    # })
+    # 
+    monodose_FCC_near_pop <- extract_near_pop(site_table$added_sites)
+    monodose_FCC_far_pop <- extract_far_pop(site_table$added_sites)
     
-    team_days_fixed_monodose_FCC <- round((near_pop_monodoseFCC * (1 + input$buffer_stock / 100)) / tp_fixed, 1)
+    team_days_fixed_monodose_FCC<- round(monodose_FCC_near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
+    team_days_mobile_monodose_FCC <- round(monodose_FCC_far_pop / tp_mobile, 1)
     
-  
+    
     #output for team days required for fixed teams
     output$tdf_monodoseFCC <- renderText({
-      paste0(as.numeric(team_days_fixed_monodose_FCC)) 
+      paste0(as.numeric(team_days_fixed_monodose_FCC))
     })
     
-    
-    #size of far population 
-    far_pop_monodoseFCC <- site_table$added_sites %>%
-      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
-      .$far_pop # number of doses needed
-    
-    
-    team_days_mobile_monodose_FCC <- round((far_pop_monodoseFCC * (1 + input$buffer_stock / 100)) / tp_mobile, 1)
-    
-    
+    #output for team days required for mobile teams
     output$tdm_monodoseFCC <- renderText({
       paste0(as.numeric(team_days_mobile_monodose_FCC))
     })
-    
     
     #######
     # Team allocation calculations and output
@@ -308,9 +324,9 @@ server <- function(input, output, session) {
     #Extract size of allocated team from the sites table
     site_teams_monodoseFCC <- extract_site_team_size(site_table$added_sites)
 
-# output for the duration that each team type will spend on site
-output$team_dur_monodoseFCC <- print_site_team_dur(site_team_quant = site_teams_monodoseFCC
-                                                   , td_fixed = team_days_fixed_monodose_FCC
+    # output for the duration that each team type will spend on site
+    output$team_dur_monodoseFCC <- print_site_team_dur(site_team_quant = site_teams_monodoseFCC
+                                                       , td_fixed = team_days_fixed_monodose_FCC
                                                    , td_mobile = team_days_mobile_monodose_FCC
                                                    )
  
@@ -345,11 +361,11 @@ output$team_dur_monodoseFCC <- print_site_team_dur(site_team_quant = site_teams_
    # dose10_FCC_doses_needed <- dose10_FCC_doses * (1 + input$buffer_stock / 100) # apply buffer. This formula doesn't seem to be making any impact
     # number of RCW25s needed, based on the volume of the vaccine indicated (1 RCW25 can transport 3300 doses if vax vol = 3cm3 and 5000 doses if vax vol = 2cm3)
     if (input$vaccine_vol_dose10 == 2.1) {
-      dose10_FCC_RCW25_needs <- ceiling(dose10_FCC_doses_needed / 5000) # these numbers refer to the doses along with the diluents
-      dose10_FCC_vaxCarr_needs <- ceiling(dose10_FCC_doses_needed / 750) # vaccine carrier
+      dose10_FCC_RCW25_needs <- ceiling(dose10_FCC_doses_needed / 5000) # these numbers refer to the doses along with the diluents. Source: Excel sheet for Appendix 23
+      dose10_FCC_vaxCarr_needs <- ceiling(dose10_FCC_doses_needed / 750) # vaccine carrier. Source: Excel sheet for Appendix 23 
     } else if (input$vaccine_vol_dose10 == 3) {
-      dose10_FCC_RCW25_needs <- ceiling(dose10_FCC_doses_needed / 3300)
-      dose10_FCC_vaxCarr_needs <- ceiling(dose10_FCC_doses_needed / 500) # vaccine carrier
+      dose10_FCC_RCW25_needs <- ceiling(dose10_FCC_doses_needed / 3300) #Source: Excel sheet for Appendix 23
+      dose10_FCC_vaxCarr_needs <- ceiling(dose10_FCC_doses_needed / 500) # vaccine carrier. Source: Excel sheet for Appendix 23
     }
     
     
@@ -387,16 +403,18 @@ output$team_dur_monodoseFCC <- print_site_team_dur(site_team_quant = site_teams_
     
     ##team days calculations
     #size of near population
-   
-    team_days_fixed_dose10_FCC <- round(dose10_FCC_doses_near_pop_req / tp_fixed, 1) #computationally, we see the number doses as the number of expected people
+    
+    dose10_FCC_near_pop <- extract_near_pop(site_table$added_sites)
+    dose10_FCC_far_pop <- extract_far_pop(site_table$added_sites)
+    
+    team_days_fixed_dose10_FCC<- round(dose10_FCC_near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
+    team_days_mobile_dose10_FCC <- round(dose10_FCC_far_pop / tp_mobile, 1)
+    
     
     #output for team days required for fixed teams
     output$tdf_dose10_FCC <- renderText({
       paste0(as.numeric(team_days_fixed_dose10_FCC))
     })
-    
-    
-    team_days_mobile_dose10_FCC <- round(dose10_FCC_doses_far_pop_req / tp_mobile, 1)
     
     #output for team days required for mobile teams
     output$tdm_dose10_FCC <- renderText({
@@ -451,8 +469,8 @@ output$team_dur_monodoseFCC <- print_site_team_dur(site_team_quant = site_teams_
     
     
     #passive cold chain required for monodose vials
-    mixed_FCC_monodose_RCW25_needs <- ceiling(mixed_FCC_monodose_final/1301)
-    mixed_FCC_monodose_vaxCarr_needs <- ceiling(mixed_FCC_monodose_final/283)
+    mixed_FCC_monodose_RCW25_needs <- ceiling(mixed_FCC_monodose_final / 1301) #Source: Excel sheet "Cold Chain equipment"
+    mixed_FCC_monodose_vaxCarr_needs <- ceiling(mixed_FCC_monodose_final / 283) #Source: Excel sheet "Cold Chain equipment"
     
     
     #total passive cold chain needs
@@ -482,13 +500,9 @@ output$team_dur_monodoseFCC <- print_site_team_dur(site_team_quant = site_teams_
     #0.6L
     mixed_FCC_RCW25_icepack_vol <- mixed_FCC_RCW25_icepack_needs * 0.6
     
-    
-    
-    
-    
-    ###
+    #####################################
     #' outputs for the mixed strategy
-    ###
+    #####################################
     
     #initial volume of ice required 
     mixed_FCC_init_iceVol <- mixed_FCC_vaxCarr_icepack_vol + mixed_FCC_RCW25_icepack_vol
@@ -517,8 +531,12 @@ output$team_dur_monodoseFCC <- print_site_team_dur(site_team_quant = site_teams_
     ##team days calculations
     #size of near population 
     
-    team_days_fixed_mixed_FCC <- round((mixed_FCC_dose10_final * dose10_wastage_ft) / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
-    team_days_mobile_mixed_FCC <- round(mixed_FCC_monodose_final / tp_mobile, 1)
+    mixed_FCC_near_pop <- extract_near_pop(site_table$added_sites)
+    mixed_FCC_far_pop <- extract_far_pop(site_table$added_sites)
+    
+    team_days_fixed_mixed_FCC<- round(mixed_FCC_near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
+    team_days_mobile_mixed_FCC <- round(mixed_FCC_far_pop / tp_mobile, 1)
+    
     
     #output for team days required for fixed teams
     output$tdf_mixed_FCC <- renderText({
@@ -539,57 +557,143 @@ output$team_dur_monodoseFCC <- print_site_team_dur(site_team_quant = site_teams_
     
     # output for the duration that each team type will spend on site
     output$team_dur_mixed_FCC <- print_site_team_dur(site_team_quant = site_teams_mixed_FCC
-                                                       , td_fixed = team_days_fixed_mixed_FCC
-                                                       , td_mobile = team_days_mobile_mixed_FCC
+                                                     , td_fixed = team_days_fixed_mixed_FCC
+                                                     , td_mobile = team_days_mobile_mixed_FCC
     )
     
-   
-    # #output for the duration that each team type will spend on site
-    # if (site_teams_mixed_FCC == 0) {
-    #   output$team_dur_mixed_FCC <- renderText(
-    #     print('<b> No teams were allocated </b>')
-    #   )
-    # }else if (site_teams_mixed_FCC == 1) {
-    #   output$team_dur_mixed_FCC <- renderText({
-    #     paste(
-    #       "In sequence,"
-    #       , "<b> Fixed post </b> team will spend"
-    #       , team_days_fixed_mixed_FCC
-    #       , "days"
-    #       , "<br>"
-    #       , "<b> Mobile </b> team will spend"
-    #       , team_days_fixed_mixed_FCC
-    #       , "<br>"
-    #       , "<b> Total: </b>"
-    #       , team_days_fixed_mixed_FCC + team_days_mobile_mixed_FCC
-    #     )
-    #   })
-    # } else{
-    #   output$team_dur_mixed_FCC <- renderText({
-    #     paste(
-    #       site_teams_mixed_FCC - 1
-    #       , "<b> Fixed post </b> teams will each spend"
-    #       , round((team_days_fixed_mixed_FCC / (site_teams_mixed_FCC - 1)), digits = 1)
-    #       , "days."
-    #       , "<br>"
-    #       , "1"
-    #       , "<b> Mobile </b> team will spend"
-    #       , team_days_mobile_mixed_FCC
-    #       , "days."
-    #     )
-    #   })
-    # }
-    # 
+    
+    
+    ##############################################################################
+    #' Calculations for partial OCC strategy, i.e 10-dose FCC for near population and monodose OCC for far population
+    ##############################################################################
+    
+    part_OCC_dose10_quant <- site_table$added_sites %>%
+      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+      .$near_pop/10
+    
+    part_OCC_monodose_quant <- site_table$added_sites %>%
+      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+      .$far_pop 
+    
+    
+   # part_OCC_doses <- part_OCC_dose10_quant + part_OCC_monodose_quant
+    
+    part_OCC_dose10_final <- part_OCC_dose10_quant* (1 + input$buffer_stock / 100)
+    
+    part_OCC_monodose_final <- part_OCC_monodose_quant* (1 + input$buffer_stock / 100)
+    
+    part_OCC_doses_needed <- part_OCC_dose10_final + part_OCC_monodose_final
+    
+    # passive cold chain needed, based on the volume of the vaccine indicated (1 RCW25 can transport 3300 doses if vax vol = 3cm3 and 5000 doses if vax vol = 2cm3)
+    if (input$vaccine_vol_dose10 == 2.1) {
+      part_OCC_dose10_RCW25_needs <- ceiling(part_OCC_dose10_final / 5000) # these numbers refer to the doses along with the diluents. Source: Excel sheet for Appendix 23
+      part_OCC_dose10_vaxCarr_needs <- ceiling(part_OCC_dose10_final / 750) # vaccine carrier. Source: Excel sheet for Appendix 23
+    } else if (input$vaccine_vol_dose10 == 3) {
+      part_OCC_dose10_RCW25_needs <- ceiling(part_OCC_dose10_final / 3300) # Source: Excel sheet for Appendix 23
+      part_OCC_dose10_vaxCarr_needs <- ceiling(part_OCC_dose10_final / 500) # vaccine carrier. Source: Excel sheet for Appendix 23
+    }
+    
+    
+    #passive cold chain required for monodose vials
+    part_OCC_monodose_RCW25_needs <- ceiling(part_OCC_monodose_final / 1301) #Source: Excel sheet "Cold Chain equipment"
+    part_OCC_monodose_vaxCarr_needs <- ceiling(part_OCC_monodose_final / 283) #Source: Excel sheet "Cold Chain equipment"
+    
+    
+    #total passive cold chain needs
+    
+    #RCW25
+    part_OCC_RCW25_needs <- part_OCC_dose10_RCW25_needs + part_OCC_monodose_RCW25_needs
+    
+    #vaccine carriers
+    part_OCC_vaxCarr_needs <- part_OCC_dose10_vaxCarr_needs + part_OCC_monodose_vaxCarr_needs
+    
+    # Part OCC quantity of icepack needs
+    
+    #0.6L ice packs for RCW 25
+    part_OCC_RCW25_icepack_needs <- part_OCC_dose10_RCW25_needs * RCW25_icepack_needs #NOTE THE CHANGE HERE: WE ONLY NEED ICE PACKS FOR THE 10 DOSE VIALS, HENCE, WE DON'T CALCULATE ICE FOR THE MONODOSE FOR BOTH THE RCW 25 AND VACCINE CARRIERS
+    
+    #0.4L ice packs for vaccine carriers
+    part_OCC_vaxCarr_icepack_needs <- part_OCC_dose10_vaxCarr_needs * vaxCarr_icepack_needs
+    
+    #total icepack needs
+    part_OCC_icepack_needs <- part_OCC_vaxCarr_icepack_needs + part_OCC_RCW25_icepack_needs
+    
+    #total volume of ice packs
+    
+    #0.4L
+    part_OCC_vaxCarr_icepack_vol <- part_OCC_vaxCarr_icepack_needs * 0.4
+    #0.6L
+    part_OCC_RCW25_icepack_vol <- part_OCC_RCW25_icepack_needs * 0.6
+    
+    
+    
+    
+    #####################################
+    #' outputs for the part OCC strategy
+    #####################################
+    
+    #initial volume of ice required 
+    part_OCC_init_iceVol <- part_OCC_vaxCarr_icepack_vol + part_OCC_RCW25_icepack_vol
+    output$ice_vol_init_part_OCC <- renderText({
+      paste(as.numeric(part_OCC_init_iceVol), "L")
+    }) # we only need 0.6L ice packs to transport the vaccines in the RCW25s. The 0.4L ones don't to play here yet
+    
+    
+    part_OCC_ft <- ceiling(
+      (1/input$mf314_quant)*((part_OCC_RCW25_icepack_needs / mf314_largepack_fr) + (part_OCC_vaxCarr_icepack_needs / mf314_smallpack_fr))
+      )
+    # freezing time
+    output$Init_ice_freezeTime_part_OCC <- renderText({
+      paste(part_OCC_ft, "day(s)")
+    }) # 
+    
+    
+    # Initial number of icepacks required
+    part_OCC_init_icepack_quant <- part_OCC_RCW25_icepack_needs + part_OCC_vaxCarr_icepack_needs
+    output$ice_packs_required_part_OCC <- renderText({
+      paste(part_OCC_init_icepack_quant)
+    })
+    
+    
+    ##team days calculations
+    #size of near population 
+    
+    part_OCC_near_pop <- extract_near_pop(site_table$added_sites)
+    part_OCC_far_pop <- extract_far_pop(site_table$added_sites)
+    
+    team_days_fixed_part_OCC <- round(part_OCC_near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
+    team_days_mobile_part_OCC <- round(part_OCC_far_pop / tp_mobile, 1)
+    
+    #output for team days required for fixed teams
+    output$tdf_part_OCC<- renderText({
+      paste0(as.numeric(team_days_fixed_part_OCC))
+    })
+    
+    #output for team days required for mobile teams
+    output$tdm_part_OCC <- renderText({
+      paste0(as.numeric(team_days_mobile_part_OCC))
+    })
+    
+    #######
+    # Team allocation calculations and output
+    #######
+    
+    #Extract size of allocated team from the sites table
+    site_teams_part_OCC <- extract_site_team_size(site_table$added_sites)
+    
+    # output for the duration that each team type will spend on site
+    output$team_dur_part_OCC <- print_site_team_dur(site_team_quant = site_teams_part_OCC
+                                                     , td_fixed = team_days_fixed_part_OCC
+                                                     , td_mobile = team_days_mobile_part_OCC
+    )
+
     
     
     ################################################################
     #' Combining the results and plotting
     #' 
     #####################################################################
-    
-    Strategy_list <- c("monodose FCC", "10-dose FCC", "mixed FCC")
-    team_type_list <- c('fixed post', 'mobile team')
-    
+   
     #plot theme
     plot_theme <-  theme(title = element_text(size = 12,
                                               face = 'bold'
@@ -600,37 +704,33 @@ output$team_dur_monodoseFCC <- print_site_team_dur(site_team_quant = site_teams_
     # Results of required freezing time per strategy
     freezing_time_results <- tibble(
       Strategy = Strategy_list,
-      time = c(monodose_FCC_ft, dose10_FCC_ft, mixed_FCC_ft)
+      time = c(monodose_FCC_ft, dose10_FCC_ft, mixed_FCC_ft, part_OCC_ft)
     )
     
     # Results of initial required volume of ice per strategy
     Init_iceVol_results <- tibble(
       Strategy = Strategy_list,
-      iceVol = c(monodose_FCC_init_iceVol, dose10_FCC_init_iceVol, mixed_FCC_init_iceVol)
+      iceVol = c(monodose_FCC_init_iceVol, dose10_FCC_init_iceVol, mixed_FCC_init_iceVol, part_OCC_init_iceVol)
     )
     
     
     #Results of team days calculations
     td_results <- tibble(
       Strategy = rep(Strategy_list, each = 2),
-      team_type = rep(team_type_list, times = 3),
+      team_type = rep(team_type_list, times = length(Strategy_list)),
       team_days = c(team_days_fixed_monodose_FCC, 
                     team_days_mobile_monodose_FCC, 
                     team_days_fixed_dose10_FCC, 
                     team_days_mobile_dose10_FCC, 
                     team_days_fixed_mixed_FCC, 
-                    team_days_mobile_mixed_FCC
+                    team_days_mobile_mixed_FCC, 
+                    team_days_fixed_part_OCC, 
+                    team_days_mobile_part_OCC
                     )
     )
     
     
-    
-    
-    ####################
-    # Output the table of all sites added
-    ####################
-    
-    output$all_sites <- DT::renderDT(site_table$added_sites)
+
     
     
     ####################
