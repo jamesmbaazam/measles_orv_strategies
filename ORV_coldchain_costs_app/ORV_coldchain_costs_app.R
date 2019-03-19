@@ -52,7 +52,16 @@ ui <- fluidPage(
       numericInput('mf314_quant', 'Number of MF314 available', value = 1, min = 1, step = 1),
       
       br(),
-      actionButton("show_results", "Display results")
+      textInput(inputId = 'sites_to_analyse', label = 'Sites to analyse', placeholder = 'Row number/Numbers separated by commas/A range', width = '400px'),
+      
+      br(),
+      actionButton("show_results", "Display results"),   
+      
+      br(),
+      
+      br(),
+      
+      actionButton("clear_all", "Click to clear app!")
     ),
     
     
