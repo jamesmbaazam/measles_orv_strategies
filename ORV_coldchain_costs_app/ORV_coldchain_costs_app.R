@@ -254,7 +254,9 @@ server <- function(input, output, session) {
     })
     
     
-    monodose_FCC_ft <- ceiling(monodose_FCC_init_icepack_quant / (input$mf314_quant * (mf314_largepack_fr + mf314_smallpack_fr))) # freezing time for icepacks
+    monodose_FCC_ft <- ceiling(
+      (1/input$mf314_quant)*((monodose_FCC_RCW25_icepack_needs_total / mf314_largepack_fr) + (monodose_FCC_vaxCarr_icepack_needs_total / mf314_smallpack_fr)) 
+                               ) # freezing time for icepacks
     
     # output
     output$Init_ice_freezeTime_monodose_FCC <- renderText({
@@ -369,7 +371,9 @@ output$team_dur_monodoseFCC <- print_site_team_dur(site_team_quant = site_teams_
     })
     
     
-    dose10_FCC_ft <- ceiling((dose10_FCC_init_icepack_quant) / (input$mf314_quant * (mf314_largepack_fr + mf314_smallpack_fr)))
+    dose10_FCC_ft <- ceiling(
+                             (1/input$mf314_quant)*((dose10_FCC_RCW25_icepack_needs_total / mf314_largepack_fr) + (dose10_FCC_vaxCarr_icepack_needs_total / mf314_smallpack_fr))                   
+                             )
     # freezing time
     output$Init_ice_freezeTime_dose10_FCC <- renderText({
       paste(dose10_FCC_ft, "day(s)")
@@ -493,7 +497,9 @@ output$team_dur_monodoseFCC <- print_site_team_dur(site_team_quant = site_teams_
     }) # we only need 0.6L ice packs to transport the vaccines in the RCW25s. The 0.4L ones don't to play here yet
     
     
-    mixed_FCC_ft <- ceiling(mixed_FCC_icepack_needs/(input$mf314_quant * (mf314_largepack_fr + mf314_smallpack_fr)))
+    mixed_FCC_ft <- ceiling(
+      (1/input$mf314_quant)*((mixed_FCC_RCW25_icepack_needs / mf314_largepack_fr) + (mixed_FCC_vaxCarr_icepack_needs / mf314_smallpack_fr))
+    )
     # freezing time
     output$Init_ice_freezeTime_mixed_FCC <- renderText({
       paste(mixed_FCC_ft, "day(s)")
