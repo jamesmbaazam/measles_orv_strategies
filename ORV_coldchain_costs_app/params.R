@@ -1,5 +1,8 @@
 # FIXED PARAMETERS
 
+Strategy_list <- c("Monodose FCC", "10-dose FCC", "Mixed FCC", "Part OCC") #OCC = out of cold chain
+team_type_list <- c('Fixed post', 'Mobile team')
+
 # active cold chain
 mf314_largepack_capacity <- 323 # large pack refers to 0.6L icepacks
 mf314_smallpack_capacity <- 450 # small pack refers to 0.4L icepacks
