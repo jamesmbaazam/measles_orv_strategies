@@ -47,4 +47,24 @@ print_site_team_dur <- function(site_team_quant, td_fixed, td_mobile){ #td_fixed
      )
    })
  }
-  }
+}
+
+
+
+#######################################
+#Calculate ice pack needs for vax carrier and RCW25s
+#######################################
+compute_rcw25_icepacks <- function(amb_temp){
+   switch (amb_temp,
+        "below 40" = 12,
+        "above 40" = 18
+   )
+}
+
+
+compute_vaxCarr_icepacks <- function(amb_temp){
+   switch (amb_temp,
+        "below 40" = 6,
+        "above 40" = 8
+   )
+   }
