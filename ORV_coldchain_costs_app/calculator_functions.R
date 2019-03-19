@@ -67,4 +67,22 @@ compute_vaxCarr_icepacks <- function(amb_temp){
         "below 40" = 6,
         "above 40" = 8
    )
-   }
+}
+
+
+
+#################################################
+#Extract population sizes
+################################################
+extract_near_pop <- function(df){
+   df %>%
+      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+      .$near_pop
+}
+
+
+extract_far_pop <- function(df){
+   df %>%
+      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+      .$far_pop
+}
