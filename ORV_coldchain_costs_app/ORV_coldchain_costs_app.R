@@ -7,11 +7,9 @@ library(ggplot2)
 library(shinythemes)
 library(DT)
 
-#source helper scripts
-source('./ORV_coldchain_costs_app/params.R')
-source('./ORV_coldchain_costs_app/calculator_functions.R')
 
-# Note: Throughout the code, FCC means Full Cold Chain, dose10 means 10-dose
+# Note: Throughout the code, FCC means Full Cold Chain, dose10 means 10-dose,
+#OCC = Out of Cold Chain
 
 
 ui <- fluidPage(
@@ -127,7 +125,10 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
-  
+
+  #source helper scripts
+  source('./params.R', local = TRUE)
+  source('./calculator_functions.R', local = TRUE)
   
   
   # empty data frame for storing all the sites added
