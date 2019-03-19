@@ -8,8 +8,8 @@ library(shinythemes)
 library(DT)
 
 #source helper scripts
-source('./params.R')
-source('./calculator_functions.R')
+source('./ORV_coldchain_costs_app/params.R')
+source('./ORV_coldchain_costs_app/calculator_functions.R')
 
 # Note: Throughout the code, FCC means Full Cold Chain, dose10 means 10-dose
 
@@ -128,24 +128,17 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
+  
+  
   # empty data frame for storing all the sites added
   site_table <- reactiveValues(added_sites = NULL)
   
   # empty dataframe for temporarily storing the newly added site for updating the old table
   site_new <- reactiveValues(data = NULL)
   
-  # empty data frame for storing results
-  
-  # results <- reactiveValues(
-  #   monodose_FCC = NULL,
-  #   dose10_FCC = NULL,
-  #   mixed_FCC = NULL
-  # ) # mixed_FCC means, in the Full Cold Chain, we'll vax near with 10-dose, and far with monodose
-  # 
   
   
-  
-  # dialog box to collect site information
+  # dialog box to collect new site information
   observeEvent(input$add_site_info, {
     showModal(modalDialog(
       title = "Site information",
@@ -187,28 +180,28 @@ server <- function(input, output, session) {
   })
   
   
-  
-  
-  # Output the table of all sites added
-  output$all_sites <- DT::renderDT(site_table$added_sites)
-  
-  
-  
   # calculate and show results
   observeEvent(input$show_results, {
     
     
     # how many 0.6L ice packs will be needed for the quantity of RCW25s calculated?
-    RCW25_icepack_needs <-  switch (input$temp,
-            "below 40" = 12,
-            "above 40" = 18
-    )
+    RCW25_icepack_needs <-  compute_rcw25_icepacks(input$temp)
     
-    vaxCarr_icepack_needs <- switch (input$temp,
-                                     "below 40" = 6,
-                                     "above 40" = 8
-    )
+    vaxCarr_icepack_needs <- compute_vaxCarr_icepacks(input$temp)
     
+    
+    #clear the app when the clear action button is clicked.
+    # observeEvent(input$clear_all,{
+    #   output$ice_packs_required_monodose_FCC <- renderText({})
+    #   output$ice_packs_required_dose10_FCC<- renderText({})
+    #   output$ice_packs_required_mixed_FCC<- renderText({})
+    #   output$tdm_monodose_FCC <- renderText({})
+    #   output$tdm_dose10_FCC <- renderText({})
+    #   output$tdm_mixed_FCC <- renderText({})
+    #   output$all_sites <- renderText({})
+    #   output$plot <- renderText({})
+    # })
+    # 
     
     ##########################################
     # Calculations for monodose-only FCC
@@ -609,7 +602,19 @@ output$team_dur_monodoseFCC <- print_site_team_dur(site_team_quant = site_teams_
     )
     
     
+    
+    
+    ####################
+    # Output the table of all sites added
+    ####################
+    
+    output$all_sites <- DT::renderDT(site_table$added_sites)
+    
+    
+    ####################
     #Making the plots!!!
+    ####################
+    
     output$plot <- renderPlot({
       ft_plot <- ggplot(data = freezing_time_results, 
                         aes(x = Strategy, y = time)
