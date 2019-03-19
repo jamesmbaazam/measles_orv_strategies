@@ -119,6 +119,21 @@ ui <- fluidPage(
                          wellPanel(htmlOutput("tdm_mixed_FCC")), #tdm = team days mobile
                          tags$h4("Duration of team types on site"),
                          wellPanel(htmlOutput("team_dur_mixed_FCC"))  
+                       ),
+                       tabPanel(
+                         title = "Part OCC",
+                         tags$h4("Initial volume of ice required for transport"),
+                         wellPanel(htmlOutput("ice_vol_init_part_OCC")),
+                         tags$h4("Quantity of ice packs required"),
+                         wellPanel(htmlOutput("ice_packs_required_part_OCC")),
+                         tags$h4("Time needed to freeze initial ice"),
+                         wellPanel(htmlOutput("Init_ice_freezeTime_part_OCC")),
+                         tags$h4("Fixed team days required (over all sites)"),
+                         wellPanel(htmlOutput("tdf_part_OCC")), #tdf = team days fixed
+                         tags$h4("Mobile team days required (over all sites)"),
+                         wellPanel(htmlOutput("tdm_part_OCC")), #tdm = team days mobile
+                         tags$h4("Duration of team types on site"),
+                         wellPanel(htmlOutput("team_dur_part_OCC"))  
                        )
                      )
   ))
