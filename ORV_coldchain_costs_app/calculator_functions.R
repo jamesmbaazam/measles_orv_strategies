@@ -1,5 +1,28 @@
 
-# Extract size of allocated team from the sites table
+
+
+################################################################################
+#'extract_near_pop() & extract_far_pop(): Extract population sizes for near and far
+#' kids for further calculations
+################################################################################
+extract_near_pop <- function(df){
+   df %>%
+      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+      .$near_pop
+}
+
+
+extract_far_pop <- function(df){
+   df %>%
+      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+      .$far_pop
+}
+
+
+################################################################################
+#' extract_site_team_size(): Extract size of allocated teams for a site from the 
+#' sites table
+################################################################################
 
 extract_site_team_size <- function(df, site = 1) { # for now, we are only going to concentrate on one site. User indicates which site to analyse
   teams <- df %>%
@@ -11,7 +34,29 @@ extract_site_team_size <- function(df, site = 1) { # for now, we are only going 
 
 
 ################################################################################
-#print_site_team_dur() calculates how long the allocated teams will spend on the site
+#'compute_rcw25_icepacks() & compute_varCarr_icepacks(): Calculate ice pack needs 
+#' for each vax carrier and RCW25s, based on ambient temperature
+################################################################################
+compute_rcw25_icepacks <- function(amb_temp){
+   switch (amb_temp,
+           "below 40" = 12,
+           "above 40" = 18
+   )
+}
+
+
+compute_vaxCarr_icepacks <- function(amb_temp){
+   switch (amb_temp,
+           "below 40" = 6,
+           "above 40" = 8
+   )
+}
+
+
+
+################################################################################
+#' print_site_team_dur(): Calculates and outputs to the UI how long the allocated 
+#' teams will spend on a site
 ################################################################################
 
 print_site_team_dur <- function(site_team_quant, td_fixed, td_mobile){ #td_fixed = team days for fixed site team, #td_mobile = team days for mobile team
@@ -51,38 +96,4 @@ print_site_team_dur <- function(site_team_quant, td_fixed, td_mobile){ #td_fixed
 
 
 
-#######################################
-#Calculate ice pack needs for vax carrier and RCW25s
-#######################################
-compute_rcw25_icepacks <- function(amb_temp){
-   switch (amb_temp,
-        "below 40" = 12,
-        "above 40" = 18
-   )
-}
 
-
-compute_vaxCarr_icepacks <- function(amb_temp){
-   switch (amb_temp,
-        "below 40" = 6,
-        "above 40" = 8
-   )
-}
-
-
-
-#################################################
-#Extract population sizes
-################################################
-extract_near_pop <- function(df){
-   df %>%
-      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
-      .$near_pop
-}
-
-
-extract_far_pop <- function(df){
-   df %>%
-      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
-      .$far_pop
-}
