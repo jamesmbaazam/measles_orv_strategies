@@ -406,7 +406,7 @@ server <- function(input, output, session) {
     #Initial volume of ice required 
     dose10_FCC_init_iceVol <- dose10_FCC_RCW25_icepack_vol + dose10_FCC_vaxCarr_icepack_vol
     output$ice_vol_init_dose10_FCC <- renderText({
-      paste(as.numeric(dose10_FCC_RCW25_icepack_vol), "L")
+      paste(as.numeric(dose10_FCC_init_iceVol), "L")
     }) # we only need 0.6L ice packs to transport the vaccines in the RCW25s. The 0.4L ones don't to play here yet
     
     ##team days calculations
