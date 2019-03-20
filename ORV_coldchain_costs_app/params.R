@@ -3,8 +3,8 @@
 Strategy_list <- c("Monodose FCC", "10-dose FCC", "Mixed FCC", "Part OCC") #OCC = out of cold chain
 team_type_list <- c('Fixed post', 'Mobile team')
 
-monodose_vialVol <- 21.09
-dose10_vialVol <- c(2.1, 3)
+monodose_vial_vol <- 21.09
+dose10_vial_vol <- c(2.1, 3)
 
 
 # active cold chain
@@ -26,7 +26,6 @@ vax_carrier_netVol <- 2600 / 1E3
 # passive cold chain ice pack capacity
 rcw25_ice_capacity <- rcw25_grossVol - rcw25_netVol
 vax_carrier_ice_capacity <- vax_carrier_grossVol - vax_carrier_netVol
-
 
 # Vaccine vial packed volume per dose (pvd) i.e vaccine + diluent
 # Vaccines are assumed to have a volume of 2.5cm^3 per dose
