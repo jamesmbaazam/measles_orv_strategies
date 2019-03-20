@@ -415,8 +415,18 @@ server <- function(input, output, session) {
     dose10_FCC_near_pop <- extract_near_pop(site_table$added_sites)
     dose10_FCC_far_pop <- extract_far_pop(site_table$added_sites)
     
-    team_days_fixed_dose10_FCC<- round(dose10_FCC_near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
-    team_days_mobile_dose10_FCC <- round(dose10_FCC_far_pop / tp_mobile, 1)
+    
+    
+    dose10_FCC_far_trip_capacity <- calc_dose_capacity(vial_type = 'dose10' 
+                                                         , vax_vol = input$vaccine_vol_dose10
+                                                         , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
+                                                         , with_ice = T)
+    
+    
+    dose10_FCC_far_trip_eff_doses <- dose10_FCC_far_trip_capacity - (dose10_wastage_mt - 1) * dose10_FCC_far_trip_capacity #The effective number of doses a team has is the total capacity they can carry less of how many are expected to be wasted.
+    
+    team_days_fixed_dose10_FCC <- round(dose10_FCC_near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
+    team_days_mobile_dose10_FCC <- round(dose10_FCC_far_pop / dose10_FCC_far_trip_eff_doses, 1)
     
     
     #output for team days required for fixed teams
