@@ -41,10 +41,10 @@ ui <- fluidPage(
       numericInput("buffer_stock", "Buffer stock (out of 100)", value = 1, min = 1, step = 0.01),
       
       br(),
-      selectInput("vaccine_vol_dose10", "10-dose: Volume per dose (cm3)", choices = c(2.1, 3), selected = 2.1),
+      selectInput("vaccine_vol_dose10", "10-dose: Volume per dose (cm3)", choices = dose10_vialVol, selected = 2.1),
       
       br(),
-      selectInput("vaccine_vol_monodose", "Monodose Volume per dose (cm3)", choices = c(21.09)),
+      selectInput("vaccine_vol_monodose", "Monodose Volume per dose (cm3)", choices = monodose_vialVol),
       
       br(),
       numericInput('mf314_quant', 'Number of MF314 available', value = 1, min = 1, step = 1),
