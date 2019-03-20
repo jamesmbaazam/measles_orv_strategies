@@ -10,6 +10,8 @@ library(DT)
 
 # Note: Throughout the code, FCC means Full Cold Chain, dose10 means 10-dose,
 #OCC = Out of Cold Chain
+#source helper scripts
+source('./params.R', local = TRUE)
 
 
 ui <- fluidPage(
