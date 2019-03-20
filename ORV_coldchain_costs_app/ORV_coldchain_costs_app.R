@@ -13,8 +13,8 @@ library(DT)
 #source helper scripts
 source('./params.R', local = TRUE)
 
-
 ui <- fluidPage(
+  
   theme = shinytheme("spacelab"),
   # Application title
   titlePanel("Estimating cold chain needs for Outbreak Response Vaccination strategies"),
@@ -315,6 +315,8 @@ server <- function(input, output, session) {
     
     team_days_fixed_monodose_FCC <- round(monodose_FCC_near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
     team_days_mobile_monodose_FCC <- round(monodose_FCC_far_pop / monodose_FCC_far_trip_capacity, 1)
+    
+    
     #output for team days required for fixed teams
     output$tdf_monodoseFCC <- renderText({
       paste0(as.numeric(team_days_fixed_monodose_FCC))
@@ -556,6 +558,8 @@ server <- function(input, output, session) {
                                                       , vax_vol = 21.09
                                                       , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
                                                       , with_ice = T)
+    
+    
     team_days_fixed_mixed_FCC<- round(mixed_FCC_near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
     team_days_mobile_mixed_FCC <- round(mixed_FCC_far_pop / mixed_FCC_far_trip_capacity, 1)
     
@@ -683,12 +687,20 @@ server <- function(input, output, session) {
     part_OCC_near_pop <- extract_near_pop(site_table$added_sites)
     part_OCC_far_pop <- extract_far_pop(site_table$added_sites)
     
+    
     part_OCC_far_trip_capacity <- calc_dose_capacity(vial_type = 'monodose' 
                                                       , vax_vol = 21.09
                                                       , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
                                                       , with_ice = F)
+    
+    
     team_days_fixed_part_OCC <- round(part_OCC_near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
     team_days_mobile_part_OCC <- round(part_OCC_far_pop / part_OCC_far_trip_capacity, 1)
+    
+    
+    
+    
+    
     
     #output for team days required for fixed teams
     output$tdf_part_OCC<- renderText({
