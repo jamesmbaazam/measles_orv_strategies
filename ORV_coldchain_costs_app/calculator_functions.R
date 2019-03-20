@@ -107,23 +107,24 @@ print_site_team_dur <- function(site_team_quant, td_fixed, td_mobile){ #td_fixed
 #' passive cold chain dose capacity
 ################################################################################
 
-calc_dose_capacity <- function(vial_type, vax_vol, equip_type, with_ice = T)
-   { #vial_type = monodose/dose10 and vax_vol depends on monodose_vialVol/dose10_vialVol #equip_type = c('rcw25','vaxCarr')
-   if(vial_type == 'dose10' & vax_vol == 2.1 & equip_type == 'rcw25')
+calc_dose_capacity <- function(vial_type, vax_vol, equip_type, with_ice = T) #vial_type = monodose/dose10 and vax_vol depends on monodose_vialVol/dose10_vialVol #equip_type = c('rcw25','vaxCarr')
+   { 
+   if(vial_type == 'dose10' & vax_vol == 2.1 & equip_type == 'rcw25' & with_ice == T)
    {5000}
-   else if (vial_type == 'dose10' & vax_vol == 3 & equip_type == 'rcw25')
+   else if (vial_type == 'dose10' & vax_vol == 3 & equip_type == 'rcw25' & with_ice == T)
    {3300}
-   else if (vial_type == 'dose10' & vax_vol == 2.1 & equip_type == 'vaxCarr') #I've not yet thrown in the numbers for 10 dose OCC because it's not operational and even being considered but might be good for a counterfactual.
+   else if (vial_type == 'dose10' & vax_vol == 2.1 & equip_type == 'vaxCarr' & with_ice == T) #I've not yet thrown in the numbers for 10 dose OCC because it's not operational and even being considered but might be good for a counterfactual.
    {750}
-   else if (vial_type == 'dose10' & vax_vol == 3 & equip_type == 'vaxCarr')
+   else if (vial_type == 'dose10' & vax_vol == 3 & equip_type == 'vaxCarr' & with_ice == T)
    {500}
-   else if(vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'rcw25')
+   else if(vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'rcw25' & with_ice == T)
    {616}
-   else if(vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'rcw25' & with_ice == F)
+   else if (vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'rcw25' & with_ice == F)
    {1301}
-   else if(vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'vaxCarr')
-   {283}
-   else if(vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'vaxCarr' & with_ice == F)
+   else if (vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'vaxCarr' & with_ice == T)
    {77}
+   else if (vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'vaxCarr' & with_ice == F)
+   {283}
+   else{stop('Wrong input entered')}
 }
 
