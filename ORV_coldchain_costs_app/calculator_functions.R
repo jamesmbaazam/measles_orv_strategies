@@ -122,7 +122,7 @@ calc_dose_capacity <- function(vial_type, vax_vol, equip_type, with_ice = T) #vi
    else if (vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'rcw25' & with_ice == F)
    {1301}
    else if (vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'vaxCarr' & with_ice == T)
-   {77}
+   {170}
    else if (vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'vaxCarr' & with_ice == F)
    {283}
    else{stop('Wrong input entered')}
