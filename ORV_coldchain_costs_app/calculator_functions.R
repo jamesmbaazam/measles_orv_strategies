@@ -125,7 +125,35 @@ calc_dose_capacity <- function(vial_type, vax_vol, equip_type, with_ice = T) #vi
    {170}
    else if (vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'vaxCarr' & with_ice == F)
    {283}
-   else{stop('Wrong input entered')}
+   else{
+      stop('Wrong input entered')
+      }
+}
+
+
+
+
+calc_transport_equipment_needs <- function(equip_type, vial_type, vax_vol, with_ice = T, doses_to_transport)
+   { 
+      if(vial_type == 'dose10' & vax_vol == 2.1 & equip_type == 'rcw25' & with_ice == T)
+      {ceiling(doses_to_transport / 5000)}
+      else if (vial_type == 'dose10' & vax_vol == 3 & equip_type == 'rcw25' & with_ice == T)
+      {ceiling(doses_to_transport / 3300)}
+      else if (vial_type == 'dose10' & vax_vol == 2.1 & equip_type == 'vaxCarr' & with_ice == T) #I've not yet thrown in the numbers for 10 dose OCC because it's not operational and even being considered but might be good for a counterfactual.
+      {ceiling(doses_to_transport / 750)}
+      else if (vial_type == 'dose10' & vax_vol == 3 & equip_type == 'vaxCarr' & with_ice == T)
+      {ceiling(doses_to_transport / 500)}
+      else if(vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'rcw25' & with_ice == T)
+      {ceiling(doses_to_transport / 616)}
+      else if (vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'rcw25' & with_ice == F)
+      {ceiling(doses_to_transport / 1301)}
+      else if (vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'vaxCarr' & with_ice == T)
+      {ceiling(doses_to_transport / 77)}
+      else if (vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'vaxCarr' & with_ice == F)
+      {ceiling(doses_to_transport / 170)}
+      else{
+         stop('Check inputs')
+      } 
 }
 
 ################################################################################
