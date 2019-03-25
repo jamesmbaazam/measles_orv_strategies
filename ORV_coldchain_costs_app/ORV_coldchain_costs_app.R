@@ -241,12 +241,26 @@ server <- function(input, output, session) {
     
     # number of RCW25s needed, based on the volume of the vaccine indicated (1 RCW25 can transport 1301 vials/doses and a vaccine carrier can transport 283 vials/doses)
     
-    monodose_FCC_RCW25_needs <- ceiling(monodose_FCC_doses_needed / 1301) # these numbers refer to the doses along with the diluents
-    monodose_vaxCarr_needs <- ceiling(monodose_FCC_doses_needed / 283) # vaccine carrier
-    
+    monodose_FCC_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
+                                                               , vial_type = 'monodose'
+                                                               , vax_vol = input$vaccine_vol_monodose
+                                                               , with_ice = T
+                                                               , doses_to_transport = monodose_FCC_doses_needed
+                                                               )
+    #   
+    #   ceiling(monodose_FCC_doses_needed / 1301) # these numbers refer to the doses along with the diluents
+    monodose_FCC_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
+                                                             , vial_type = 'monodose'
+                                                             , vax_vol = input$vaccine_vol_monodose
+                                                             , with_ice = T
+                                                             , doses_to_transport = monodose_FCC_doses_needed
+                                                             )
+      
+   #   ceiling(monodose_FCC_doses_needed / 283) # vaccine carrier
+
     
     # Monodose FCC RCW25 icepack needs
-    monodose_FCC_vaxCarr_icepack_needs_total <- vaxCarr_icepack_needs * monodose_vaxCarr_needs # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
+    monodose_FCC_vaxCarr_icepack_needs_total <- vaxCarr_icepack_needs * monodose_FCC_vaxCarr_needs # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
     monodose_FCC_vaxCarr_icepack_vol <- monodose_FCC_vaxCarr_icepack_needs_total * 0.4 # total volume of ice packs needed is simply the above calculation * 0.6L
     
     
@@ -277,38 +291,6 @@ server <- function(input, output, session) {
       paste(as.numeric(monodose_FCC_init_iceVol), "L")
     }) # we only need 0.6L ice packs to tra
     
-    
-    #######
-    #team days calculations
-    #######
-    
-    #size of near population 
-    # near_pop_monodoseFCC <- site_table$added_sites %>%
-    #   dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
-    #   .$near_pop # number of doses needed
-    # 
-    # team_days_fixed_monodose_FCC <- round((near_pop_monodoseFCC * (1 + input$buffer_stock / 100)) / tp_fixed, 1)
-    # 
-    # 
-    # #output for team days required for fixed teams
-    # output$tdf_monodoseFCC <- renderText({
-    #   paste0(as.numeric(team_days_fixed_monodose_FCC)) 
-    # })
-    # 
-    # 
-    # #size of far population 
-    # far_pop_monodoseFCC <- site_table$added_sites %>%
-    #   dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
-    #   .$far_pop # number of doses needed
-    # 
-    # 
-    # team_days_mobile_monodose_FCC <- round((far_pop_monodoseFCC * (1 + input$buffer_stock / 100)) / tp_mobile, 1)
-    # 
-    # 
-    # output$tdm_monodoseFCC <- renderText({
-    #   paste0(as.numeric(team_days_mobile_monodose_FCC))
-    # })
-    # 
     monodose_FCC_near_pop <- extract_near_pop(site_table$added_sites)
     monodose_FCC_far_pop <- extract_far_pop(site_table$added_sites)
     
@@ -379,13 +361,28 @@ server <- function(input, output, session) {
     
    # dose10_FCC_doses_needed <- dose10_FCC_doses * (1 + input$buffer_stock / 100) # apply buffer. This formula doesn't seem to be making any impact
     # number of RCW25s needed, based on the volume of the vaccine indicated (1 RCW25 can transport 3300 doses if vax vol = 3cm3 and 5000 doses if vax vol = 2cm3)
-    if (input$vaccine_vol_dose10 == 2.1) {
-      dose10_FCC_RCW25_needs <- ceiling(dose10_FCC_doses_needed / 5000) # these numbers refer to the doses along with the diluents. Source: Excel sheet for Appendix 23
-      dose10_FCC_vaxCarr_needs <- ceiling(dose10_FCC_doses_needed / 750) # vaccine carrier. Source: Excel sheet for Appendix 23 
-    } else if (input$vaccine_vol_dose10 == 3) {
-      dose10_FCC_RCW25_needs <- ceiling(dose10_FCC_doses_needed / 3300) #Source: Excel sheet for Appendix 23
-      dose10_FCC_vaxCarr_needs <- ceiling(dose10_FCC_doses_needed / 500) # vaccine carrier. Source: Excel sheet for Appendix 23
-    }
+    # if (input$vaccine_vol_dose10 == 2.1) {
+    #   dose10_FCC_RCW25_needs <- ceiling(dose10_FCC_doses_needed / 5000) # these numbers refer to the doses along with the diluents. Source: Excel sheet for Appendix 23
+    #   dose10_FCC_vaxCarr_needs <- ceiling(dose10_FCC_doses_needed / 750) # vaccine carrier. Source: Excel sheet for Appendix 23 
+    # } else if (input$vaccine_vol_dose10 == 3) {
+    #   dose10_FCC_RCW25_needs <- ceiling(dose10_FCC_doses_needed / 3300) #Source: Excel sheet for Appendix 23
+    #   dose10_FCC_vaxCarr_needs <- ceiling(dose10_FCC_doses_needed / 500) # vaccine carrier. Source: Excel sheet for Appendix 23
+    # }
+    
+    
+    dose10_FCC_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
+                                   , vial_type = 'dose10'
+                                   , vax_vol = input$vaccine_vol_dose10
+                                   , with_ice = T
+                                   , doses_to_transport = dose10_FCC_doses_needed
+                                   )
+    
+    dose10_FCC_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
+                                                              , vial_type = 'dose10'
+                                                              , vax_vol = input$vaccine_vol_dose10
+                                                              , with_ice = T
+                                                              , doses_to_transport = dose10_FCC_doses_needed
+                                                              )
     
     
     # 10-dose FCC RCW25 icepack needs
@@ -492,18 +489,47 @@ server <- function(input, output, session) {
     
     
     # passive cold chain needed, based on the volume of the vaccine indicated (1 RCW25 can transport 3300 doses if vax vol = 3cm3 and 5000 doses if vax vol = 2cm3)
-    if (input$vaccine_vol_dose10 == 2.1) {
-      mixed_FCC_dose10_RCW25_needs <- ceiling(mixed_FCC_dose10_final / 5000) # these numbers refer to the doses along with the diluents
-      mixed_FCC_dose10_vaxCarr_needs <- ceiling(mixed_FCC_dose10_final / 750) # vaccine carrier
-    } else if (input$vaccine_vol_dose10 == 3) {
-      mixed_FCC_dose10_RCW25_needs <- ceiling(mixed_FCC_dose10_final / 3300)
-      mixed_FCC_dose10_vaxCarr_needs <- ceiling(mixed_FCC_dose10_final / 500) # vaccine carrier
-    }
+    # if (input$vaccine_vol_dose10 == 2.1) {
+    #   mixed_FCC_dose10_RCW25_needs <- ceiling(mixed_FCC_dose10_final / 5000) # these numbers refer to the doses along with the diluents
+    #   mixed_FCC_dose10_vaxCarr_needs <- ceiling(mixed_FCC_dose10_final / 750) # vaccine carrier
+    # } else if (input$vaccine_vol_dose10 == 3) {
+    #   mixed_FCC_dose10_RCW25_needs <- ceiling(mixed_FCC_dose10_final / 3300)
+    #   mixed_FCC_dose10_vaxCarr_needs <- ceiling(mixed_FCC_dose10_final / 500) # vaccine carrier
+    # }
     
+    mixed_FCC_dose10_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
+                                   , vial_type = 'dose10'
+                                   , vax_vol = input$vaccine_vol_dose10
+                                   , with_ice = T
+                                   , doses_to_transport = mixed_FCC_dose10_final
+                                   )
+    
+    mixed_FCC_dose10_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
+                                                                     , vial_type = 'dose10'
+                                                                     , vax_vol = input$vaccine_vol_dose10
+                                                                     , with_ice = T
+                                                                     , doses_to_transport = mixed_FCC_dose10_final
+                                                                     )
     
     #passive cold chain required for monodose vials
-    mixed_FCC_monodose_RCW25_needs <- ceiling(mixed_FCC_monodose_final / 1301) #Source: Excel sheet "Cold Chain equipment"
-    mixed_FCC_monodose_vaxCarr_needs <- ceiling(mixed_FCC_monodose_final / 283) #Source: Excel sheet "Cold Chain equipment"
+    mixed_FCC_monodose_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
+                                                                     , vial_type = 'monodose'
+                                                                     , vax_vol = input$vaccine_vol_monodose
+                                                                     , with_ice = T
+                                                                     , doses_to_transport = mixed_FCC_monodose_final
+                                                                     )
+      
+      
+    #  ceiling(mixed_FCC_monodose_final / 1301) #Source: Excel sheet "Cold Chain equipment"
+    mixed_FCC_monodose_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
+                                                                       , vial_type = 'monodose'
+                                                                       , vax_vol = input$vaccine_vol_monodose
+                                                                       , with_ice = T
+                                                                       , doses_to_transport = mixed_FCC_monodose_final
+                                                                       )
+      
+      
+      #ceiling(mixed_FCC_monodose_final / 283) #Source: Excel sheet "Cold Chain equipment"
     
     
     #total passive cold chain needs
@@ -628,18 +654,47 @@ server <- function(input, output, session) {
     part_OCC_doses_needed <- part_OCC_dose10_final + part_OCC_monodose_final
     
     # passive cold chain needed, based on the volume of the vaccine indicated (1 RCW25 can transport 3300 doses if vax vol = 3cm3 and 5000 doses if vax vol = 2cm3)
-    if (input$vaccine_vol_dose10 == 2.1) {
-      part_OCC_dose10_RCW25_needs <- ceiling(part_OCC_dose10_final / 5000) # these numbers refer to the doses along with the diluents. Source: Excel sheet for Appendix 23
-      part_OCC_dose10_vaxCarr_needs <- ceiling(part_OCC_dose10_final / 750) # vaccine carrier. Source: Excel sheet for Appendix 23
-    } else if (input$vaccine_vol_dose10 == 3) {
-      part_OCC_dose10_RCW25_needs <- ceiling(part_OCC_dose10_final / 3300) # Source: Excel sheet for Appendix 23
-      part_OCC_dose10_vaxCarr_needs <- ceiling(part_OCC_dose10_final / 500) # vaccine carrier. Source: Excel sheet for Appendix 23
-    }
+    # if (input$vaccine_vol_dose10 == 2.1) {
+    #   part_OCC_dose10_RCW25_needs <- ceiling(part_OCC_dose10_final / 5000) # these numbers refer to the doses along with the diluents. Source: Excel sheet for Appendix 23
+    #   part_OCC_dose10_vaxCarr_needs <- ceiling(part_OCC_dose10_final / 750) # vaccine carrier. Source: Excel sheet for Appendix 23
+    # } else if (input$vaccine_vol_dose10 == 3) {
+    #   part_OCC_dose10_RCW25_needs <- ceiling(part_OCC_dose10_final / 3300) # Source: Excel sheet for Appendix 23
+    #   part_OCC_dose10_vaxCarr_needs <- ceiling(part_OCC_dose10_final / 500) # vaccine carrier. Source: Excel sheet for Appendix 23
+    # }
+    
+    part_OCC_dose10_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
+                                   , vial_type = 'dose10'
+                                   , vax_vol = input$vaccine_vol_dose10
+                                   , with_ice = T
+                                   , doses_to_transport = part_OCC_dose10_final)
+    
+    
+    part_OCC_dose10_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
+                                                                    , vial_type = 'dose10'
+                                                                    , vax_vol = input$vaccine_vol_dose10
+                                                                    , with_ice = T
+                                                                    , doses_to_transport = part_OCC_dose10_final)
     
     
     #passive cold chain required for monodose vials
-    part_OCC_monodose_RCW25_needs <- ceiling(part_OCC_monodose_final / 1301) #Source: Excel sheet "Cold Chain equipment"
-    part_OCC_monodose_vaxCarr_needs <- ceiling(part_OCC_monodose_final / 283) #Source: Excel sheet "Cold Chain equipment"
+    part_OCC_monodose_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
+                                                                    , vial_type = 'monodose'
+                                                                    , vax_vol = input$vaccine_vol_monodose
+                                                                    , with_ice = F
+                                                                    , doses_to_transport = part_OCC_monodose_final)
+    
+      
+      #ceiling(part_OCC_monodose_final / 1301) #Source: Excel sheet "Cold Chain equipment"
+    part_OCC_monodose_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
+                                                                      , vial_type = 'monodose'
+                                                                      , vax_vol = input$vaccine_vol_monodose
+                                                                      , with_ice = F
+                                                                      , doses_to_transport = part_OCC_monodose_final)
+    
+      
+      
+      
+    #ceiling(part_OCC_monodose_final / 283) #Source: Excel sheet "Cold Chain equipment"
     
     
     #total passive cold chain needs
