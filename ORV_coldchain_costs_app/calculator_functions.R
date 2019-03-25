@@ -128,3 +128,33 @@ calc_dose_capacity <- function(vial_type, vax_vol, equip_type, with_ice = T) #vi
    else{stop('Wrong input entered')}
 }
 
+################################################################################
+#' Full Cold Chain (FCC) calculations
+################################################################################
+
+#calc_doses_required(): calculates number of doses needed based on the target population size; indicate if you need doses for the near or far people; the type of vial you need calcalations for; and the row numbers of the sites you want to analyse
+calc_doses_required <- function(df, site_rows_selected, is_dose10 = T, pop_type){ #df is the dataframe of added sites; site_row = row numbers to analyse; is.dose10, if false, means monodose; #pop_type = c(near, far)
+   selected_sites <- df %>% 
+            dplyr::slice(site_rows_selected)
+   
+   if(pop_type == 'near' & is_dose10 == T){
+      doses_required <- selected_sites %>% 
+            dplyr::summarise(sum(.$near_pop))
+      return(ceiling(doses_required / 10))
+      }else if(pop_type == 'near' & is_dose10 == F){
+         doses_required <- selected_sites %>% 
+            dplyr::summarise(sum(.$near_pop))
+         return(doses_required)
+      } else if(pop_type == 'far' & is_dose10 == T){
+         doses_required <- selected_sites %>% 
+            dplyr::summarise(sum(.$far_pop))
+         return(ceiling(doses_required / 10))
+      }else if(pop_type == 'far' & is_dose10 == F){
+         doses_required <- selected_sites %>% 
+            dplyr::summarise(sum(.$far_pop))
+         return(doses_required)
+      } else{
+         stop('Error in dose calculation function; check your inputs')
+      }
+   }
+   
