@@ -52,7 +52,7 @@ ui <- fluidPage(
       numericInput('mf314_quant', 'Number of MF314 available', value = 1, min = 1, step = 1),
       
       br(),
-      textInput(inputId = 'sites_to_analyse', label = 'Sites to analyse', placeholder = 'row / row numbers separated by commas / row range', width = '400px'),
+      sliderInput(inputId = 'sites_to_analyse', label = 'Site/range of sites to analyse', min = 1, max = 200, value = c(1, 1), step = 1),
       
       br(),
       actionButton("show_results", "Display results"),   
