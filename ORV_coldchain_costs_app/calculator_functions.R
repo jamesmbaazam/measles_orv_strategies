@@ -157,4 +157,15 @@ calc_doses_required <- function(df, site_rows_selected, is_dose10 = T, pop_type)
          stop('Error in dose calculation function; check your inputs')
       }
    }
+
+##########
+#calc_freezing_time()
+##########
+
+calc_freezing_time <- function(mf314_available, large_icepacks_quantity, small_icepacks_quantity){
+   ceiling(
+      (1/mf314_available)*((large_icepacks_quantity / mf314_largepack_fr) + (small_icepacks_quantity / mf314_smallpack_fr)) 
+   )
+   
+}
    
