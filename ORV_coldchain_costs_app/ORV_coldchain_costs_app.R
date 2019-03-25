@@ -225,9 +225,17 @@ server <- function(input, output, session) {
     # Calculations for monodose-only FCC
     ##########################################
     
-    monodose_FCC_doses <- site_table$added_sites %>%
-      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
-      dplyr::summarise(sum(near_pop, far_pop)) # number of doses needed
+    monodose_FCC_doses_ft <- calc_doses_required(df = site_table$added_sites
+                                                 ,  site_rows_selected = input$sites_to_analyse
+                                                 , is_dose10 = F
+                                                 , pop_type = 'near')
+    
+    monodose_FCC_doses_mt <- calc_doses_required(df = site_table$added_sites
+                                                 ,  site_rows_selected = input$sites_to_analyse
+                                                 , is_dose10 = F
+                                                 , pop_type = 'far')
+    
+    monodose_FCC_doses <-  monodose_FCC_doses_ft + monodose_FCC_doses_mt 
     
     monodose_FCC_doses_needed <- monodose_FCC_doses * (1 + input$buffer_stock / 100) # apply buffer. This formula doesn't seem to be making any impact
     
@@ -351,13 +359,15 @@ server <- function(input, output, session) {
     #   dplyr::summarise(sum(near_pop, far_pop) / 10) # number of doses needed
     #   
       
-    dose10_FCC_doses_near_pop <-  site_table$added_sites %>%
-      dplyr::slice(1) %>% 
-      .$near_pop/10
+    dose10_FCC_doses_near_pop <-  calc_doses_required(df = site_table$added_sites
+                                                     ,  site_rows_selected = input$sites_to_analyse
+                                                     , is_dose10 = T
+                                                     , pop_type = 'near')
     
-    dose10_FCC_doses_far_pop <-  site_table$added_sites %>%
-      dplyr::slice(1) %>% 
-      .$far_pop/10
+    dose10_FCC_doses_far_pop <-  calc_doses_required(df = site_table$added_sites
+                                                    ,  site_rows_selected = input$sites_to_analyse
+                                                    , is_dose10 = T
+                                                    , pop_type = 'far')
     
     #doses required for near population after wastage penalty
     dose10_FCC_doses_near_pop_req <- dose10_FCC_doses_near_pop * dose10_wastage_ft
@@ -460,13 +470,15 @@ server <- function(input, output, session) {
     #' Calculations for mixed strategy, i.e 10-dose for near population and monodose for far population
     ##########################################
     
-    mixed_FCC_dose10_quant <- site_table$added_sites %>%
-      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
-      .$near_pop/10
+    mixed_FCC_dose10_quant <- calc_doses_required(df = site_table$added_sites
+                                                 ,  site_rows_selected = input$sites_to_analyse
+                                                 , is_dose10 = T
+                                                 , pop_type = 'near')
     
-    mixed_FCC_monodose_quant <- site_table$added_sites %>%
-      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
-      .$far_pop 
+    mixed_FCC_monodose_quant <- calc_doses_required(df = site_table$added_sites
+                                                   ,  site_rows_selected = input$sites_to_analyse
+                                                   , is_dose10 = F
+                                                   , pop_type = 'far')
     
     
     mixed_FCC_doses <- mixed_FCC_dose10_quant + mixed_FCC_monodose_quant
@@ -593,20 +605,23 @@ server <- function(input, output, session) {
     #' Calculations for partial OCC strategy, i.e 10-dose FCC for near population and monodose OCC for far population
     ##############################################################################
     
-    part_OCC_dose10_quant <- site_table$added_sites %>%
-      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
-      .$near_pop/10
+    part_OCC_dose10_quant <- calc_doses_required(df = site_table$added_sites
+                                                ,  site_rows_selected = input$sites_to_analyse
+                                                , is_dose10 = T
+                                                , pop_type = 'near')
     
-    part_OCC_monodose_quant <- site_table$added_sites %>%
-      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
-      .$far_pop 
+    part_OCC_monodose_quant <- calc_doses_required(df = site_table$added_sites
+                                                   ,  site_rows_selected = input$sites_to_analyse
+                                                   , is_dose10 = F
+                                                   , pop_type = 'far')
+    
     
     
    # part_OCC_doses <- part_OCC_dose10_quant + part_OCC_monodose_quant
     
-    part_OCC_dose10_final <- part_OCC_dose10_quant* (1 + input$buffer_stock / 100)
+    part_OCC_dose10_final <- part_OCC_dose10_quant * (1 + input$buffer_stock / 100)
     
-    part_OCC_monodose_final <- part_OCC_monodose_quant* (1 + input$buffer_stock / 100)
+    part_OCC_monodose_final <- part_OCC_monodose_quant * (1 + input$buffer_stock / 100)
     
     part_OCC_doses_needed <- part_OCC_dose10_final + part_OCC_monodose_final
     
