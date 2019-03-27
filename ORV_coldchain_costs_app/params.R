@@ -1,3 +1,7 @@
+#Data table row selection control
+num_of_sites_selectable <- 'single' #'single' means only one row can be selected at a time. To prevent row selection, set to 'none'. Selected rows are available through input$id_of_table_rows_selected
+
+
 # FIXED PARAMETERS
 
 Strategy_list <- c("Monodose FCC", "10-dose FCC", "Mixed FCC", "Part OCC") #OCC = out of cold chain
