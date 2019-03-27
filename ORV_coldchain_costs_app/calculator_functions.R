@@ -1,38 +1,3 @@
-
-
-
-################################################################################
-#'extract_near_pop() & extract_far_pop(): Extract population sizes for near and far
-#' kids for further calculations
-################################################################################
-extract_near_pop <- function(df){
-   df %>%
-      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
-      .$near_pop
-}
-
-
-extract_far_pop <- function(df){
-   df %>%
-      dplyr::slice(1) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
-      .$far_pop
-}
-
-
-################################################################################
-#' extract_site_team_size(): Extract size of allocated teams for a site from the 
-#' sites table
-################################################################################
-
-extract_site_team_size <- function(df, site = 1) { # for now, we are only going to concentrate on one site. User indicates which site to analyse
-  teams <- df %>%
-    dplyr::slice(site) %>%
-    .$site_team_alloc # number of teams allocated to site
-  return(teams)
-}
-
-
-
 ################################################################################
 #'compute_rcw25_icepacks() & compute_varCarr_icepacks(): Calculate ice pack needs 
 #' for each vax carrier and RCW25s, based on ambient temperature
@@ -52,6 +17,38 @@ compute_vaxCarr_icepacks <- function(amb_temp){
    )
 }
 
+
+
+
+################################################################################
+#'extract_near_pop() & extract_far_pop(): Extract population sizes for near and far
+#' kids for further calculations
+################################################################################
+extract_near_pop <- function(df, site_rows_selected){
+   df %>%
+      dplyr::slice(site_rows_selected) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+      .$near_pop
+}
+
+
+extract_far_pop <- function(df, site_rows_selected){
+   df %>%
+      dplyr::slice(site_rows_selected) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+      .$far_pop
+}
+
+
+################################################################################
+#' extract_site_team_size(): Extract size of allocated teams for a site from the 
+#' sites table
+################################################################################
+
+extract_site_team_size <- function(df, site_rows_selected) { # for now, we are only going to concentrate on one site. User indicates which site to analyse
+  teams <- df %>%
+    dplyr::slice(site_rows_selected) %>%
+    .$site_team_alloc # number of teams allocated to site
+  return(teams)
+}
 
 
 ################################################################################
