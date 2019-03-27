@@ -75,7 +75,8 @@ ui <- fluidPage(
       8,
       tabsetPanel(
         tabPanel(title = "Table of sites added", DT::dataTableOutput("all_sites", width = "90%", height = "100%")),
-        tabPanel(title = "Strategy comparison plots", plotOutput("plot"))
+        tabPanel(title = "Strategy comparison plots", plotOutput("plot")),
+        tabPanel(title = 'Help', textOutput('help'))
       )
     )
   ), fluidRow(column(8,
