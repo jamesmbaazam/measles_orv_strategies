@@ -37,11 +37,11 @@ ui <- fluidPage(
       
       br(),
       
-      actionButton("remove_site", "Click to remove a site"),
-      
-      br(),
-      
-      br(),
+      # actionButton("remove_site", "Click to remove a site"),
+      # 
+      # br(),
+      # 
+      # br(),
       
       selectInput("temp", "Ambient temperature", choices = c("below 40", "above 40")),
       
