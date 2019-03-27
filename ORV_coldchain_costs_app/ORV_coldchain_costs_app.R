@@ -270,12 +270,12 @@ server <- function(input, output, session) {
     ##########################################
     
     monodose_FCC_doses_ft <- calc_doses_required(df = site_table$added_sites
-                                                 ,  site_rows_selected = input$sites_to_analyse
+                                                 ,  site_rows_selected = input$all_sites_rows_selected
                                                  , is_dose10 = F
                                                  , pop_type = 'near')
     
     monodose_FCC_doses_mt <- calc_doses_required(df = site_table$added_sites
-                                                 ,  site_rows_selected = input$sites_to_analyse
+                                                 ,  site_rows_selected = input$all_sites_rows_selected
                                                  , is_dose10 = F
                                                  , pop_type = 'far')
     
@@ -335,8 +335,8 @@ server <- function(input, output, session) {
       paste(as.numeric(monodose_FCC_init_iceVol), "L")
     }) # we only need 0.6L ice packs to tra
     
-    monodose_FCC_near_pop <- extract_near_pop(site_table$added_sites)
-    monodose_FCC_far_pop <- extract_far_pop(site_table$added_sites)
+    monodose_FCC_near_pop <- extract_near_pop(site_table$added_sites, site_rows_selected = input$all_sites_rows_selected)
+    monodose_FCC_far_pop <- extract_far_pop(site_table$added_sites, site_rows_selected = input$all_sites_rows_selected)
     
     #this calculates the number of doses we can transport. We will then find out if we can transport more or less irrespective of how many we are expected to vaccinate, i.e, team performance/vaccination rate
     monodose_FCC_far_trip_capacity <- calc_dose_capacity(vial_type = 'monodose' 
@@ -365,7 +365,7 @@ server <- function(input, output, session) {
     #######
     
     #Extract size of allocated team from the sites table
-    site_teams_monodoseFCC <- extract_site_team_size(site_table$added_sites)
+    site_teams_monodoseFCC <- extract_site_team_size(site_table$added_sites, site_rows_selected = input$all_sites_rows_selected)
 
     # output for the duration that each team type will spend on site
     output$team_dur_monodoseFCC <- print_site_team_dur(site_team_quant = site_teams_monodoseFCC
@@ -385,12 +385,12 @@ server <- function(input, output, session) {
     #   
       
     dose10_FCC_doses_near_pop <-  calc_doses_required(df = site_table$added_sites
-                                                     ,  site_rows_selected = input$sites_to_analyse
+                                                     ,  site_rows_selected = input$all_sites_rows_selected
                                                      , is_dose10 = T
                                                      , pop_type = 'near')
     
     dose10_FCC_doses_far_pop <-  calc_doses_required(df = site_table$added_sites
-                                                    ,  site_rows_selected = input$sites_to_analyse
+                                                    ,  site_rows_selected = input$all_sites_rows_selected
                                                     , is_dose10 = T
                                                     , pop_type = 'far')
     
@@ -466,8 +466,8 @@ server <- function(input, output, session) {
     ##team days calculations
     #size of near population
     
-    dose10_FCC_near_pop <- extract_near_pop(site_table$added_sites)
-    dose10_FCC_far_pop <- extract_far_pop(site_table$added_sites)
+    dose10_FCC_near_pop <- extract_near_pop(site_table$added_sites, site_rows_selected = input$all_sites_rows_selected)
+    dose10_FCC_far_pop <- extract_far_pop(site_table$added_sites, site_rows_selected = input$all_sites_rows_selected)
     
     
     
@@ -498,7 +498,7 @@ server <- function(input, output, session) {
     #######
     
     #Extract size of allocated team from the sites table
-    site_teams_dose10_FCC <- extract_site_team_size(site_table$added_sites)
+    site_teams_dose10_FCC <- extract_site_team_size(site_table$added_sites, site_rows_selected = input$all_sites_rows_selected)
     
     # output for the duration that each team type will spend on site
     output$team_dur_dose10_FCC <- print_site_team_dur(site_team_quant = site_teams_dose10_FCC
@@ -513,12 +513,12 @@ server <- function(input, output, session) {
     ##########################################
     
     mixed_FCC_dose10_quant <- calc_doses_required(df = site_table$added_sites
-                                                 ,  site_rows_selected = input$sites_to_analyse
+                                                 ,  site_rows_selected = input$all_sites_rows_selected
                                                  , is_dose10 = T
                                                  , pop_type = 'near')
     
     mixed_FCC_monodose_quant <- calc_doses_required(df = site_table$added_sites
-                                                   ,  site_rows_selected = input$sites_to_analyse
+                                                   ,  site_rows_selected = input$all_sites_rows_selected
                                                    , is_dose10 = F
                                                    , pop_type = 'far')
     
@@ -635,8 +635,8 @@ server <- function(input, output, session) {
     ##team days calculations
     #size of near population 
     
-    mixed_FCC_near_pop <- extract_near_pop(site_table$added_sites)
-    mixed_FCC_far_pop <- extract_far_pop(site_table$added_sites)
+    mixed_FCC_near_pop <- extract_near_pop(site_table$added_sites, site_rows_selected = input$all_sites_rows_selected)
+    mixed_FCC_far_pop <- extract_far_pop(site_table$added_sites, site_rows_selected = input$all_sites_rows_selected)
     
     mixed_FCC_far_trip_capacity <- calc_dose_capacity(vial_type = 'monodose' 
                                                       , vax_vol = 21.09
@@ -663,7 +663,7 @@ server <- function(input, output, session) {
     #######
     
     #Extract size of allocated team from the sites table
-    site_teams_mixed_FCC <- extract_site_team_size(site_table$added_sites)
+    site_teams_mixed_FCC <- extract_site_team_size(site_table$added_sites, site_rows_selected = input$all_sites_rows_selected)
     
     # output for the duration that each team type will spend on site
     output$team_dur_mixed_FCC <- print_site_team_dur(site_team_quant = site_teams_mixed_FCC
@@ -678,12 +678,12 @@ server <- function(input, output, session) {
     ##############################################################################
     
     part_OCC_dose10_quant <- calc_doses_required(df = site_table$added_sites
-                                                ,  site_rows_selected = input$sites_to_analyse
+                                                ,  site_rows_selected = input$all_sites_rows_selected
                                                 , is_dose10 = T
                                                 , pop_type = 'near')
     
     part_OCC_monodose_quant <- calc_doses_required(df = site_table$added_sites
-                                                   ,  site_rows_selected = input$sites_to_analyse
+                                                   ,  site_rows_selected = input$all_sites_rows_selected
                                                    , is_dose10 = F
                                                    , pop_type = 'far')
     
@@ -800,8 +800,8 @@ server <- function(input, output, session) {
     ##team days calculations
     #size of near population 
     
-    part_OCC_near_pop <- extract_near_pop(site_table$added_sites)
-    part_OCC_far_pop <- extract_far_pop(site_table$added_sites)
+    part_OCC_near_pop <- extract_near_pop(site_table$added_sites, site_rows_selected = input$all_sites_rows_selected)
+    part_OCC_far_pop <- extract_far_pop(site_table$added_sites, site_rows_selected = input$all_sites_rows_selected)
     
     
     part_OCC_far_trip_capacity <- calc_dose_capacity(vial_type = 'monodose' 
@@ -833,7 +833,7 @@ server <- function(input, output, session) {
     #######
     
     #Extract size of allocated team from the sites table
-    site_teams_part_OCC <- extract_site_team_size(site_table$added_sites)
+    site_teams_part_OCC <- extract_site_team_size(site_table$added_sites, site_rows_selected = input$all_sites_rows_selected)
     
     # output for the duration that each team type will spend on site
     output$team_dur_part_OCC <- print_site_team_dur(site_team_quant = site_teams_part_OCC
@@ -934,9 +934,9 @@ server <- function(input, output, session) {
                    td_plot,
                    ncol = 3)
     })
+    }
   })
 }
-
 
 
 
