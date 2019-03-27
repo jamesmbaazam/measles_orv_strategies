@@ -206,16 +206,6 @@ server <- function(input, output, session) {
   
   
   
-  
-  observeEvent(input$show_results, {
-    
-    
-    # how many 0.6L ice packs will be needed for the quantity of RCW25s calculated?
-    RCW25_icepack_needs <-  compute_rcw25_icepacks(input$temp)
-    
-    vaxCarr_icepack_needs <- compute_vaxCarr_icepacks(input$temp)
-    
-    
   #clear the app when the clear action button is clicked.
   # observeEvent(input$clear_all,{
   #   output$ice_packs_required_monodose_FCC <- renderText({})
@@ -260,6 +250,21 @@ server <- function(input, output, session) {
   # 
   
   # dialog box to analyse sites
+  
+  # calculate and show results
+  observeEvent(input$show_results, {
+    if(is.null(input$all_sites_rows_selected)){
+      showModal(
+        modalDialog(
+          title = 'No site selected for analysis!', "Analyse site information by clicking the desired row in the sites table, followed by the 'Display Results' button to show the results!")
+      ) 
+    }else{
+    # how many 0.6L ice packs will be needed for the quantity of RCW25s calculated?
+    RCW25_icepack_needs <-  compute_rcw25_icepacks(input$temp)
+    
+    vaxCarr_icepack_needs <- compute_vaxCarr_icepacks(input$temp)
+    
+    
     ##########################################
     # Calculations for monodose-only FCC
     ##########################################
