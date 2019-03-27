@@ -200,41 +200,13 @@ server <- function(input, output, session) {
       )
       site_table$added_sites <- bind_rows(site_table$added_sites, site_new$data)
       removeModal()
-    }
-    output$all_sites <- DT::renderDT(site_table$added_sites)
-  })
-  
-  # dialog box to remove sites
-  observeEvent(input$remove_site, {
-    showModal(modalDialog(
-      title = "Enter site row number",
-      numericInput("site_to_remove", "Which site do you want to remove?", value = 0, min = 0, step = 1),
-      fade = TRUE,
-      footer = tagList(
-        modalButton("Dismiss"),
-        actionButton("remove_site_button_click", "Remove site")
-      )
-    ))
-  })
-  
-  observeEvent(input$remove_site_button_click, {
-    if(input$site_to_remove == 0 | input$site_to_remove > dim(site_table$added_sites)[1]){
-      showModal(
-        modalDialog(
-          title = "Wrong input! No site will be removed")
-      ) 
-    }else{
-      showModal(
-        modalDialog(
-          title = paste('Site', input$site_to_remove, 'will be removed and site table will be updated'))
-      ) 
-      site_table$added_sites <- dplyr::slice(site_table$added_sites, -input$site_to_remove)
-      output$all_sites <- DT::renderDT(site_table$added_sites)
-    }
+  }
+    output$all_sites <- DT::renderDataTable(site_table$added_sites, selection = num_of_sites_selectable)
   })
   
   
-  # calculate and show results
+  
+  
   observeEvent(input$show_results, {
     
     
