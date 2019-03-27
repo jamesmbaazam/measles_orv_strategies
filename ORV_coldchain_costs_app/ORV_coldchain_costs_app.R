@@ -216,19 +216,19 @@ server <- function(input, output, session) {
     vaxCarr_icepack_needs <- compute_vaxCarr_icepacks(input$temp)
     
     
-    #clear the app when the clear action button is clicked.
-    # observeEvent(input$clear_all,{
-    #   output$ice_packs_required_monodose_FCC <- renderText({})
-    #   output$ice_packs_required_dose10_FCC<- renderText({})
-    #   output$ice_packs_required_mixed_FCC<- renderText({})
-    #   output$tdm_monodose_FCC <- renderText({})
-    #   output$tdm_dose10_FCC <- renderText({})
-    #   output$tdm_mixed_FCC <- renderText({})
-    #   output$all_sites <- renderText({})
-    #   output$plot <- renderText({})
-    # })
-    # 
-    
+  #clear the app when the clear action button is clicked.
+  # observeEvent(input$clear_all,{
+  #   output$ice_packs_required_monodose_FCC <- renderText({})
+  #   output$ice_packs_required_dose10_FCC<- renderText({})
+  #   output$ice_packs_required_mixed_FCC<- renderText({})
+  #   output$tdm_monodose_FCC <- renderText({})
+  #   output$tdm_dose10_FCC <- renderText({})
+  #   output$tdm_mixed_FCC <- renderText({})
+  #   output$all_sites <- renderText({})
+  #   output$plot <- renderText({})
+  # })
+  # 
+  
     ##########################################
     # Calculations for monodose-only FCC
     ##########################################
