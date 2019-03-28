@@ -59,33 +59,55 @@ extract_site_team_size <- function(df, site_rows_selected) { # for now, we are o
 print_site_team_dur <- function(site_team_quant, td_fixed, td_mobile){ #td_fixed = team days for fixed site team, #td_mobile = team days for mobile team
  if (site_team_quant == 0) {
    renderText(
-     print("<b> no teams were allocated </b>")
+     print("<b> No teams were allocated. </b>")
   )
  } else if (site_team_quant == 1) {
    renderText({
      paste(
-       "in sequence,",
-       "<b> Fixed post </b> team will spend",
+       "Teams will work sequentially.",
+       '<br>',
+       "First, the <b> FIXED post </b> team will spend:",
        td_fixed,
-       "days",
+       "day(s).",
        "<br>",
-       "<b> Mobile </b> team will spend",
-       td_fixed,
+       "Afterwards, the <b> MOBILE </b> team will spend:",
+       td_mobile,
+       'day(s).', 
        "<br>",
-       "<b> total: </b>", td_fixed + td_mobile
+       "<b> Total: </b>", td_fixed + td_mobile,
+       'day(s).'
      )
    })
- } else {
+ } else if (site_team_quant == 2) {
+    renderText({
+       paste(
+          "The <b> Fixed post </b> team will spend",
+          td_fixed,
+          "day(s).",
+          "<br>",
+          "The <b> Mobile </b> team will spend",
+          td_mobile, 
+          "day(s).", 
+          "<br>",
+          "<b> Total: </b>", 
+          td_fixed + td_mobile,
+          'day(s).'
+       )
+    })
+ }else {
    renderText({
      paste(
-       site_team_quant - 1,
+        'The',
+        site_team_quant - 1,
        "<b> Fixed post </b> teams will each spend",
        round((td_fixed / (site_team_quant - 1)), digits = 1),
-       "days.",
+       "day(s).",
        "<br>",
-       "1",
-       "<b> Mobile </b> team will spend",
-       td_mobile, "days."
+       "The <b> Mobile </b> team will spend",
+       td_mobile, "day(s).", 
+       "<br>",
+       "<b> Total: </b>", td_fixed + td_mobile,
+       'day(s).'
      )
    })
  }
