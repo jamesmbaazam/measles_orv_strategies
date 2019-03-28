@@ -283,7 +283,7 @@ server <- function(input, output, session) {
     
     monodose_FCC_doses_needed <- monodose_FCC_doses * (1 + input$buffer_stock / 100) # apply buffer. This formula doesn't seem to be making any impact
     
-    # number of RCW25s needed, based on the volume of the vaccine indicated (1 RCW25 can transport 1301 vials/doses and a vaccine carrier can transport 283 vials/doses)
+    # number of RCW25s needed, based on the volume of the vaccine indicated (Without ice, 1 RCW25 can transport 1301 vials/doses and a vaccine carrier can transport 170 vials/doses. With ice, the numbers are 616 and 77 per our calculations)
     
     monodose_FCC_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
                                                                , vial_type = 'monodose'
@@ -291,17 +291,13 @@ server <- function(input, output, session) {
                                                                , with_ice = T
                                                                , doses_to_transport = monodose_FCC_doses_needed
                                                                )
-    #   
-    #   ceiling(monodose_FCC_doses_needed / 1301) # these numbers refer to the doses along with the diluents
+
     monodose_FCC_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
                                                              , vial_type = 'monodose'
                                                              , vax_vol = input$vaccine_vol_monodose
                                                              , with_ice = T
                                                              , doses_to_transport = monodose_FCC_doses_needed
                                                              )
-      
-   #   ceiling(monodose_FCC_doses_needed / 283) # vaccine carrier
-
     
     # Monodose FCC RCW25 icepack needs
     monodose_FCC_vaxCarr_icepack_needs_total <- vaxCarr_icepack_needs * monodose_FCC_vaxCarr_needs # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
@@ -338,7 +334,7 @@ server <- function(input, output, session) {
     monodose_FCC_near_pop <- extract_near_pop(site_table$added_sites, site_rows_selected = input$all_sites_rows_selected)
     monodose_FCC_far_pop <- extract_far_pop(site_table$added_sites, site_rows_selected = input$all_sites_rows_selected)
     
-    #this calculates the number of doses we can transport. We will then find out if we can transport more or less irrespective of how many we are expected to vaccinate, i.e, team performance/vaccination rate
+    #this calculates the number of doses we can transport for the far campaign. We will then find out if we can transport more or less irrespective of how many we are expected to vaccinate, i.e, team performance/vaccination rate
     monodose_FCC_far_trip_capacity <- calc_dose_capacity(vial_type = 'monodose' 
                                                 , vax_vol = 21.09
                                                 , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
@@ -377,12 +373,6 @@ server <- function(input, output, session) {
     ##########################################
     # Calculations for 10-dose only FCC
     ##########################################
-    
-    
-    # dose10_FCC_doses <- site_table$added_sites %>%
-    #   dplyr::slice(1)  # for now, we are only going to concentrate on one site. User indicates which site to analyse
-    #   dplyr::summarise(sum(near_pop, far_pop) / 10) # number of doses needed
-    #   
       
     dose10_FCC_doses_near_pop <-  calc_doses_required(df = site_table$added_sites
                                                      ,  site_rows_selected = input$all_sites_rows_selected
@@ -403,17 +393,7 @@ server <- function(input, output, session) {
     #number of doses required after buffer 
     dose10_FCC_doses_needed <- (dose10_FCC_doses_near_pop_req + dose10_FCC_doses_far_pop_req) * (1 + input$buffer_stock / 100)
     
-   # dose10_FCC_doses_needed <- dose10_FCC_doses * (1 + input$buffer_stock / 100) # apply buffer. This formula doesn't seem to be making any impact
-    # number of RCW25s needed, based on the volume of the vaccine indicated (1 RCW25 can transport 3300 doses if vax vol = 3cm3 and 5000 doses if vax vol = 2cm3)
-    # if (input$vaccine_vol_dose10 == 2.1) {
-    #   dose10_FCC_RCW25_needs <- ceiling(dose10_FCC_doses_needed / 5000) # these numbers refer to the doses along with the diluents. Source: Excel sheet for Appendix 23
-    #   dose10_FCC_vaxCarr_needs <- ceiling(dose10_FCC_doses_needed / 750) # vaccine carrier. Source: Excel sheet for Appendix 23 
-    # } else if (input$vaccine_vol_dose10 == 3) {
-    #   dose10_FCC_RCW25_needs <- ceiling(dose10_FCC_doses_needed / 3300) #Source: Excel sheet for Appendix 23
-    #   dose10_FCC_vaxCarr_needs <- ceiling(dose10_FCC_doses_needed / 500) # vaccine carrier. Source: Excel sheet for Appendix 23
-    # }
-    
-    
+
     dose10_FCC_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
                                    , vial_type = 'dose10'
                                    , vax_vol = input$vaccine_vol_dose10
@@ -564,16 +544,12 @@ server <- function(input, output, session) {
                                                                      )
       
       
-    #  ceiling(mixed_FCC_monodose_final / 1301) #Source: Excel sheet "Cold Chain equipment"
     mixed_FCC_monodose_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
                                                                        , vial_type = 'monodose'
                                                                        , vax_vol = input$vaccine_vol_monodose
                                                                        , with_ice = T
                                                                        , doses_to_transport = mixed_FCC_monodose_final
                                                                        )
-      
-      
-      #ceiling(mixed_FCC_monodose_final / 283) #Source: Excel sheet "Cold Chain equipment"
     
     
     #total passive cold chain needs
@@ -734,12 +710,6 @@ server <- function(input, output, session) {
                                                                       , vax_vol = input$vaccine_vol_monodose
                                                                       , with_ice = F
                                                                       , doses_to_transport = part_OCC_monodose_final)
-    
-      
-      
-      
-    #ceiling(part_OCC_monodose_final / 283) #Source: Excel sheet "Cold Chain equipment"
-    
     
     #total passive cold chain needs
     
