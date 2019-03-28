@@ -5,8 +5,8 @@
 compute_rcw25_icepacks <- function(amb_temp){
    switch (amb_temp,
            "below 40" = 12,
-           "above 40" = 18
-   )
+           "above 40" = 24
+   ) #I use the upper and lower limits of ice required. Lowest to use is 12 and highest is 24. 
 }
 
 
