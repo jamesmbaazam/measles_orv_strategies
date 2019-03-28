@@ -141,9 +141,9 @@ calc_dose_capacity <- function(vial_type, vax_vol, equip_type, with_ice = T) #vi
    else if (vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'rcw25' & with_ice == F)
    {1301}
    else if (vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'vaxCarr' & with_ice == T)
-   {170}
+   {77}
    else if (vial_type == 'monodose' & vax_vol == 21.09 & equip_type == 'vaxCarr' & with_ice == F)
-   {283}
+   {170}
    else{
       stop('Wrong input entered')
       }
@@ -154,6 +154,7 @@ calc_dose_capacity <- function(vial_type, vax_vol, equip_type, with_ice = T) #vi
 
 calc_transport_equipment_needs <- function(equip_type, vial_type, vax_vol, with_ice = T, doses_to_transport)
    { 
+   #NB: numbers here are doses and are based on the packed volume per dose, i.e, how much volume is required to pack one dose. 
       if(vial_type == 'dose10' & vax_vol == 2.1 & equip_type == 'rcw25' & with_ice == T)
       {ceiling(doses_to_transport / 5000)}
       else if (vial_type == 'dose10' & vax_vol == 3 & equip_type == 'rcw25' & with_ice == T)
