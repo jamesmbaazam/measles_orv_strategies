@@ -44,6 +44,21 @@ team_days_comparison_df <- tibble(
     team_days_monodose_far_OCC = rev(team_days_mobile_monodose_noIce)
 )
 
+#####
+#current situation
+#####
+team_days_comparison_current <- tibble(dose10_wastage= dose10_wr_ft
+                       , trip_capacity_ratio = monodose_FCC_far_trip_capacity_expanded[1] / dose10_FCC_far_trip_capacity
+                       , strategy = c('team_days_dose10_far_FCC', 'team_days_monodose_far_OCC')
+                       , team_days_mt = c(team_days_mobile_dose10_Ice[1], team_days_mobile_monodose_noIce[1]))
+
+
 df <- team_days_comparison_df %>% melt(id.vars = c('dose10_wastage', 'trip_capacity_ratio'), variable.name = 'strategy', value.name = 'team_days_mt')
 
-ggplot(data = df, aes(x = trip_capacity_ratio, y = team_days_mt, shape = strategy )) + geom_point() + geom_line()
+ggplot(data = df) + 
+    geom_point(aes(x = trip_capacity_ratio, y = dose10_wastage, color = strategy, size = team_days_mt)) + 
+    geom_point(data = team_days_comparison_current, aes(x = trip_capacity_ratio, y = dose10_wastage), color = 'yellow') +
+    labs(x = 'Fraction of volume capacity of monodose versus 10-dose', y = 'wastage rate (10-dose)') + 
+    scale_color_manual(values = c('team_days_dose10_far_FCC' = 'green', 'team_days_monodose_far_OCC' = 'tomato3')
+                       , labels = c('10-dose FCC', 'Monodose OCC'), name = 'Strategy') + 
+    scale_size(name = 'Mobile team days')
