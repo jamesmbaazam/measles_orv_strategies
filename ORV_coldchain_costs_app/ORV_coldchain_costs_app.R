@@ -385,10 +385,10 @@ server <- function(input, output, session) {
                                                     , pop_type = 'far')
     
     #doses required for near population after wastage penalty
-    dose10_FCC_doses_near_pop_req <- dose10_FCC_doses_near_pop * dose10_wastage_ft
+    dose10_FCC_doses_near_pop_req <- dose10_FCC_doses_near_pop * (1 + dose10_wr_ft)
     
     #doses required for far population after wastage penalty
-    dose10_FCC_doses_far_pop_req <- dose10_FCC_doses_far_pop * dose10_wastage_mt
+    dose10_FCC_doses_far_pop_req <- dose10_FCC_doses_far_pop * (1 + dose10_wr_mt)
     
     #number of doses required after buffer 
     dose10_FCC_doses_needed <- (dose10_FCC_doses_near_pop_req + dose10_FCC_doses_far_pop_req) * (1 + input$buffer_stock / 100)
@@ -457,7 +457,7 @@ server <- function(input, output, session) {
                                                          , with_ice = T)
     
     
-    dose10_FCC_far_trip_eff_doses <- dose10_FCC_far_trip_capacity - (dose10_wastage_mt - 1) * dose10_FCC_far_trip_capacity #The effective number of doses a team has is the total capacity they can carry less of how many are expected to be wasted.
+    dose10_FCC_far_trip_eff_doses <- dose10_FCC_far_trip_capacity * (1 - dose10_wr_mt)  #The effective number of doses a team has is the total capacity they can carry less of how many are expected to be wasted.
     
     team_days_fixed_dose10_FCC <- round(dose10_FCC_near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
     team_days_mobile_dose10_FCC <- round(dose10_FCC_far_pop / dose10_FCC_far_trip_eff_doses, 1)

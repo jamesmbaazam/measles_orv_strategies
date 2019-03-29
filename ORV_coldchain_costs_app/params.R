@@ -47,8 +47,8 @@ tp_mobile <- 250
 #wastage factors
 #Wastage here refers to open vial wastage. Other forms of wastage haven't been accounted for yet.
 #we assume the monodose has no wastage.
-dose10_wastage_ft <- 1.17 #wastage factor for fixed teams, ft, 15% wastage of every 100 doses; known/commonly used by MSF for all campaigns across all strategies
-dose10_wastage_mt <- 1.43 #wastage factor for mobile teams, mt, 30% (twice, compared to fixed teams); I'm assuming this 
+dose10_wr_ft <- 0.15 #wastage rate for fixed teams, ft, 15% wastage of every 100 doses; known/commonly used by MSF for all campaigns across all strategies
+dose10_wr_mt <- dose10_wr_ft*2 #wastage rate for mobile teams, mt, 30% (twice, compared to fixed teams); I'm assuming this 
 
 
 
