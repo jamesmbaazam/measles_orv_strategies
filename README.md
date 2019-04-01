@@ -27,4 +27,5 @@ We intend to use this app as a strategic tool to assess various outbreak respons
     14. Do fixed and mobile teams return to the base daily? 
     15. We assume that the monodose has 0 open vial wastage.
     16. We assume an average vaccination rate (team performance) of 250 for mobile teams and 450 for fixed site teams, irrespective of monodose or 10 dose, even though these values are based on MSF's use of the 10 dose vials for ORVs. 
-    17. Fixed teams are not so much limited by the volume they can transport but the mobile teams are.      
+    17. Fixed teams are not so much limited by the volume they can transport but the mobile teams are.
+    18. Currently assume everyone will take the vaccine without resistance.
