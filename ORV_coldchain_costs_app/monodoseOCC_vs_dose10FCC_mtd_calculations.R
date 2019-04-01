@@ -1,8 +1,8 @@
 library('ggplot2')
 library('dplyr')
 
-source('./params.R', local = TRUE)
-source('./calculator_functions.R', local = TRUE)
+source('./ORV_coldchain_costs_app/params.R')
+source('./ORV_coldchain_costs_app/calculator_functions.R')
 
 #params
 far_pop <- 250
