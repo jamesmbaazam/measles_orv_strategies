@@ -14,7 +14,7 @@ monodose_OCC_far_trip_capacity <- calc_dose_capacity(vial_type = 'monodose'
                                                      , with_ice = F)
 
 
-monodose_OCC_far_trip_capacity_expanded <- seq(1, 4.5, 0.5) * monodose_FCC_far_trip_capacity 
+monodose_OCC_far_trip_capacity_expanded <- seq(1, 4.5, 0.5) * monodose_OCC_far_trip_capacity 
 
 team_days_mobile_monodose_noIce <- round(far_pop / monodose_OCC_far_trip_capacity_expanded, 1)
 
