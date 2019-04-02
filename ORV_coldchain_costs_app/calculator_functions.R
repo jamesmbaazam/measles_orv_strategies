@@ -117,10 +117,23 @@ print_site_team_dur <- function(site_team_quant, td_fixed, td_mobile){ #td_fixed
 #' team days calculations
 ################################################################################
 
-# calc_tdm_monodose_FCC <- function(far_pop_size){
-#    far_pop_size / vax_car
-# }
-
+calc_monodose_team_days <- function(target_pop, carrier_vol_capacity) {
+   if ((carrier_vol_capacity >= target_pop) & (target_pop <= tp_mobile)) {
+      return(1) #we can carry more doses than the target population size and are within the maximum kids we are expected to vaccinate, so it'll take us 1 day
+   }
+   else if ((carrier_vol_capacity > tp_mobile) & (target_pop <= tp_mobile)) {
+      return(1) #we can carry more than we are expected to vaccinate but the target population is less than how many kids we are expected to vaccinate, so it'll take us 1 day
+   }
+   else if ((carrier_vol_capacity > tp_mobile) & (target_pop > tp_mobile)) {
+      return(round(target_pop / tp_mobile, 2)) #we can carry more than we are expected to vaccinate but the target population is more than how many kids we are expected to vaccinate, so the team performance becomes the constraint
+   }
+   else if ((carrier_vol_capacity < target_pop) & (carrier_vol_capacity <= tp_mobile)) {
+      return(round(target_pop / carrier_vol_capacity, 2)) # we can't carry enough doses to even vaccinate the expected number of kids per day, so the volume capacity becomes a constrainst 
+   }
+   else if (carrier_vol_capacity > tp_mobile) { 
+      return(round(target_pop / tp_mobile, 2)) #We can carry more than we are expected to, so the team performance becomes the constraint
+   }
+}
 
 ################################################################################
 #' passive cold chain dose capacity
