@@ -2,6 +2,8 @@ library('ggplot2')
 library('dplyr')
 library('reshape2')
 library('purrr')
+library('gridExtra')
+library('tidyr')
 
 source('./ORV_coldchain_costs_app/params.R')
 source('./ORV_coldchain_costs_app/calculator_functions.R')
@@ -60,18 +62,72 @@ team_days_output <- tibble(
 
 #Plots
 
-team_days_output_melted <- team_days_output %>% melt(id.vars = c('dose10_wastage', 'vaxCarr_capacity_ratio'), variable.name = 'strategy', value.name = 'team_days_mt')
+#team_days_output_melted <- team_days_output %>% melt(id.vars = c('dose10_wastage', 'vaxCarr_capacity_ratio'), variable.name = 'strategy', value.name = 'team_days_mt')
 
 #assign zero wastage to the monodose strategy
-team_days_output_melted_mod <- dplyr::mutate(team_days_output_melted, dose10_wastage = if_else(strategy == 'team_days_dose10_far_FCC', team_days_output_melted$dose10_wastage, 0))
+#team_days_output_melted_mod <- dplyr::mutate(team_days_output_melted, dose10_wastage = if_else(strategy == 'team_days_dose10_far_FCC', team_days_output_melted$dose10_wastage, 0))
 
-team_days_axis_lim <- range(team_days_output_melted_mod$team_days_mt, na.rm = T)
+wastage_vs_team_days_axis_lim <- range(as.numeric(c(team_days_output$team_days_dose10_far_FCC, team_days_output$team_days_monodose_far_OCC)), na.rm = T)
+#monodose_lineplot_df <- purrr::map_df(length(team_days_output), bind_rows(), dplyr::filter(team_days_output, dose10_wastage == 0), dplyr::filter(team_days_output, dose10_wastage == 0)) 
 
-ggplot(data = team_days_output_melted_mod) + 
- #   geom_point(aes(x = vaxCarr_capacity_ratio, y = team_days_mt, shape = strategy, size = dose10_wastage )) + 
-    geom_line(aes(x = dose10_wastage , y = team_days_mt, color = strategy), size = 2)  + 
-    geom_point(data = dplyr::filter(team_days_output_melted_mod, dose10_wastage ==0.15), aes(x = vaxCarr_capacity_ratio, y = team_days_mt), color = 'yellow') + 
-    scale_y_continuous(breaks = seq(team_days_axis_lim[1], team_days_axis_lim[2], 2), labels = seq(team_days_axis_lim[1], team_days_axis_lim[2], 2)) + 
-    scale_shape(name = 'Strategy', labels = c('10-dose FCC', 'Monodose OCC')) +
-    scale_size(name = '10 dose open vial wastage') + 
-    labs(x = 'Ratio of increasing monodose volume capacity to fixed 10-dose capacity', y = 'Mobile team days')
+
+#plot of 10 dose mobile team days against increasing wastage
+wastage_vs_team_days <- ggplot(data = team_days_output) + 
+    geom_point(aes(x = dose10_wastage, y = team_days_dose10_far_FCC)) + 
+    geom_line(aes(x = dose10_wastage, y = team_days_dose10_far_FCC))  + 
+    geom_point(data = dplyr::filter(team_days_output, dose10_wastage == 0), 
+              aes(x = dose10_wastage, y = team_days_monodose_far_OCC), 
+              color = 'red', 
+              size = 4
+              ) + 
+    scale_y_continuous(breaks = round(seq(wastage_vs_team_days_axis_lim[1], 
+                                    wastage_vs_team_days_axis_lim[2], 
+                                    length.out = 10), 2
+                                    ), 
+                       labels = round(seq(wastage_vs_team_days_axis_lim[1], 
+                                    wastage_vs_team_days_axis_lim[2], 
+                                    length.out = 10), 2
+                                    )
+                       ) + 
+    labs(x = 'Open vial wastage', y = 'Mobile team days', title = '10 dose for far campaigns in full cold chain (monodose value shown in red)')
+
+
+
+#plot of monodose mobile team days against increasing dose storage capacity
+storage_vs_team_days_lim <- range(c(team_days_output$team_days_monodose_far_OCC, 
+                                    team_days_output$team_days_dose10_far_FCC[1]), 
+                                  na.rm = T
+                                  )
+
+storage_vs_team_days <- ggplot(data = team_days_output) + 
+    geom_point(aes(x = vaxCarr_monodose_capacity, y = team_days_monodose_far_OCC)) + 
+    geom_line(aes(x = vaxCarr_monodose_capacity, y = team_days_monodose_far_OCC))  + 
+    geom_point(data = dplyr::filter(team_days_output, dose10_wastage == 0.15), 
+               aes(x = vaxCarr_dose10_capacity, y = team_days_dose10_far_FCC), 
+               color = 'red', 
+               size = 4
+    ) + 
+    scale_x_continuous(breaks = seq(range(team_days_output$vaxCarr_monodose_capacity)[1], 
+            range(team_days_output$vaxCarr_monodose_capacity)[2], 
+            44),
+            labels = seq(range(team_days_output$vaxCarr_monodose_capacity)[1], 
+                         range(team_days_output$vaxCarr_monodose_capacity)[2], 
+                         44)
+                       ) + 
+    scale_y_continuous(breaks = round(
+        seq(storage_vs_team_days_lim[1], 
+            storage_vs_team_days_lim[2], 
+            length.out = 10
+        ),
+        2
+    ), 
+    labels = round(seq(storage_vs_team_days_lim[1], 
+                       storage_vs_team_days_lim[2], 
+                       length.out = 10
+    ), 2
+    )
+    ) + 
+    labs(x = 'Dose storage capacity', y = 'Mobile team days', title = 'Monodose for far campaigns out of cold chain (10 dose value shown in red)')
+
+
+grid.arrange(wastage_vs_team_days, storage_vs_team_days, ncol = 1)
