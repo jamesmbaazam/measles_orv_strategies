@@ -67,18 +67,26 @@ team_days_output <- tibble(
 #assign zero wastage to the monodose strategy
 #team_days_output_melted_mod <- dplyr::mutate(team_days_output_melted, dose10_wastage = if_else(strategy == 'team_days_dose10_far_FCC', team_days_output_melted$dose10_wastage, 0))
 
+#range of points for formating axis labels
 wastage_vs_team_days_axis_lim <- range(as.numeric(c(team_days_output$team_days_dose10_far_FCC, team_days_output$team_days_monodose_far_OCC)), na.rm = T)
-#monodose_lineplot_df <- purrr::map_df(length(team_days_output), bind_rows(), dplyr::filter(team_days_output, dose10_wastage == 0), dplyr::filter(team_days_output, dose10_wastage == 0)) 
 
+#formating monodose data for comparison
+monodose_wastage_comparison_dat <- dplyr::filter(team_days_output, dose10_wastage == 0) %>% 
+    select(dose10_wastage, team_days_monodose_far_OCC) %>% 
+    bind_rows(data.frame(dose10_wastage = max(team_days_output$dose10_wastage, na.rm = T), 
+                                                        team_days_monodose_far_OCC = .$team_days_monodose_far_OCC
+                                                        )
+                                             )
 
 #plot of 10 dose mobile team days against increasing wastage
 wastage_vs_team_days <- ggplot(data = team_days_output) + 
     geom_point(aes(x = dose10_wastage, y = team_days_dose10_far_FCC)) + 
     geom_line(aes(x = dose10_wastage, y = team_days_dose10_far_FCC))  + 
-    geom_point(data = dplyr::filter(team_days_output, dose10_wastage == 0), 
+    geom_line(data = monodose_wastage_comparison_dat, 
               aes(x = dose10_wastage, y = team_days_monodose_far_OCC), 
               color = 'red', 
-              size = 4
+              size = 2,
+              linetype = 'dashed'
               ) + 
     scale_y_continuous(breaks = round(seq(wastage_vs_team_days_axis_lim[1], 
                                     wastage_vs_team_days_axis_lim[2], 
@@ -89,7 +97,9 @@ wastage_vs_team_days <- ggplot(data = team_days_output) +
                                     length.out = 10), 2
                                     )
                        ) + 
-    labs(x = 'Open vial wastage', y = 'Mobile team days', title = '10 dose for far campaigns in full cold chain (monodose value shown in red)')
+    labs(x = 'Open vial wastage', 
+         y = 'Mobile team days', 
+         title = '10 dose for far campaigns in full cold chain (monodose value shown in red)')
 
 
 
@@ -99,13 +109,21 @@ storage_vs_team_days_lim <- range(c(team_days_output$team_days_monodose_far_OCC,
                                   na.rm = T
                                   )
 
+#formating 10-dose data for comparison
+dose10_storage_comparison_dat <- dplyr::filter(team_days_output, dose10_wastage == 0.15) %>% 
+    select(vaxCarr_dose10_capacity, team_days_dose10_far_FCC) %>% 
+    bind_rows(data.frame(vaxCarr_dose10_capacity = min(team_days_output$vaxCarr_monodose_capacity, na.rm = T), 
+                                                        team_days_dose10_far_FCC = .$team_days_dose10_far_FCC
+                                             ))
+
+
 storage_vs_team_days <- ggplot(data = team_days_output) + 
     geom_point(aes(x = vaxCarr_monodose_capacity, y = team_days_monodose_far_OCC)) + 
     geom_line(aes(x = vaxCarr_monodose_capacity, y = team_days_monodose_far_OCC))  + 
-    geom_point(data = dplyr::filter(team_days_output, dose10_wastage == 0.15), 
+    geom_line(data = dose10_storage_comparison_dat, 
                aes(x = vaxCarr_dose10_capacity, y = team_days_dose10_far_FCC), 
                color = 'red', 
-               size = 4
+               size = 2
     ) + 
     scale_x_continuous(breaks = seq(range(team_days_output$vaxCarr_monodose_capacity)[1], 
             range(team_days_output$vaxCarr_monodose_capacity)[2], 
