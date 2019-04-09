@@ -62,7 +62,7 @@ team_days_output <- tibble(
 
 #Plots
 
-#team_days_output_melted <- team_days_output %>% melt(id.vars = c('dose10_wastage', 'vaxCarr_capacity_ratio'), variable.name = 'strategy', value.name = 'team_days_mt')
+
 
 #assign zero wastage to the monodose strategy
 #team_days_output_melted_mod <- dplyr::mutate(team_days_output_melted, dose10_wastage = if_else(strategy == 'team_days_dose10_far_FCC', team_days_output_melted$dose10_wastage, 0))
@@ -82,7 +82,7 @@ monodose_wastage_comparison_dat <- dplyr::filter(team_days_output, dose10_wastag
 wastage_vs_team_days <- ggplot(data = team_days_output) + 
     geom_point(aes(x = dose10_wastage, y = team_days_dose10_far_FCC)) + 
     geom_line(aes(x = dose10_wastage, y = team_days_dose10_far_FCC))  + 
-    geom_line(data = monodose_wastage_comparison_dat, 
+    geom_point(data = slice(monodose_wastage_comparison_dat, 1), 
               aes(x = dose10_wastage, y = team_days_monodose_far_OCC), 
               color = 'red', 
               size = 2,
@@ -111,26 +111,27 @@ storage_vs_team_days_lim <- range(c(team_days_output$team_days_monodose_far_OCC,
 
 #formating 10-dose data for comparison
 dose10_storage_comparison_dat <- dplyr::filter(team_days_output, dose10_wastage == 0.15) %>% 
-    select(vaxCarr_dose10_capacity, team_days_dose10_far_FCC) %>% 
-    bind_rows(data.frame(vaxCarr_dose10_capacity = min(team_days_output$vaxCarr_monodose_capacity, na.rm = T), 
+    select(vaxCarr_dose10_capacity, vaxCarr_capacity_ratio, team_days_dose10_far_FCC) %>% 
+    bind_rows(data.frame(vaxCarr_dose10_capacity = min(team_days_output$vaxCarr_monodose_capacity, na.rm = T),
+                         vaxCarr_capacity_ratio = min(team_days_output$vaxCarr_capacity_ratio, na.rm = T),
                                                         team_days_dose10_far_FCC = .$team_days_dose10_far_FCC
                                              ))
 
 
 storage_vs_team_days <- ggplot(data = team_days_output) + 
-    geom_point(aes(x = vaxCarr_monodose_capacity, y = team_days_monodose_far_OCC)) + 
-    geom_line(aes(x = vaxCarr_monodose_capacity, y = team_days_monodose_far_OCC))  + 
-    geom_line(data = dose10_storage_comparison_dat, 
-               aes(x = vaxCarr_dose10_capacity, y = team_days_dose10_far_FCC), 
+    geom_point(aes(x = vaxCarr_capacity_ratio, y = team_days_monodose_far_OCC)) + 
+    geom_line(aes(x = vaxCarr_capacity_ratio, y = team_days_monodose_far_OCC))  + 
+    geom_point(data = slice(dose10_storage_comparison_dat, 1), 
+               aes(x = vaxCarr_capacity_ratio, y = team_days_dose10_far_FCC), 
                color = 'red', 
                size = 2
     ) + 
-    scale_x_continuous(breaks = seq(range(team_days_output$vaxCarr_monodose_capacity)[1], 
-            range(team_days_output$vaxCarr_monodose_capacity)[2], 
-            44),
-            labels = seq(range(team_days_output$vaxCarr_monodose_capacity)[1], 
-                         range(team_days_output$vaxCarr_monodose_capacity)[2], 
-                         44)
+    scale_x_continuous(breaks = round(seq(range(team_days_output$vaxCarr_capacity_ratio)[1], 
+            range(team_days_output$vaxCarr_capacity_ratio)[2], 
+            length.out = 8), 2),
+            labels = round(seq(range(team_days_output$vaxCarr_capacity_ratio)[1], 
+                         range(team_days_output$vaxCarr_capacity_ratio)[2], 
+                         length.out = 8), 2)
                        ) + 
     scale_y_continuous(breaks = round(
         seq(storage_vs_team_days_lim[1], 
@@ -145,7 +146,13 @@ storage_vs_team_days <- ggplot(data = team_days_output) +
     ), 2
     )
     ) + 
-    labs(x = 'Dose storage capacity', y = 'Mobile team days', title = 'Monodose for far campaigns out of cold chain (10 dose value shown in red)')
+    labs(x = 'Dose storage capacity ratio (monodose vs 10-dose)', y = 'Mobile team days', title = 'Monodose for far campaigns out of cold chain (10 dose value shown in red)')
+
+
+#Reshaping the data
+team_days_output_melted <- team_days_output %>% melt(id.vars = c('dose10_wastage', 'vaxCarr_capacity_ratio', 'team_days_dose10_far_FCC', 'team_days_monodose_far_OCC'), variable.name = 'strategy', value.name = 'storage_capacity')
+ggplot(data = team_days_output_melted) + geom_point(aes(x = team_days_dose10_far_FCC, y = team_days_monodose_far_OCC, size = 'dose10_wastage'))
+
 
 
 grid.arrange(wastage_vs_team_days, storage_vs_team_days, ncol = 1)
