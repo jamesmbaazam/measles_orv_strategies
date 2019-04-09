@@ -817,12 +817,7 @@ server <- function(input, output, session) {
     #' Combining the results and plotting
     #' 
     #####################################################################
-   
-    #plot theme
-    plot_theme <-  theme(title = element_text(size = 12,
-                                              face = 'bold'
-    )
-    )
+
     
     #Making the tibbles!!!!
     # Results of required freezing time per strategy
@@ -869,7 +864,7 @@ server <- function(input, output, session) {
         labs(title = 'Freezing time required per strategy', 
              y = "Freezing time required (days)"
              ) + 
-       plot_theme
+       shiny_plot_theme
       
       iceVol_plot <- ggplot(data = Init_iceVol_results, 
                             aes(x = Strategy, 
@@ -879,7 +874,7 @@ server <- function(input, output, session) {
         labs(title = 'Initial volume of ice required per strategy', 
              y = "Initial volume of ice required (Litres)"
              ) + 
-        plot_theme
+        shiny_plot_theme
       
       td_plot <- ggplot(data = td_results, 
                         aes(x = Strategy, 
@@ -896,13 +891,21 @@ server <- function(input, output, session) {
         scale_fill_manual(values = c("royalblue4", "tomato3"), 
                           name = "Team type",
                           breaks = team_type_list) +
-        plot_theme
+        shiny_plot_theme
       
+      # ft_presentation_plot <- ft_plot + presentation_plot_theme
+      # iceVol_presentation_plot <- iceVol_plot + presentation_plot_theme
+      # td_presentation_plot <- td_plot + presentation_plot_theme
+      # 
       #arrange the plots on a grid
       grid.arrange(ft_plot, 
                    iceVol_plot, 
                    td_plot,
                    ncol = 3)
+      # ggsave(filename = 'freezing_time', plot = ft_presentation_plot, device = 'png')
+      # ggsave(filename = 'init_ice_volume', plot = iceVol_presentation_plot, device = 'png')
+      # ggsave(filename = 'team_days', plot = td_presentation_plot, device = 'png')
+      # 
     })
     }
   })
