@@ -9,7 +9,7 @@ source('./ORV_coldchain_costs_app/params.R')
 source('./ORV_coldchain_costs_app/calculator_functions.R')
 
 #params
-far_pop <- 250
+far_pop <- 500
 
 ###############################
 
@@ -64,8 +64,6 @@ team_days_output <- tibble(
 
 
 
-#assign zero wastage to the monodose strategy
-#team_days_output_melted_mod <- dplyr::mutate(team_days_output_melted, dose10_wastage = if_else(strategy == 'team_days_dose10_far_FCC', team_days_output_melted$dose10_wastage, 0))
 
 #range of points for formating axis labels
 wastage_vs_team_days_axis_lim <- range(as.numeric(c(team_days_output$team_days_dose10_far_FCC, team_days_output$team_days_monodose_far_OCC)), na.rm = T)
@@ -148,11 +146,29 @@ storage_vs_team_days <- ggplot(data = team_days_output) +
     ) + 
     labs(x = 'Dose storage capacity ratio (monodose vs 10-dose)', y = 'Mobile team days', title = 'Monodose for far campaigns out of cold chain (10 dose value shown in red)')
 
-
-#Reshaping the data
-team_days_output_melted <- team_days_output %>% melt(id.vars = c('dose10_wastage', 'vaxCarr_capacity_ratio', 'team_days_dose10_far_FCC', 'team_days_monodose_far_OCC'), variable.name = 'strategy', value.name = 'storage_capacity')
-ggplot(data = team_days_output_melted) + geom_point(aes(x = team_days_dose10_far_FCC, y = team_days_monodose_far_OCC, size = 'dose10_wastage'))
-
-
-
 grid.arrange(wastage_vs_team_days, storage_vs_team_days, ncol = 1)
+
+
+
+#Reshaping the results and assigning zero wastage to the monodose strategy
+
+team_days_output_melted <- team_days_output %>% gather(key = 'strategy', value = 'team_days', c('team_days_dose10_far_FCC', 'team_days_monodose_far_OCC'), factor_key = T)
+team_days_output_melted_mod <- dplyr::mutate(team_days_output_melted, dose10_wastage = if_else(strategy == 'team_days_dose10_far_FCC', team_days_output_melted$dose10_wastage, 0))
+
+#View(team_days_output_melted_mod)
+
+ggplot(data = team_days_output_melted_mod) + 
+    geom_point(aes(x = vaxCarr_capacity_ratio, 
+                   y = team_days,
+                   color = strategy,
+                   size = dose10_wastage)
+               ) +
+    labs(x = 'Dose storage capacity ratio (monodose vs 10-dose)', y = 'Mobile team days') + 
+    scale_shape(
+                labels = c('10-dose FCC', 'Monodose OCC'), 
+                name = 'Strategy') + 
+    scale_size(name = 'Open vial wastage')
+
+
+
+
