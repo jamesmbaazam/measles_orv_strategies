@@ -55,3 +55,19 @@ dose10_wr_mt <- dose10_wr_ft*2 #wastage rate for mobile teams, mt, 30% (twice, c
 # DATA
 # icepack_quants <- read_excel('/data/passiveCC_icepack_quantity_data.xlsx')
 # vax_storage_capacity <- read_excel('/data/passiveCC_vaccine_storage_capacity_data.xlsx')
+
+
+# formatting the labels
+presentation_plot_theme <- theme(
+    axis.text.x = element_text(size = 15)
+    , axis.title.x = element_text(size = 20)
+    , axis.text = element_text(size = 15)
+    , axis.title.y = element_text(size = 20)
+)
+
+
+#plot theme
+shiny_plot_theme <-  theme(title = element_text(size = 12,
+                                          face = 'bold'
+)
+)
