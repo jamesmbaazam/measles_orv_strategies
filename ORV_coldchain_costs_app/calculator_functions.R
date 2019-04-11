@@ -230,3 +230,22 @@ calc_freezing_time <- function(mf314_available, large_icepacks_quantity, small_i
    
 }
    
+
+every_nth <- function(x, nth, empty = TRUE, inverse = FALSE) 
+{
+   if (!inverse) {
+      if(empty) {
+         x[1:nth == 1] <- ""
+         x
+      } else {
+         x[1:nth != 1]
+      }
+   } else {
+      if(empty) {
+         x[1:nth != 1] <- ""
+         x
+      } else {
+         x[1:nth == 1]
+      }
+   }
+}
