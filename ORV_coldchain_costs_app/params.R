@@ -60,9 +60,11 @@ dose10_wr_mt <- dose10_wr_ft*2 #wastage rate for mobile teams, mt, 30% (twice, c
 # formatting the labels
 presentation_plot_theme <- theme(
     axis.text.x = element_text(size = 15)
-    , axis.title.x = element_text(size = 20)
     , axis.text = element_text(size = 15)
+    , axis.title.x = element_text(size = 20)
+    , legend.text = element_text(size = 15)
     , axis.title.y = element_text(size = 20)
+    , legend.title = element_text(size = 20)
 )
 
 
