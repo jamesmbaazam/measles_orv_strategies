@@ -236,15 +236,14 @@ team_days_intersection_plot <- ggplot(data = team_days_output) +
                        ) +
     labs(x = 'Vaccine carrier capacity ratio (monodose vs 10-dose)',
          y = 'Mobile team days',
-         color = 'Wastage (10-dose)') +
-    presentation_plot_theme
-
-ggsave(filename = 'team_days_intersection_plot.png', 
-       plot = team_days_intersection_plot, 
-       width = 9, 
-       height = 5)
-
-
+         color = 'Wastage (10-dose)') 
+ # 
+ # ggsave(filename = 'team_days_intersection_plot.png', 
+ #        plot = team_days_intersection_plot + presentation_plot_theme, 
+ #        width = 9, 
+ #        height = 5)
+ # 
+team_days_intersection_plot
 
 df <- team_days_output %>% filter(team_days_monodose_far_OCC > 2)
 
@@ -303,3 +302,4 @@ ggplot(data = isocline) +
                        ) +
     labs(x = 'Vaccine carrier capacity ratio (monodose vs 10-dose)',
          y = 'Open vial wastage (10-dose)')
+
