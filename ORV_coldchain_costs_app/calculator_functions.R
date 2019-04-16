@@ -117,22 +117,26 @@ print_site_team_dur <- function(site_team_quant, td_fixed, td_mobile){ #td_fixed
 #' team days calculations
 ################################################################################
 
-calc_monodose_team_days <- function(target_pop, carrier_vol_capacity) {
-   if ((carrier_vol_capacity >= target_pop) & (target_pop <= tp_mobile)) {
+calc_monodose_team_days <- function(target_pop, 
+                                    carrier_vol_capacity, 
+                                    team_performance = tp_mobile #how many you are expected to vaccinate on average per day
+                                    ) 
+   {
+   if ((carrier_vol_capacity >= target_pop) & (target_pop <= team_performance)) {
       return(1) #we can carry more doses than the target population size and are within the maximum kids we are expected to vaccinate, so it'll take us 1 day
    }
-   else if ((carrier_vol_capacity > tp_mobile) & (target_pop <= tp_mobile)) {
+   else if ((carrier_vol_capacity > team_performance) & (team_performance >= target_pop)) {
       return(1) #we can carry more than we are expected to vaccinate but the target population is less than how many kids we are expected to vaccinate, so it'll take us 1 day
    }
-   else if ((carrier_vol_capacity > tp_mobile) & (target_pop > tp_mobile)) {
-      return(round(target_pop / tp_mobile, 2)) #we can carry more than we are expected to vaccinate but the target population is more than how many kids we are expected to vaccinate, so the team performance becomes the constraint
+   else if ((carrier_vol_capacity > team_performance) & (team_performance < target_pop)) {
+      return(round(target_pop / team_performance, 2)) #we can carry more than we are expected to vaccinate but the target population is more than how many kids we are expected to vaccinate, so the team performance becomes the constraint
    }
-   else if ((carrier_vol_capacity < target_pop) & (carrier_vol_capacity <= tp_mobile)) {
+   else if ((target_pop > carrier_vol_capacity) & (carrier_vol_capacity <= team_performance)) {
       return(round(target_pop / carrier_vol_capacity, 2)) # we can't carry enough doses to even vaccinate the expected number of kids per day, so the volume capacity becomes a constrainst 
    }
-   else if (carrier_vol_capacity > tp_mobile) { 
-      return(round(target_pop / tp_mobile, 2)) #We can carry more than we are expected to, so the team performance becomes the constraint
-   }
+   # else if (carrier_vol_capacity > team_performance) { 
+   #    return(round(target_pop / team_performance, 2)) #We can carry more than we are expected to, so the team performance becomes the constraint
+   # }
 }
 
 ################################################################################
@@ -229,8 +233,13 @@ calc_freezing_time <- function(mf314_available, large_icepacks_quantity, small_i
    )
    
 }
-   
 
+################
+#plotting functions
+###################
+
+#every_nth() is a useful function I got from SO for adding blank labels inbetween
+#vectors for labelling graphs, if you want to have unlabelled ticks
 every_nth <- function(x, nth, empty = TRUE, inverse = FALSE) 
 {
    if (!inverse) {
