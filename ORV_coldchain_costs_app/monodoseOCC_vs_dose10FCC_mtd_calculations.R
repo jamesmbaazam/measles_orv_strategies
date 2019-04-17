@@ -156,9 +156,9 @@ team_days_output_melted <- team_days_output %>% gather(key = 'strategy', value =
 team_days_output_melted_mod <- dplyr::mutate(team_days_output_melted, dose10_wastage = if_else(strategy == 'team_days_dose10_far_FCC', team_days_output_melted$dose10_wastage, 0))
 
 
-team_days_output_melted %>% gather()
-
-#View(team_days_output_melted_mod)
+# team_days_output_reshaped <- team_days_output_melted %>% dplyr::mutate(team_days = paste(team_days, collapse = ',')) %>% separate_rows(team_days)
+# team_days_output_reshaped$team_days <- as.numeric(team_days_output_reshaped$team_days)
+# View(team_days_output_reshaped)
 
 # y_lim_switching_decision_plot <- seq(0, 65, 2.5)
 # 
@@ -220,17 +220,39 @@ team_days_dose10_70_wastage <- tibble(dose10_wastage = rep(dose10_wastage_70$dos
 )
 
 
-dose10_team_days_lines <- bind_rows(team_days_dose10_0_wastage, team_days_dose10_67_wastage, team_days_dose10_70_wastage, team_days_dose10_78_wastage)
+# dose10_team_days_lines <- team_days_output_reshaped %>% select(-vaxCarr_monodose_capacity, -vaxCarr_dose10_capacity) %>% 
+#     filter(dose10_wastage == c(0, 0.67, 0.7, 0.78), strategy == 'team_days_dose10_far_FCC')
+
+
+
+dose10_team_days_lines <- bind_rows(team_days_dose10_0_wastage, 
+                                    team_days_dose10_15_wastage, 
+                                    team_days_dose10_67_wastage, 
+                                    team_days_dose10_70_wastage, 
+                                    team_days_dose10_78_wastage
+                                    )
 
 team_days_intersection_plot <- ggplot(data = team_days_output) + 
     geom_point(aes(x = vaxCarr_capacity_ratio, 
-                   y = team_days_monodose_far_OCC), color = 'black') +
+                   y = team_days_monodose_far_OCC), 
+               color = 'black'
+               ) +
+    geom_line(aes(x = vaxCarr_capacity_ratio, 
+                   y = team_days_monodose_far_OCC), 
+               color = 'black'
+    ) +
     geom_point(data = dose10_team_days_lines, 
                aes(x = vaxCarr_capacity_ratio, 
                    y = team_days_dose10_far_FCC, 
                    color = factor(dose10_wastage)
                    )
                ) +
+    geom_line(data = dose10_team_days_lines, 
+               aes(x = vaxCarr_capacity_ratio, 
+                   y = team_days_dose10_far_FCC, 
+                   color = factor(dose10_wastage)
+               )
+    ) +
     scale_x_continuous(breaks = seq(0.2, 1, 0.05),
                        labels  = every_nth(seq(0.2, 1, 0.05), 2, inverse = T)
                        ) +
@@ -245,61 +267,75 @@ team_days_intersection_plot <- ggplot(data = team_days_output) +
  # 
 team_days_intersection_plot
 
-df <- team_days_output %>% filter(team_days_monodose_far_OCC > 2)
+# dose10_monodose_intersection <-  team_days_output %>% filter(team_days_dose10_far_FCC >= 2 & team_days_dose10_far_FCC <= 3)
 
 #df <- df %>% mutate(isocline_wastage = 1 - far_pop/(team_days_monodose_far_OCC*dose10_FCC_far_trip_capacity))
-ggplot(data = df) + geom_line(aes(x = vaxCarr_capacity_ratio,
-                                   y = dose10_wastage)
-                               ) 
+# ggplot(data = dose10_monodose_intersection) + geom_line(aes(x = vaxCarr_capacity_ratio,
+#                                    y = dose10_wastage)
+#                                ) 
 
 
 #isocline
-ggplot(data = isocline_dat[-c(2, 8),]) +
-    geom_point(aes(x = vaxCarr_capacity_ratio, 
-                   y = dose10_wastage)
-               ) +
-    geom_line(data = isocline_dat[-c(2, 8), ],
-              aes(x = vaxCarr_capacity_ratio, 
-                  y = dose10_wastage
-                  )
-              ) +
-    scale_y_continuous(breaks = seq(0.67, 0.8, 0.03),
-                       labels = seq(0.67, 0.8, 0.03)
-                       ) +
-    scale_x_continuous(breaks = seq(0.72, 0.84, 0.01),
-                       labels = seq(0.72, 0.84, 0.01)
-                       ) +
-    labs(x = 'Vaccine carrier capacity ratio (monodose vs 10-dose)',
-         y = 'Open vial wastage (10-dose)'
-         )
+# ggplot(data = isocline_dat[-c(2, 8),]) +
+#     geom_point(aes(x = vaxCarr_capacity_ratio, 
+#                    y = dose10_wastage)
+#                ) +
+#     geom_line(data = isocline_dat[-c(2, 8), ],
+#               aes(x = vaxCarr_capacity_ratio, 
+#                   y = dose10_wastage
+#                   )
+#               ) +
+#     scale_y_continuous(breaks = seq(0.67, 0.8, 0.03),
+#                        labels = seq(0.67, 0.8, 0.03)
+#                        ) +
+#     scale_x_continuous(breaks = seq(0.72, 0.84, 0.01),
+#                        labels = seq(0.72, 0.84, 0.01)
+#                        ) +
+#     labs(x = 'Vaccine carrier capacity ratio (monodose vs 10-dose)',
+#          y = 'Open vial wastage (10-dose)'
+#          )
 
 
 dose10_wastage_15 <- team_days_output %>% dplyr::filter(dose10_wastage == 0.15)
-team_days_dose10_15_wastage <- tibble(dose10_wastage = rep(dose10_wastage_15$dose10_wastage, nrow(team_days_output)), 
-                                     vaxCarr_capacity_ratio = team_days_output$vaxCarr_capacity_ratio, 
+team_days_dose10_15_wastage <- tibble(dose10_wastage = rep(dose10_wastage_15$dose10_wastage, nrow(team_days_output)),
+                                     vaxCarr_capacity_ratio = team_days_output$vaxCarr_capacity_ratio,
                                      team_days_dose10_far_FCC = rep(dose10_wastage_15$team_days_dose10_far_FCC, nrow(team_days_output))
-) 
+)
 
 
 model_baseline_dose10_wastage <- data.frame(dose10_wastage = seq(0, 0.15, 0.01), vaxCarr_capacity_ratio = rep(0.85, 16))
 
-ggplot(data = isocline) + 
+# ggplot(data = isocline) + 
+#     geom_point(aes(x = vaxCarr_capacity_ratio,
+#                    y = isocline_wastage)
+#               , color = 'red') +
+#     geom_point(data = team_days_dose10_15_wastage, 
+#                aes(x = vaxCarr_capacity_ratio,
+#                    y = dose10_wastage )
+#                ) +
+#     geom_point(data = model_baseline_dose10_wastage, 
+#                aes(x = vaxCarr_capacity_ratio, 
+#                    y = dose10_wastage)) +
+#     scale_x_continuous(breaks = seq(0.2, 1, 0.05),
+#                        labels = every_nth(seq(0.2, 1, 0.05), 2, inverse = T)
+#                        ) +
+#     scale_y_continuous(breaks = seq(0, 1, 0.05),
+#                        labels = every_nth(seq(0, 1, 0.05), 2, inverse = T)
+#                        ) +
+#     labs(x = 'Vaccine carrier capacity ratio (monodose vs 10-dose)',
+#          y = 'Open vial wastage (10-dose)')
+
+
+
+isocline_df <- team_days_output %>% mutate(wastage_isocline = 1 - (far_pop/(vaxCarr_dose10_capacity*team_days_monodose_far_OCC)))
+
+View(isocline_df)
+ggplot(isocline_df %>% filter(wastage_isocline > 0.6666667)) +
     geom_point(aes(x = vaxCarr_capacity_ratio,
-                   y = isocline_wastage)
-              , color = 'red') +
-    geom_point(data = team_days_dose10_15_wastage, 
-               aes(x = vaxCarr_capacity_ratio,
-                   y = dose10_wastage )
-               ) +
-    geom_point(data = model_baseline_dose10_wastage, 
-               aes(x = vaxCarr_capacity_ratio, 
-                   y = dose10_wastage)) +
-    scale_x_continuous(breaks = seq(0.2, 1, 0.05),
-                       labels = every_nth(seq(0.2, 1, 0.05), 2, inverse = T)
-                       ) +
-    scale_y_continuous(breaks = seq(0, 1, 0.05),
-                       labels = every_nth(seq(0, 1, 0.05), 2, inverse = T)
-                       ) +
+                   y = wastage_isocline)
+               )+
+    geom_line(aes(x = vaxCarr_capacity_ratio,
+                   y = wastage_isocline)
+    ) +
     labs(x = 'Vaccine carrier capacity ratio (monodose vs 10-dose)',
          y = 'Open vial wastage (10-dose)')
-
