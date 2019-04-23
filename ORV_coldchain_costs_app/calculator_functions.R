@@ -129,10 +129,10 @@ calc_monodose_team_days <- function(target_pop,
       return(1) #we can carry more than we are expected to vaccinate but the target population is less than how many kids we are expected to vaccinate, so it'll take us 1 day
    }
    else if ((carrier_vol_capacity > team_performance) & (team_performance < target_pop)) {
-      return(round(target_pop / team_performance, 2)) #we can carry more than we are expected to vaccinate but the target population is more than how many kids we are expected to vaccinate, so the team performance becomes the constraint
+      return(round(target_pop / team_performance, 3)) #we can carry more than we are expected to vaccinate but the target population is more than how many kids we are expected to vaccinate, so the team performance becomes the constraint
    }
    else if ((target_pop > carrier_vol_capacity) & (carrier_vol_capacity <= team_performance)) {
-      return(round(target_pop / carrier_vol_capacity, 2)) # we can't carry enough doses to even vaccinate the expected number of kids per day, so the volume capacity becomes a constrainst 
+      return(round(target_pop / carrier_vol_capacity, 3)) # we can't carry enough doses to even vaccinate the expected number of kids per day, so the volume capacity becomes a constrainst 
    }
    # else if (carrier_vol_capacity > team_performance) { 
    #    return(round(target_pop / team_performance, 2)) #We can carry more than we are expected to, so the team performance becomes the constraint
