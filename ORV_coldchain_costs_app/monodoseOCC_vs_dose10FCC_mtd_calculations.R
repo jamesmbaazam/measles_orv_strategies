@@ -39,13 +39,19 @@ team_days_mobile_monodose_noIce <- unlist(purrr::map(monodose_OCC_far_trip_capac
 #Considering wastage ranging from 0% to 100%, with 0% meaning no wastage and 100%, wastage of whole vial. MSF considers an average of 15% wastage rate in field operations. 
 wastage_dose10_mt_vect <- round(seq(0, 1, length.out = length(team_days_mobile_monodose_noIce)), 3) 
 
+#dose10_FCC_far_trip_eff_doses_vect <- ceiling(dose10_FCC_far_trip_capacity * (1 - wastage_dose10_mt_vect)) #effectively, how many vaccinations is a mobile team actually undertaking?
 
-dose10_FCC_far_trip_eff_doses_vect <- ceiling(dose10_FCC_far_trip_capacity * (1 - wastage_dose10_mt_vect)) #effectively, how many vaccinations is a mobile team actually undertaking?
+team_days_mobile_dose10_Ice <-  purrr::map_dbl(.x = wastage_dose10_mt_vect,
+                                                  .f = calc_dose10_team_days, 
+                                                  target_pop = far_pop, 
+                                                  vaxCarr_capacity = dose10_FCC_far_trip_capacity,
+                                                  team_performance = tp_mobile)
+                                        #there's a division by zero here, returning an infinity, so we'll replace it with NA to allow for better manipulation
 
-dose10_FCC_far_trip_eff_doses_vect <- ifelse(dose10_FCC_far_trip_eff_doses_vect > 0, dose10_FCC_far_trip_eff_doses_vect, NA) #I do a correction here to avoid division by zero.
 
-team_days_mobile_dose10_Ice <- round(far_pop / dose10_FCC_far_trip_eff_doses_vect, 2)  #there's a division by zero here, returning an infinity, so we'll replace it with NA to allow for better manipulation
+team_days_mobile_dose10_Ice <- ifelse(!is.infinite(team_days_mobile_dose10_Ice), team_days_mobile_dose10_Ice, NA) #I do a correction here to avoid division by zero.
 
+#data.frame(wastage = wastage_dose10_mt_vect, team_days = team_days_mobile_dose10_Ice)
 
 #x-axis of plot: ratio of increasing vaccine carrier volume capacity for monodose vs fixed for 10-dose
 ratio_monodose_dose10_vaxCarr_capacity <- round(monodose_OCC_far_trip_capacity_expanded / dose10_FCC_far_trip_capacity, 3)
