@@ -232,9 +232,9 @@ team_days_intersection_plot
 #                                    y = dose10_wastage)
 #                                ) 
 
-
-#isocline
-# ggplot(data = isocline_dat[-c(2, 8),]) +
+#'The isocline represents the point on the intersection between the monodose and 10-dose 
+#'strategies where there is no difference in team days. The areas above and below the line
+#'correspond to a switch in decision.
 #     geom_point(aes(x = vaxCarr_capacity_ratio, 
 #                    y = dose10_wastage)
 #                ) +
@@ -276,7 +276,6 @@ model_baseline_dose10_wastage <- data.frame(dose10_wastage = seq(0, 0.15, 0.01),
 #                        ) +
 #     labs(x = 'Vaccine carrier capacity ratio (monodose vs 10-dose)',
 #          y = 'Open vial wastage (10-dose)')
-
 
 
 isocline_df <- team_days_output %>% mutate(wastage_isocline = 1 - (far_pop/(vaxCarr_dose10_capacity*team_days_monodose_far_OCC)))
