@@ -139,6 +139,26 @@ calc_monodose_team_days <- function(target_pop,
    # }
 }
 
+
+calc_dose10_team_days <- function(target_pop, 
+                                  dose10_wastage,
+                                  vaxCarr_capacity,
+                                  team_performance = tp_mobile)  #how many you are expected to vaccinate on average per day 
+{
+   effective_doses <- ceiling(vaxCarr_capacity * (1 - dose10_wastage)) #effectively, how many vaccinations is a mobile team actually undertaking?
+   if ((effective_doses >= target_pop) & (target_pop <= team_performance)) {
+      return(1) #we can carry more doses than the target population size and are within the maximum kids we are expected to vaccinate, so it'll take us 1 day
+   }
+   else if ((effective_doses > team_performance) & (team_performance >= target_pop)) {
+      return(1) #we can carry more than we are expected to vaccinate but the target population is less than how many kids we are expected to vaccinate, so it'll take us 1 day
+   }
+   else if ((effective_doses > team_performance) & (team_performance < target_pop)) {
+      return(round(target_pop / team_performance, 3)) #we can carry more than we are expected to vaccinate but the target population is more than how many kids we are expected to vaccinate, so the team performance becomes the constraint
+   }
+   else if ((target_pop > effective_doses) & (effective_doses <= team_performance)) {
+      return(round(target_pop / effective_doses, 3)) # we can't carry enough doses to even vaccinate the expected number of kids per day, so the volume capacity becomes a constrainst 
+   }
+}
 ################################################################################
 #' passive cold chain dose capacity
 ################################################################################
