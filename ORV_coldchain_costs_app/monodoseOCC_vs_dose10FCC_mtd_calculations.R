@@ -293,4 +293,12 @@ isocline_plot <- ggplot(isocline_df %>% filter(wastage_isocline > 0.6666667)) +
     labs(x = 'Vaccine carrier capacity ratio (monodose vs 10-dose)',
          y = 'Open vial wastage (10-dose)')
 
-isocline_plot
+plot(isocline_plot)
+
+if(save_plots){
+    ggsave(filename = 'mobile_team_days_isocline.png'
+          # , plot = isocline_plot + presentation_plot_theme #uncomment this line to save a powerpoint version
+          , plot = isocline_plot
+           , width = 9
+           , height = 5)
+}
