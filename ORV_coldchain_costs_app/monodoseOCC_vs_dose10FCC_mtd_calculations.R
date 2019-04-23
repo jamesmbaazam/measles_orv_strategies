@@ -114,7 +114,7 @@ storage_vs_team_days_lim <- range(c(team_days_output$team_days_monodose_far_OCC,
                                   )
 
 #formating 10-dose data for comparison
-dose10_storage_comparison_dat <- dplyr::filter(team_days_output, dose10_wastage == 0.15) %>% 
+dose10_storage_comparison_dat <- dplyr::filter(team_days_output, dose10_wastage == 0.155) %>% 
     select(vaxCarr_dose10_capacity, vaxCarr_capacity_ratio, team_days_dose10_far_FCC) %>% 
     bind_rows(data.frame(vaxCarr_dose10_capacity = min(team_days_output$vaxCarr_monodose_capacity, na.rm = T),
                          vaxCarr_capacity_ratio = min(team_days_output$vaxCarr_capacity_ratio, na.rm = T),
