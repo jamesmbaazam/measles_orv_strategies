@@ -100,9 +100,10 @@ wastage_vs_team_days <- ggplot(data = team_days_output) +
                                     length.out = 10), 2
                                     )
                        ) + 
-    labs(x = 'Open vial wastage', 
-         y = 'Mobile team days', 
-         title = '10 dose for far campaigns in full cold chain (monodose value shown in red)')
+    labs(x = 'Open vial wastage' 
+         , y = 'Mobile team days' 
+         #, title = '10 dose for far campaigns in full cold chain (monodose value shown in red)'
+         )
 
 
 
@@ -149,7 +150,10 @@ storage_vs_team_days <- ggplot(data = team_days_output) +
     ), 2
     )
     ) + 
-    labs(x = 'Dose storage capacity ratio (monodose vs 10-dose)', y = 'Mobile team days', title = 'Monodose for far campaigns out of cold chain (10 dose value shown in red)')
+    labs(x = 'Dose storage capacity ratio (monodose vs 10-dose)'
+         , y = 'Mobile team days'
+         #, title = 'Monodose for far campaigns out of cold chain (10 dose value shown in red)'
+         )
 
 grid.arrange(wastage_vs_team_days, storage_vs_team_days, ncol = 1)
 
