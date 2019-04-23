@@ -161,96 +161,32 @@ grid.arrange(wastage_vs_team_days, storage_vs_team_days, ncol = 1)
 
 #Reshaping the results and assigning zero wastage to the monodose strategy
 
-team_days_output_melted <- team_days_output %>% gather(key = 'strategy', value = 'team_days', c('team_days_dose10_far_FCC', 'team_days_monodose_far_OCC'), factor_key = T)
-team_days_output_melted_mod <- dplyr::mutate(team_days_output_melted, dose10_wastage = if_else(strategy == 'team_days_dose10_far_FCC', team_days_output_melted$dose10_wastage, 0))
+team_days_output_melted <- team_days_output %>% 
+    select(-vaxCarr_dose10_capacity, -vaxCarr_monodose_capacity) %>% 
+    gather(key = 'strategy'
+           , value = 'team_days'
+           , c('team_days_dose10_far_FCC', 'team_days_monodose_far_OCC')
+           , factor_key = T
+           )
 
-
-team_days_output_reshaped <- team_days_output_melted_mod %>% 
-    dplyr::mutate(vaxCarr_capacity_ratio = paste(vaxCarr_capacity_ratio, collapse = ',')
-                  ) %>% 
-    separate_rows(vaxCarr_capacity_ratio)
-
-
-team_days_output_reshaped$vaxCarr_capacity_ratio <- as.numeric(team_days_output_reshaped$vaxCarr_capacity_ratio)
-#View(team_days_output_reshaped)
-
-# y_lim_switching_decision_plot <- seq(0, 65, 2.5)
-# 
-# switching_decision_plot <- ggplot(data = team_days_output) + 
-#     geom_point(aes(x = vaxCarr_capacity_ratio, 
-#                    y = team_days,
-#                    colour = factor(strategy),
-#                    size = dose10_wastage)
-#                ) +
-#     geom_line(data = team_days_output_melted_mod,
-#               aes(x = vaxCarr_capacity_ratio, y = team_days, colour = strategy), size = 1) + 
-#     scale_x_continuous(breaks = seq(0.2, 1, 0.1),
-#                        labels = seq(0.2, 1, 0.1)) +
-#     scale_y_continuous(breaks = y_lim_switching_decision_plot,
-#                        labels = every_nth(y_lim_switching_decision_plot, 2, inverse = T)) +
-#     labs(x = 'Dose storage capacity ratio (monodose vs 10-dose)', y = 'Mobile team days') + 
-#     scale_color_manual(labels = c('10-dose FCC', 'Monodose OCC'),
-#                 values = c('steelblue', 'tomato3'), 
-#                 name = 'Strategy') + 
-#     scale_size(name = 'Open vial wastage') + 
-#     presentation_plot_theme
-# 
-# ggsave(filename = 'switching_decision_plot.png', plot = switching_decision_plot, width = 9, height = 5)
+team_days_output_melted_mod <- dplyr::mutate(team_days_output_melted
+                                             , dose10_wastage = if_else(strategy == 'team_days_dose10_far_FCC'
+                                                                        , team_days_output_melted$dose10_wastage
+                                                                        , 0
+                                                                        )
+                                             )
+#I do some further reshaping of the results for 10-dose so I can plot the team days wrt constant wastage rates across the monodose plot
+team_days_output_melted_dose10 <- dplyr::filter(team_days_output_melted_mod
+                                                , strategy == 'team_days_dose10_far_FCC') %>% 
+    dplyr::mutate(vaxCarr_capacity_ratio = paste(vaxCarr_capacity_ratio, collapse = ',')) %>% 
+    separate_rows(vaxCarr_capacity_ratio, convert = T)
 
 
 
-# team_days_dose10_worse <- filter(team_days_output, team_days_dose10_far_FCC > 2) #all cases where 10-dose produces worse number of team days that monodose
-# team_days_monodose_best <- filter(team_days_output, team_days_monodose_far_OCC==2) #monodose is better so far as we can transport doses that can vaccinate all we are expected to vaccinate in a day
-# 
-# isocline_dat <- filter(team_days_output, team_days_monodose_far_OCC == 2 & team_days_monodose_far_OCC <= 3 & dose10_wastage >= 0.67 & team_days_dose10_far_FCC <= 2.5)
-# 
-# isocline <- team_days_output %>% mutate(isocline_wastage = 1 - vaxCarr_capacity_ratio)
 
-#View(isocline)
-
-dose10_wastage_0 <- team_days_output %>% dplyr::filter(dose10_wastage == 0)
-team_days_dose10_0_wastage <- tibble(dose10_wastage = rep(dose10_wastage_0$dose10_wastage, nrow(team_days_output)), 
-                                         vaxCarr_capacity_ratio = team_days_output$vaxCarr_capacity_ratio, 
-                                         team_days_dose10_far_FCC = rep(dose10_wastage_0$team_days_dose10_far_FCC, nrow(team_days_output))
-                                         ) 
-
-dose10_wastage_15 <- team_days_output %>% dplyr::filter(dose10_wastage == 0.15)
-team_days_dose10_15_wastage <- tibble(dose10_wastage = rep(dose10_wastage_15$dose10_wastage, nrow(team_days_output)),
-                                      vaxCarr_capacity_ratio = team_days_output$vaxCarr_capacity_ratio,
-                                      team_days_dose10_far_FCC = rep(dose10_wastage_15$team_days_dose10_far_FCC, nrow(team_days_output))
-)
-
-
-dose10_wastage_67 <- team_days_output %>% dplyr::filter(dose10_wastage == 0.67)
-team_days_dose10_67_wastage <- tibble(dose10_wastage = rep(dose10_wastage_67$dose10_wastage, nrow(team_days_output)), 
-                                      vaxCarr_capacity_ratio = team_days_output$vaxCarr_capacity_ratio, 
-                                      team_days_dose10_far_FCC = rep(dose10_wastage_67$team_days_dose10_far_FCC, nrow(team_days_output))
-) 
-
-dose10_wastage_78 <- team_days_output %>% dplyr::filter(dose10_wastage ==  0.78)
-team_days_dose10_78_wastage <- tibble(dose10_wastage = rep(dose10_wastage_78$dose10_wastage[1], nrow(team_days_output)), 
-                                      vaxCarr_capacity_ratio = team_days_output$vaxCarr_capacity_ratio, 
-                                      team_days_dose10_far_FCC = rep(dose10_wastage_78$team_days_dose10_far_FCC[1], nrow(team_days_output))
-)
-
-dose10_wastage_70 <- team_days_output %>% dplyr::filter(dose10_wastage == 0.7)
-team_days_dose10_70_wastage <- tibble(dose10_wastage = rep(dose10_wastage_70$dose10_wastage, nrow(team_days_output)), 
-                                      vaxCarr_capacity_ratio = team_days_output$vaxCarr_capacity_ratio, 
-                                      team_days_dose10_far_FCC = rep(dose10_wastage_70$team_days_dose10_far_FCC, nrow(team_days_output))
-)
-
-
-# dose10_team_days_lines <- team_days_output_reshaped %>% select(-vaxCarr_monodose_capacity, -vaxCarr_dose10_capacity) %>% 
-#     filter(dose10_wastage == c(0, 0.67, 0.7, 0.78), strategy == 'team_days_dose10_far_FCC')
-
-
-
-dose10_team_days_lines <- bind_rows(team_days_dose10_0_wastage, 
-                                    team_days_dose10_15_wastage, 
-                                    team_days_dose10_67_wastage, 
-                                    team_days_dose10_70_wastage, 
-                                    team_days_dose10_78_wastage
-                                    )
+#' plot to illustrate how the 10-dose and monodose team days intersect at some 
+#' points and how that leads to an isocline for decision-making
+#' 
 
 team_days_intersection_plot <- ggplot(data = team_days_output) + 
     geom_point(aes(x = vaxCarr_capacity_ratio, 
