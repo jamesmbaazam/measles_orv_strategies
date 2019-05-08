@@ -8,6 +8,12 @@ library('tidyr')
 source('./ORV_coldchain_costs_app/params.R')
 source('./ORV_coldchain_costs_app/calculator_functions.R')
 
+#####################
+#Far campaigns: monodose Outside of Cold Chain versus 10-dose in Full Cold Chain
+#########################
+
+
+
 #params
 far_pop <- 500
 

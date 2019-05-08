@@ -35,7 +35,7 @@ simod <- function(t, x, parms) {
   K <- x[5]
   #
   with(as.list(parms), {
-    Q <- ifelse(t < T | t > T + orv_dur, 0, (-log(1 - coverage) / orv_dur))
+    Q <- ifelse(t < T | t > T + orv_dur, 0, (-log(1 - coverage) / orv_dur)) #-log(1 - coverage) / orv_dur what is this formula?
     dS <- -B * S * I - vax_eff * Q * S
     dE <- B * S * I - r * E
     dI <- r * E - g * I
@@ -50,16 +50,30 @@ simod <- function(t, x, parms) {
 #####################################################
 # % Intervention
 #####################################################
-p_red <- function(R, vaccine_efficacy, target_vaccination, intervention_length, mtime = 120, LP = 7, IP = 7, N = 10000, step = 1) {
+p_red <- function(R, 
+                  vaccine_efficacy
+                  , target_vaccination
+                  , intervention_length
+                  , mtime = 120
+                  , LP = 7 #LP = Latent period
+                  , IP = 7 #IP = Infectious period
+                  , N = 10000
+                  , step = 1
+                  ) { 
   steps <- (0:mtime)[seq(1, mtime, by = step)]
   p_red <- rep(NA, length(steps))
-  xstrt <- c(S = 1 - 1 / N, E = 0, I = 1 / N, R = 0, K = 0) # starting values
+  xstrt <- c(S = 1 - 1 / N, E = 0, I = 1 / N, R = 0, K = 0) # starting values as proportions. Starts with 1 infected and remaining being susceptible
   beta <- R / IP # transmission rate
   t <- 1
   for (i in 1:length(steps)) {
     par <- c(
-      B = beta, r = 1 / LP, g = 1 / IP, vax_eff = vaccine_efficacy,
-      coverage = target_vaccination, orv_dur = intervention_length, T = steps[i]
+      B = beta, 
+      r = 1 / LP
+      , g = 1 / IP
+      , vax_eff = vaccine_efficacy
+      , coverage = target_vaccination
+      , orv_dur = intervention_length
+      , T = steps[i]
     )
     out <- as.data.frame(lsoda(xstrt, steps, simod, par))
     p_red[t] <- out$K[dim(out)[1]]
