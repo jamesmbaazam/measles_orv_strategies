@@ -11,7 +11,7 @@ library(DT)
 # Note: Throughout the code, FCC means Full Cold Chain, dose10 means 10-dose,
 #OCC = Out of Cold Chain
 #source helper scripts
-source('./params.R', local = TRUE)
+source('../scripts/parameters.R', local = TRUE)
 
 ui <- fluidPage(
   
@@ -151,8 +151,8 @@ ui <- fluidPage(
 server <- function(input, output, session) {
 
   #source helper scripts
-  source('./params.R', local = TRUE)
-  source('./calculator_functions.R', local = TRUE)
+  source('../scripts/parameters.R', local = TRUE)
+  source('../scripts/supply_chain_functions.R', local = TRUE)
   
   # empty data frame for storing all the sites added
   site_table <- reactiveValues(added_sites = NULL)

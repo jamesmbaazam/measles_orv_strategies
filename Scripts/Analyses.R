@@ -5,8 +5,8 @@ library('purrr')
 library('gridExtra')
 library('tidyr')
 
-source('./ORV_coldchain_costs_app/params.R')
-source('./ORV_coldchain_costs_app/calculator_functions.R')
+source('./scripts/parameters.R')
+source('./scripts/supply_chain_functions.R')
 
 #####################
 #Far campaigns: monodose Outside of Cold Chain versus 10-dose in Full Cold Chain
@@ -224,6 +224,7 @@ if(save_plots){
  ggsave(filename = 'team_days_intersection_plot.png'
         #, plot = team_days_intersection_plot + presentation_plot_theme #uncomment this line to save a powerpoint version
         , team_days_intersection_plot
+        , path = './figures/'
         , width = 9
         , height = 5)
 }
@@ -257,6 +258,7 @@ if(save_plots){
     ggsave(filename = 'mobile_team_days_isocline.png'
           # , plot = isocline_plot + presentation_plot_theme #uncomment this line to save a powerpoint version
           , plot = isocline_plot
+          , path = './figures/'
            , width = 9
            , height = 5)
 }
