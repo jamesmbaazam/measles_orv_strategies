@@ -13,10 +13,6 @@ source('./scripts/supply_chain_functions.R')
 #########################
 
 
-
-#params
-far_pop <- 500
-
 ###############################
 
 #how many doses of the 10-dose vials can we transport in a vaccine carrier?
