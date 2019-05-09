@@ -15,16 +15,16 @@ simod <- function(t, x, parms) {
   #
   # coverage = target coverage
   # orv_dur = length of vaccination campaign
-  # T = Day of campaign start
+  # campaign_day = Day of campaign start
   # USAGE:
   # times<-1:100
   # xstrt<-c(S=.999,E=0,I=.001,R=0,K=0)
-  # par<-c(B=.5, r=1/7, g = 1/7, vax_eff = .8, coverage = 0, orv_dur = 10, T = 80)
+  # par<-c(B=.5, r=1/7, g = 1/7, vax_eff = .8, coverage = 0, orv_dur = 10, campaign_day = 80)
   # out<-as.data.frame(lsoda(xstrt,times,simod,par))
   # plot(out$time,out$I,type="l")
   #
   #
-  # par<-c(B=.5, r=1/7, g = 1/7, vax_eff = .8, coverage = .99, orv_dur = 10, T = 50)
+  # par<-c(B=.5, r=1/7, g = 1/7, vax_eff = .8, coverage = .99, orv_dur = 10, campaign_day = 50)
   # out<-as.data.frame(lsoda(xstrt,times,simod,par))
   # lines(out$time,out$I,col="red")
 
@@ -32,10 +32,10 @@ simod <- function(t, x, parms) {
   E <- x[2]
   I <- x[3]
   R <- x[4]
-  K <- x[5]
+  K <- x[5] #class for tracking new infections
   #
   with(as.list(parms), {
-    Q <- ifelse(t < T | t > T + orv_dur, 0, (-log(1 - coverage) / orv_dur)) #-log(1 - coverage) / orv_dur what is this formula?
+    Q <- ifelse(t < campaign_day | t > campaign_day + orv_dur, 0, (-log(1 - coverage) / orv_dur)) #-log(1 - coverage) / orv_dur what is this formula?
     dS <- -B * S * I - vax_eff * Q * S
     dE <- B * S * I - r * E
     dI <- r * E - g * I
@@ -57,7 +57,7 @@ p_red <- function(R,
                   , mtime = 120
                   , LP = 7 #LP = Latent period
                   , IP = 7 #IP = Infectious period
-                  , N = 10000
+                  , N 
                   , step = 1
                   ) { 
   steps <- (0:mtime)[seq(1, mtime, by = step)]
@@ -66,39 +66,49 @@ p_red <- function(R,
   beta <- R / IP # transmission rate
   t <- 1
   for (i in 1:length(steps)) {
-    par <- c(
-      B = beta, 
-      r = 1 / LP
+    par <- c(B = beta 
+      , r = 1 / LP
       , g = 1 / IP
       , vax_eff = vaccine_efficacy
-      , coverage = target_vaccination
-      , orv_dur = intervention_length
-      , T = steps[i]
+      , coverage = target_vaccination #to be an output from this model
+      , orv_dur = intervention_length #SC output
+      , campaign_day = steps[i]
     )
     out <- as.data.frame(lsoda(xstrt, steps, simod, par))
     p_red[t] <- out$K[dim(out)[1]]
     t <- t + 1
     cat("step ", i, "of ", floor(mtime / step), ".\r")
   }
-  par <- c(
-    B = beta, r = 1 / LP, g = 1 / IP, vax_eff = vaccine_efficacy,
-    coverage = 0, orv_dur = 0, T = Inf
+  par <- c(B = beta 
+           , r = 1 / LP
+           , g = 1 / IP
+           , vax_eff = vaccine_efficacy
+           , coverage = 0
+           , orv_dur = 0
+           , campaign_day = Inf
   )
   outv <- as.data.frame(lsoda(xstrt, steps, simod, par))
   # fs should really be the prediction with steps=Inf?
   fs <- max(out$K)
   res <- list(
-    out = cbind(steps, p_red / max(p_red)),
-    R = R,
-    vaccine_efficacy = vaccine_efficacy,
-    target_vaccination = target_vaccination,
-    intervention_length = intervention_length,
-    mtime = mtime, LP = LP, IP = IP, N = N, step = step,
-    virgin = outv$I, vfs = fs
+    out = cbind(steps, p_red / max(p_red))
+    , R = R
+    , vaccine_efficacy = vaccine_efficacy
+    , target_vaccination = target_vaccination
+    , intervention_length = intervention_length
+    , mtime = mtime
+    , LP = LP
+    , IP = IP
+    , N = N
+    , step = step
+    , virgin = outv$I #infected individuals from the no-intervention counterfactual
+    , vfs = fs
   )
   class(res) <- "p_red"
   return(res)
 }
+
+
 ######################################################
 
 #####################################################
