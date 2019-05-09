@@ -61,15 +61,17 @@ dose10_wr_mt <- dose10_wr_ft*2 #wastage rate for mobile teams, mt, 30% (twice, c
 
 
 
+
+
 # DATA
 # icepack_quants <- read_excel('/data/passiveCC_icepack_quantity_data.xlsx')
 # vax_storage_capacity <- read_excel('/data/passiveCC_vaccine_storage_capacity_data.xlsx')
 
 #############################################
-#Population parameters
+#Epidemiological parameters
 #############################################
 
-far_pop <- 500
+#far_pop <- 500
 R0 <- 18
 
 
