@@ -1,6 +1,6 @@
-#Control parameters
-save_plots <- FALSE
-
+########################################################
+#Supply chain parameters
+########################################################
 
 #Data table row selection control
 num_of_sites_selectable <- 'single' #'single' means only one row can be selected at a time. To prevent row selection, set to 'none'. Selected rows are available through input$id_of_table_rows_selected
@@ -59,6 +59,21 @@ dose10_wr_mt <- dose10_wr_ft*2 #wastage rate for mobile teams, mt, 30% (twice, c
 # DATA
 # icepack_quants <- read_excel('/data/passiveCC_icepack_quantity_data.xlsx')
 # vax_storage_capacity <- read_excel('/data/passiveCC_vaccine_storage_capacity_data.xlsx')
+
+#############################################
+#Population parameters
+#############################################
+
+far_pop <- 500
+R0 <- 18
+
+
+
+######################################################
+#Plot parameters
+######################################################
+#Control parameters
+save_plots <- FALSE
 
 
 # formatting the labels
