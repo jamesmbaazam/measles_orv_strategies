@@ -14,7 +14,7 @@ source('./scripts/supply_chain_functions.R')
 ######################################
 ambient_temp <- c("below 40", "above 40")
 mf314_quant <- 1
-buffer_stock <- 0.1
+buffer_stock <- 0 #no buffer for now 
 
 site_table <- NULL
 site_table$added_sites <- tibble(dist_from_base = 0 
@@ -80,14 +80,14 @@ monodose_FCC_init_icepack_quant <- monodose_FCC_RCW25_icepack_needs_total + mono
 ###
 # outputs for monodose FCC calculations
 ###
-ice_packs_required_monodose_FCC <- monodose_FCC_RCW25_icepack_needs_total + monodose_FCC_vaxCarr_icepack_needs_total
+#ice_packs_required_monodose_FCC <- monodose_FCC_RCW25_icepack_needs_total + monodose_FCC_vaxCarr_icepack_needs_total
 
 
 monodose_FCC_ft <- calc_freezing_time(mf314_available = mf314_quant
                                       , large_icepacks_quantity = monodose_FCC_RCW25_icepack_needs_total 
                                       , small_icepacks_quantity = monodose_FCC_vaxCarr_icepack_needs_total)
 # output
-Init_ice_freezeTime_monodose_FCC <- monodose_FCC_ft # Time it takes to freeze depends on how many freezers are available and their capacity. I currently assume that we only use the MF314 freezer, which is the largest, and I specify the quantity at the beginning of this script
+#Init_ice_freezeTime_monodose_FCC <- monodose_FCC_ft # Time it takes to freeze depends on how many freezers are available and their capacity. I currently assume that we only use the MF314 freezer, which is the largest, and I specify the quantity at the beginning of this script
 
 monodose_FCC_init_iceVol <- monodose_FCC_RCW25_icepack_vol + monodose_FCC_vaxCarr_icepack_vol# we only need 0.6L ice packs to tra
 
@@ -107,10 +107,10 @@ team_days_mobile_monodose_FCC <- round(monodose_FCC_far_pop / monodose_FCC_far_t
 
 
 #output for team days required for fixed teams
-tdf_monodoseFCC <- team_days_fixed_monodose_FCC
+#tdf_monodoseFCC <- team_days_fixed_monodose_FCC
 
 #output for team days required for mobile teams
-tdm_monodoseFCC <- team_days_mobile_monodose_FCC
+#tdm_monodoseFCC <- team_days_mobile_monodose_FCC
 
 #######
 # Team allocation calculations and output
@@ -140,19 +140,19 @@ dose10_FCC_doses_near_pop_req <- dose10_FCC_doses_near_pop * (1 + dose10_wr_ft)
 dose10_FCC_doses_far_pop_req <- dose10_FCC_doses_far_pop * (1 + dose10_wr_mt)
 
 #number of doses required after buffer 
-dose10_FCC_doses_needed <- (dose10_FCC_doses_near_pop_req + dose10_FCC_doses_far_pop_req) * (1 + input$buffer_stock / 100)
+dose10_FCC_doses_needed <- (dose10_FCC_doses_near_pop_req + dose10_FCC_doses_far_pop_req) * (1 + buffer_stock / 100)
 
 
 dose10_FCC_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
                                                          , vial_type = 'dose10'
-                                                         , vax_vol = input$vaccine_vol_dose10
+                                                         , vax_vol = dose10_vial_vol[1]
                                                          , with_ice = T
                                                          , doses_to_transport = dose10_FCC_doses_needed
 )
 
 dose10_FCC_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
                                                            , vial_type = 'dose10'
-                                                           , vax_vol = input$vaccine_vol_dose10
+                                                           , vax_vol = dose10_vial_vol[1]
                                                            , with_ice = T
                                                            , doses_to_transport = dose10_FCC_doses_needed
 )
@@ -171,26 +171,15 @@ dose10_FCC_RCW25_icepack_vol <- dose10_FCC_RCW25_icepack_needs_total * 0.6 # tot
 
 # Initial number of icepacks required
 dose10_FCC_init_icepack_quant <- dose10_FCC_RCW25_icepack_needs_total + dose10_FCC_vaxCarr_icepack_needs_total
-output$ice_packs_required_dose10_FCC <- renderText({
-    paste(dose10_FCC_init_icepack_quant)
-})
 
-# freezing time
-dose10_FCC_ft <- calc_freezing_time(mf314_available = input$mf314_quant
+# freezing time: # Time it takes to freeze depends on how many freezers are available and their capacity. I currently assume that we only use the MF314 freezer, which is the largest, and I specify the quantity at the beginning of this script
+dose10_FCC_ft <- calc_freezing_time(mf314_available = mf314_quant
                                     , large_icepacks_quantity = dose10_FCC_RCW25_icepack_needs_total 
                                     , small_icepacks_quantity = dose10_FCC_vaxCarr_icepack_needs_total)
 
 
-
-output$Init_ice_freezeTime_dose10_FCC <- renderText({
-    paste(dose10_FCC_ft, "day(s)")
-}) # Time it takes to freeze depends on how many freezers are available and their capacity. I currently assume that we only use the MF314 freezer, which is the largest, and I specify the quantity at the beginning of this script
-
 #Initial volume of ice required 
 dose10_FCC_init_iceVol <- dose10_FCC_RCW25_icepack_vol + dose10_FCC_vaxCarr_icepack_vol
-output$ice_vol_init_dose10_FCC <- renderText({
-    paste(as.numeric(dose10_FCC_init_iceVol), "L")
-}) # we only need 0.6L ice packs to transport the vaccines in the RCW25s. The 0.4L ones don't to play here yet
 
 ##team days calculations
 #size of near population
@@ -201,7 +190,7 @@ dose10_FCC_far_pop <- extract_far_pop(site_table$added_sites, site_rows_selected
 
 
 dose10_FCC_far_trip_capacity <- calc_dose_capacity(vial_type = 'dose10' 
-                                                   , vax_vol = input$vaccine_vol_dose10
+                                                   , vax_vol = dose10_vial_vol[1]
                                                    , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
                                                    , with_ice = T)
 
@@ -212,29 +201,12 @@ team_days_fixed_dose10_FCC <- round(dose10_FCC_near_pop / tp_fixed, 1) #computat
 team_days_mobile_dose10_FCC <- round(dose10_FCC_far_pop / dose10_FCC_far_trip_eff_doses, 1)
 
 
-#output for team days required for fixed teams
-output$tdf_dose10_FCC <- renderText({
-    paste0(as.numeric(team_days_fixed_dose10_FCC))
-})
-
-#output for team days required for mobile teams
-output$tdm_dose10_FCC <- renderText({
-    paste0(as.numeric(team_days_mobile_dose10_FCC))
-})
-
 #######
 # Team allocation calculations and output
 #######
 
 #Extract size of allocated team from the sites table
 site_teams_dose10_FCC <- extract_site_team_size(site_table$added_sites, site_rows_selected = 1)
-
-# output for the duration that each team type will spend on site
-output$team_dur_dose10_FCC <- print_site_team_dur(site_team_quant = site_teams_dose10_FCC
-                                                  , td_fixed = team_days_fixed_dose10_FCC
-                                                  , td_mobile = team_days_mobile_dose10_FCC
-)
-
 
 
 ##########################################
@@ -254,9 +226,9 @@ mixed_FCC_monodose_quant <- calc_doses_required(df = site_table$added_sites
 
 mixed_FCC_doses <- mixed_FCC_dose10_quant + mixed_FCC_monodose_quant
 
-mixed_FCC_dose10_final <- mixed_FCC_dose10_quant* (1 + input$buffer_stock / 100)
+mixed_FCC_dose10_final <- mixed_FCC_dose10_quant* (1 + buffer_stock / 100)
 
-mixed_FCC_monodose_final <- mixed_FCC_monodose_quant* (1 + input$buffer_stock / 100)
+mixed_FCC_monodose_final <- mixed_FCC_monodose_quant* (1 + buffer_stock / 100)
 
 mixed_FCC_doses_needed <- mixed_FCC_dose10_final + mixed_FCC_monodose_final # apply buffer. This formula doesn't seem to be making any impact
 
@@ -272,14 +244,14 @@ mixed_FCC_doses_needed <- mixed_FCC_dose10_final + mixed_FCC_monodose_final # ap
 
 mixed_FCC_dose10_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
                                                                , vial_type = 'dose10'
-                                                               , vax_vol = input$vaccine_vol_dose10
+                                                               , vax_vol = dose10_vial_vol[1]
                                                                , with_ice = T
                                                                , doses_to_transport = mixed_FCC_dose10_final
 )
 
 mixed_FCC_dose10_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
                                                                  , vial_type = 'dose10'
-                                                                 , vax_vol = input$vaccine_vol_dose10
+                                                                 , vax_vol = dose10_vial_vol[1]
                                                                  , with_ice = T
                                                                  , doses_to_transport = mixed_FCC_dose10_final
 )
@@ -287,7 +259,7 @@ mixed_FCC_dose10_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'v
 #passive cold chain required for monodose vials
 mixed_FCC_monodose_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
                                                                  , vial_type = 'monodose'
-                                                                 , vax_vol = input$vaccine_vol_monodose
+                                                                 , vax_vol = monodose_vial_vol
                                                                  , with_ice = T
                                                                  , doses_to_transport = mixed_FCC_monodose_final
 )
@@ -295,7 +267,7 @@ mixed_FCC_monodose_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'r
 
 mixed_FCC_monodose_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
                                                                    , vial_type = 'monodose'
-                                                                   , vax_vol = input$vaccine_vol_monodose
+                                                                   , vax_vol = monodose_vial_vol
                                                                    , with_ice = T
                                                                    , doses_to_transport = mixed_FCC_monodose_final
 )
@@ -334,26 +306,15 @@ mixed_FCC_RCW25_icepack_vol <- mixed_FCC_RCW25_icepack_needs * 0.6
 
 #initial volume of ice required 
 mixed_FCC_init_iceVol <- mixed_FCC_vaxCarr_icepack_vol + mixed_FCC_RCW25_icepack_vol
-output$ice_vol_init_mixed_FCC <- renderText({
-    paste(as.numeric(mixed_FCC_init_iceVol), "L")
-}) # we only need 0.6L ice packs to transport the vaccines in the RCW25s. The 0.4L ones don't to play here yet
-
 
 # freezing time
-mixed_FCC_ft <- calc_freezing_time(mf314_available = input$mf314_quant
+mixed_FCC_ft <- calc_freezing_time(mf314_available = mf314_quant
                                    , large_icepacks_quantity = mixed_FCC_RCW25_icepack_needs 
                                    , small_icepacks_quantity = mixed_FCC_vaxCarr_icepack_needs)
-
-output$Init_ice_freezeTime_mixed_FCC <- renderText({
-    paste(mixed_FCC_ft, "day(s)")
-}) # 
 
 
 # Initial number of icepacks required
 mixed_FCC_init_icepack_quant <- mixed_FCC_RCW25_icepack_needs + mixed_FCC_vaxCarr_icepack_needs
-output$ice_packs_required_mixed_FCC <- renderText({
-    paste(mixed_FCC_init_icepack_quant)
-})
 
 
 
@@ -373,30 +334,12 @@ team_days_fixed_mixed_FCC<- round(mixed_FCC_near_pop / tp_fixed, 1) #computation
 team_days_mobile_mixed_FCC <- round(mixed_FCC_far_pop / mixed_FCC_far_trip_capacity, 1)
 
 
-#output for team days required for fixed teams
-output$tdf_mixed_FCC <- renderText({
-    paste0(as.numeric(team_days_fixed_mixed_FCC))
-})
-
-#output for team days required for mobile teams
-output$tdm_mixed_FCC <- renderText({
-    paste0(as.numeric(team_days_mobile_mixed_FCC))
-})
-
 #######
 # Team allocation calculations and output
 #######
 
 #Extract size of allocated team from the sites table
 site_teams_mixed_FCC <- extract_site_team_size(site_table$added_sites, site_rows_selected = 1)
-
-# output for the duration that each team type will spend on site
-output$team_dur_mixed_FCC <- print_site_team_dur(site_team_quant = site_teams_mixed_FCC
-                                                 , td_fixed = team_days_fixed_mixed_FCC
-                                                 , td_mobile = team_days_mobile_mixed_FCC
-)
-
-
 
 ##############################################################################
 #' Calculations for partial OCC strategy, i.e 10-dose FCC for near population and monodose OCC for far population
@@ -416,9 +359,9 @@ part_OCC_monodose_quant <- calc_doses_required(df = site_table$added_sites
 
 # part_OCC_doses <- part_OCC_dose10_quant + part_OCC_monodose_quant
 
-part_OCC_dose10_final <- part_OCC_dose10_quant * (1 + input$buffer_stock / 100)
+part_OCC_dose10_final <- part_OCC_dose10_quant * (1 + buffer_stock / 100)
 
-part_OCC_monodose_final <- part_OCC_monodose_quant * (1 + input$buffer_stock / 100)
+part_OCC_monodose_final <- part_OCC_monodose_quant * (1 + buffer_stock / 100)
 
 part_OCC_doses_needed <- part_OCC_dose10_final + part_OCC_monodose_final
 
@@ -433,14 +376,14 @@ part_OCC_doses_needed <- part_OCC_dose10_final + part_OCC_monodose_final
 
 part_OCC_dose10_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
                                                               , vial_type = 'dose10'
-                                                              , vax_vol = input$vaccine_vol_dose10
+                                                              , vax_vol = dose10_vial_vol[1]
                                                               , with_ice = T
                                                               , doses_to_transport = part_OCC_dose10_final)
 
 
 part_OCC_dose10_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
                                                                 , vial_type = 'dose10'
-                                                                , vax_vol = input$vaccine_vol_dose10
+                                                                , vax_vol = dose10_vial_vol[1]
                                                                 , with_ice = T
                                                                 , doses_to_transport = part_OCC_dose10_final)
 
@@ -448,7 +391,7 @@ part_OCC_dose10_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'va
 #passive cold chain required for monodose vials
 part_OCC_monodose_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
                                                                 , vial_type = 'monodose'
-                                                                , vax_vol = input$vaccine_vol_monodose
+                                                                , vax_vol = monodose_vial_vol
                                                                 , with_ice = F
                                                                 , doses_to_transport = part_OCC_monodose_final)
 
@@ -456,7 +399,7 @@ part_OCC_monodose_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rc
 #ceiling(part_OCC_monodose_final / 1301) #Source: Excel sheet "Cold Chain equipment"
 part_OCC_monodose_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
                                                                   , vial_type = 'monodose'
-                                                                  , vax_vol = input$vaccine_vol_monodose
+                                                                  , vax_vol = monodose_vial_vol
                                                                   , with_ice = F
                                                                   , doses_to_transport = part_OCC_monodose_final)
 
@@ -495,25 +438,17 @@ part_OCC_RCW25_icepack_vol <- part_OCC_RCW25_icepack_needs * 0.6
 
 #initial volume of ice required 
 part_OCC_init_iceVol <- part_OCC_vaxCarr_icepack_vol + part_OCC_RCW25_icepack_vol
-output$ice_vol_init_part_OCC <- renderText({
-    paste(as.numeric(part_OCC_init_iceVol), "L")
-}) # we only need 0.6L ice packs to transport the vaccines in the RCW25s. The 0.4L ones don't to play here yet
+# we only need 0.6L ice packs to transport the vaccines in the RCW25s. The 0.4L ones don't to play here yet
 
 # freezing time
-part_OCC_ft <- calc_freezing_time(mf314_available = input$mf314_quant
+part_OCC_ft <- calc_freezing_time(mf314_available = mf314_quant
                                   , large_icepacks_quantity = part_OCC_RCW25_icepack_needs 
                                   , small_icepacks_quantity = part_OCC_vaxCarr_icepack_needs)
 
-output$Init_ice_freezeTime_part_OCC <- renderText({
-    paste(part_OCC_ft, "day(s)")
-}) # 
 
 
 # Initial number of icepacks required
 part_OCC_init_icepack_quant <- part_OCC_RCW25_icepack_needs + part_OCC_vaxCarr_icepack_needs
-output$ice_packs_required_part_OCC <- renderText({
-    paste(part_OCC_init_icepack_quant)
-})
 
 
 ##team days calculations
@@ -533,33 +468,12 @@ team_days_fixed_part_OCC <- round(part_OCC_near_pop / tp_fixed, 1) #computationa
 team_days_mobile_part_OCC <- round(part_OCC_far_pop / part_OCC_far_trip_capacity, 1)
 
 
-
-
-
-
-#output for team days required for fixed teams
-output$tdf_part_OCC<- renderText({
-    paste0(as.numeric(team_days_fixed_part_OCC))
-})
-
-#output for team days required for mobile teams
-output$tdm_part_OCC <- renderText({
-    paste0(as.numeric(team_days_mobile_part_OCC))
-})
-
 #######
 # Team allocation calculations and output
 #######
 
 #Extract size of allocated team from the sites table
 site_teams_part_OCC <- extract_site_team_size(site_table$added_sites, site_rows_selected = 1)
-
-# output for the duration that each team type will spend on site
-output$team_dur_part_OCC <- print_site_team_dur(site_team_quant = site_teams_part_OCC
-                                                , td_fixed = team_days_fixed_part_OCC
-                                                , td_mobile = team_days_mobile_part_OCC
-)
-
 
 
 ################################################################
@@ -647,9 +561,9 @@ td_results <- tibble(
     # 
     #arrange the plots on a grid
     grid.arrange(ft_plot, 
-                 iceVol_plot, 
+                # iceVol_plot, 
                  td_plot,
-                 ncol = 3)
+                 ncol = 2)
 
 
 
@@ -701,7 +615,7 @@ monodose_OCC_far_trip_capacity_expanded <- seq(monodose_OCC_far_trip_capacity, d
 
 #mobile team days using monodose OCC
 
-team_days_mobile_monodose_noIce <- unlist(purrr::map(monodose_OCC_far_trip_capacity_expanded, calc_monodose_team_days, target_pop = far_pop))
+team_days_mobile_monodose_noIce <- unlist(purrr::map(monodose_OCC_far_trip_capacity_expanded, calc_monodose_team_days, target_pop = site_table$added_sites$far_pop))
 
 ###############################
 #10 dose FCC for far campaigns
@@ -714,7 +628,7 @@ wastage_dose10_mt_vect <- round(seq(0, 1, length.out = length(team_days_mobile_m
 
 team_days_mobile_dose10_Ice <-  purrr::map_dbl(.x = wastage_dose10_mt_vect,
                                                   .f = calc_dose10_team_days, 
-                                                  target_pop = far_pop, 
+                                                  target_pop = site_table$added_sites$far_pop, 
                                                   vaxCarr_capacity = dose10_FCC_far_trip_capacity,
                                                   team_performance = tp_mobile)
                                         #there's a division by zero here, returning an infinity, so we'll replace it with NA to allow for better manipulation
@@ -903,7 +817,7 @@ if(save_plots){
 #'strategies where there is no difference in team days. The areas above and below the line
 #'correspond to a switch in decision.
 
-isocline_df <- team_days_output %>% mutate(wastage_isocline = 1 - (far_pop/(vaxCarr_dose10_capacity*team_days_monodose_far_OCC)))
+isocline_df <- team_days_output %>% mutate(wastage_isocline = 1 - (site_table$added_sites$far_pop/(vaxCarr_dose10_capacity*team_days_monodose_far_OCC)))
 
 #View(isocline_df)
 
