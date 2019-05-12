@@ -13,7 +13,7 @@ num_of_sites_selectable <- 'single' #'single' means only one row can be selected
 
 # FIXED PARAMETERS
 
-Strategy_list <- c("Monodose FCC", "10-dose FCC", "Mixed FCC", "Part OCC") #OCC = out of cold chain
+strategy_list <- c("Monodose FCC", "10-dose FCC", "Mixed FCC", "Part OCC") #OCC = out of cold chain
 team_type_list <- c('Fixed post', 'Mobile team')
 
 monodose_vial_vol <- 21.09
