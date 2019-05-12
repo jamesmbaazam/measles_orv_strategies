@@ -2,6 +2,21 @@ require(shiny)
 require(deSolve)
 
 
+#new inputs for the model will be:
+#1. vaccination rate for mobile and fixed teams (as input to SC model)
+#2. campaign duration (as output from SC model)
+#3. vaccine efficacy (already an input)
+#4. delay before start (as output from SC model)
+
+
+#new calculations
+#1. coverage as a result of delay and campaign duration
+
+#outputs
+#1. coverage
+#2. final size
+
+
 ######################################################
 # SEIR model
 ######################################################
