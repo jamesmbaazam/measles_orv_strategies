@@ -485,21 +485,21 @@ site_teams_part_OCC <- extract_site_team_size(site_table$added_sites, site_rows_
 #Making the tibbles!!!!
 # Results of required freezing time per strategy
 freezing_time_results <- tibble(
-    Strategy = Strategy_list,
+    strategy = strategy_list,
     time = c(monodose_FCC_ft, dose10_FCC_ft, mixed_FCC_ft, part_OCC_ft)
 )
 
 # Results of initial required volume of ice per strategy
 Init_iceVol_results <- tibble(
-    Strategy = Strategy_list,
+    strategy = strategy_list,
     iceVol = c(monodose_FCC_init_iceVol, dose10_FCC_init_iceVol, mixed_FCC_init_iceVol, part_OCC_init_iceVol)
 )
 
 
 #Results of team days calculations
 td_results <- tibble(
-    Strategy = rep(Strategy_list, each = 2),
-    team_type = rep(team_type_list, times = length(Strategy_list)),
+    strategy = rep(strategy_list, each = 2),
+    team_type = rep(team_type_list, times = length(strategy_list)),
     team_days = c(team_days_fixed_monodose_FCC, 
                   team_days_mobile_monodose_FCC, 
                   team_days_fixed_dose10_FCC, 
@@ -520,7 +520,7 @@ td_results <- tibble(
 ####################
 
     ft_plot <- ggplot(data = freezing_time_results, 
-                      aes(x = Strategy, y = time)
+                      aes(x = strategy, y = time)
     ) + 
         geom_bar(stat = "identity", fill = "steelblue") + 
         labs(title = 'Freezing time required per strategy', 
@@ -529,7 +529,7 @@ td_results <- tibble(
         shiny_plot_theme
     
     iceVol_plot <- ggplot(data = Init_iceVol_results, 
-                          aes(x = Strategy, 
+                          aes(x = strategy, 
                               y = iceVol)
     ) + 
         geom_bar(stat = "identity", fill = "steelblue") + 
@@ -539,7 +539,7 @@ td_results <- tibble(
         shiny_plot_theme
     
     td_plot <- ggplot(data = td_results, 
-                      aes(x = Strategy, 
+                      aes(x = strategy, 
                           y = team_days,
                           fill = team_type
                       )
