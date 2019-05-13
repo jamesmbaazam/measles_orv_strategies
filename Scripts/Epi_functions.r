@@ -50,7 +50,8 @@ simod <- function(t, x, parms) {
   K <- x[5] #class for tracking new infections
   #
   with(as.list(parms), {
-    Q <- ifelse(t < campaign_day | t > campaign_day + orv_dur, 0, (-log(1 - coverage) / orv_dur)) #-log(1 - coverage) / orv_dur what is this formula?
+    #Q <- ifelse(t < campaign_day | t > campaign_day + orv_dur, 0, (-log(1 - coverage) / orv_dur)) #-log(1 - coverage) / orv_dur what is this formula?
+    Q <- vax_rate/N
     dS <- -B * S * I - vax_eff * Q * S
     dE <- B * S * I - r * E
     dI <- r * E - g * I
