@@ -225,23 +225,41 @@ calc_doses_required <- function(df, site_rows_selected, is_dose10 = T, pop_type)
    if(pop_type == 'near' & is_dose10 == T){
       doses_required <- selected_sites %>% 
             dplyr::summarise(sum(.$near_pop))
-      return(ceiling(doses_required / 10))
+      return(ceiling(as.numeric(doses_required) / 10))
       }else if(pop_type == 'near' & is_dose10 == F){
          doses_required <- selected_sites %>% 
             dplyr::summarise(sum(.$near_pop))
-         return(doses_required)
+         return(as.numeric(doses_required))
       } else if(pop_type == 'far' & is_dose10 == T){
          doses_required <- selected_sites %>% 
             dplyr::summarise(sum(.$far_pop))
-         return(ceiling(doses_required / 10))
+         return(as.numeric(ceiling(doses_required / 10)))
       }else if(pop_type == 'far' & is_dose10 == F){
          doses_required <- selected_sites %>% 
             dplyr::summarise(sum(.$far_pop))
-         return(doses_required)
+         return(as.numeric(doses_required))
       } else{
          stop('Error in dose calculation function; check your inputs')
       }
    }
+
+###########################################################
+#buffer_doses(): account for factors that'll require us to transport
+#more doses than needed
+###########################################################
+
+fudge_doses <- function(buffer_size, doses){
+   req_doses <- doses * (1 + buffer_size / 100)
+   return(req_doses)
+}
+
+
+
+
+
+
+
+
 
 ##########
 #calc_freezing_time()
