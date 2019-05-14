@@ -94,30 +94,32 @@ p_red <- function(R,
     t <- t + 1
     cat("step ", i, "of ", floor(mtime / step), ".\r")
   }
-  par <- c(B = beta 
-           , r = 1 / LP
-           , g = 1 / IP
-           , vax_eff = vaccine_efficacy
-           , coverage = 0
-           , orv_dur = 0
-           , campaign_day = Inf
-  )
-  outv <- as.data.frame(lsoda(xstrt, steps, simod, par))
-  # fs should really be the prediction with steps=Inf?
+  # par <- c(B = beta 
+  #          , r = 1 / LP
+  #          , g = 1 / IP
+  #          , vax_eff = vaccine_efficacy
+  #         # , coverage = 0
+  #          , orv_dur = 0
+  #          , campaign_day = Inf
+  # )
+  # outv <- as.data.frame(lsoda(xstrt, steps, simod, par))
+  # # fs should really be the prediction with steps=Inf?
   fs <- max(out$K)
   res <- list(
     out = cbind(steps, p_red / max(p_red))
     , R = R
     , vaccine_efficacy = vaccine_efficacy
-    , target_vaccination = target_vaccination
+  #  , target_vaccination = target_vaccination
     , intervention_length = intervention_length
     , mtime = mtime
     , LP = LP
     , IP = IP
     , N = N
     , step = step
-    , virgin = outv$I #infected individuals from the no-intervention counterfactual
+   # , virgin = outv$I #infected individuals from the no-intervention counterfactual
     , vfs = fs
+  , campaign_time = t
+  , model_step = i
   )
   class(res) <- "p_red"
   return(res)
