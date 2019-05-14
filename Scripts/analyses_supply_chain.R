@@ -35,18 +35,20 @@ dose10_FCC_doses_far_pop <-  calc_doses_required(df = site_data
                                                  , is_dose10 = T
                                                  , pop_type = 'far')
 
-#doses required for near population after wastage penalty
-dose10_FCC_doses_near_pop_req <- dose10_FCC_doses_near_pop * (1 + dose10_wr_ft/100)
+#adjustment for wastage (fixed post teams)
+dose10_FCC_doses_near_pop_req <- dose10_FCC_doses_near_pop * (1 + sc_model_params$dose10_wr_ft/100)
 
-#doses required for far population after wastage penalty
-dose10_FCC_doses_far_pop_req <- dose10_FCC_doses_far_pop * (1 + dose10_wr_mt/100)
+#adjustment for wastage (mobile team)
+dose10_FCC_doses_far_pop_req <- dose10_FCC_doses_far_pop * (1 + sc_model_params$dose10_wr_mt/100)
 
-#number of doses required after buffer 
-dose10_FCC_doses_needed <- fudge_doses(doses = dose10_FCC_doses_near_pop_req + dose10_FCC_doses_far_pop_req
+#apply buffer
+dose10_FCC_doses_needed <- fudge_doses(doses = ceiling(dose10_FCC_doses_near_pop_req + dose10_FCC_doses_far_pop_req)
                                        , buffer_size = sc_model_params$buffer_stock
-                                       )  
+)  
 
 
+
+#determine passive cold chain needs
 dose10_FCC_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
                                                          , vial_type = 'dose10'
                                                          , vax_vol = sc_model_params$dose10_vial_vol[1]
