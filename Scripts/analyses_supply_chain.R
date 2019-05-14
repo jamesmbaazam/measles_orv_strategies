@@ -121,10 +121,10 @@ dose10_FCC_doses_far_pop <-  calc_doses_required(df = site_data
                                                  , pop_type = 'far')
 
 #doses required for near population after wastage penalty
-dose10_FCC_doses_near_pop_req <- dose10_FCC_doses_near_pop * (1 + dose10_wr_ft)
+dose10_FCC_doses_near_pop_req <- dose10_FCC_doses_near_pop * (1 + dose10_wr_ft/100)
 
 #doses required for far population after wastage penalty
-dose10_FCC_doses_far_pop_req <- dose10_FCC_doses_far_pop * (1 + dose10_wr_mt)
+dose10_FCC_doses_far_pop_req <- dose10_FCC_doses_far_pop * (1 + dose10_wr_mt/100)
 
 #number of doses required after buffer 
 dose10_FCC_doses_needed <- fudge_doses(doses = dose10_FCC_doses_near_pop_req + dose10_FCC_doses_far_pop_req
