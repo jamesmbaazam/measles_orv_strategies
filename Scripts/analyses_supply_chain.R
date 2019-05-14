@@ -479,31 +479,16 @@ td_results <- tibble(
                  td_plot,
                  ncol = 2)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#'Towards the isocline!! We have determined that the mixed FCC and monodose FCC
+#'are out of question now. Also, we know that vaccine wastage is a function of the landscape
+#' hence, is non-linear. Additionally, we know the vaccine carrier design is optimised for transporting ice.
+#' The question then arises that if the vaccine carriers could be manufactured in larger capacities to transport monodose,
+#' would that solve the problem? Again, that the fixed post teams have all they need to conduct the campaign at 
+#'the site, hence, we will narrow in on the campaign targetting far children. Here, we have the choice 
+#'between using 10-dose vials in full cold chain or the monodose out of the cold chain. We want to investigate
+#'under what combinations of 10-dose wastage and higher storage capacity for monodose vials will 
+#'the use of monodose outside of the cold chain be better than the 10-dose vaccine?
+#'We will answer this using an isocline formulation.
 
 #####################
 #Far campaigns: monodose Outside of Cold Chain versus 10-dose in Full Cold Chain
