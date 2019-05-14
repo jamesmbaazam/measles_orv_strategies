@@ -493,6 +493,20 @@ Init_iceVol_results <- tibble(
 )
 
 
+passive_cold_chain_needs <- tibble(strategy = strategy_list,
+                                   rcw25 = c(monodose_FCC_RCW25_needs
+                                             , dose10_FCC_RCW25_needs
+                                             , mixed_FCC_RCW25_needs
+                                             , part_OCC_RCW25_needs
+                                             ),
+                                   vaxCarr = c(monodose_FCC_vaxCarr_needs
+                                               , dose10_FCC_vaxCarr_needs
+                                               , mixed_FCC_vaxCarr_needs
+                                               , part_OCC_vaxCarr_needs
+                                               )
+                                   )
+                                             
+
 #Results of team days calculations
 td_results <- tibble(
     strategy = rep(strategy_list, each = 2),
