@@ -21,6 +21,12 @@ sc_model_params <- list(ambient_temp = c("below 40", "above 40")
                 )
 
 
+orv_model_params <- list(R0 = 18
+                         , vaccine_efficacy = 0.95
+                         , model_time = 120 #run model for a year
+                         )
+
+
 site_data <- tibble(near_pop = 1500 
                            , far_pop = 500
                            , site_team_alloc = 1 #number of teams allocated to site
