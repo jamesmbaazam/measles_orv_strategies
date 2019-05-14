@@ -20,29 +20,29 @@ require(deSolve)
 ######################################################
 # SEIR model
 ######################################################
-simod <- function(t, x, parms) {
-  ################
-  # Parameters
-  # B = transmission rate
-  # 1/r = latent period
-  # 1/g = infectious period
-  # vax_eff = vaccine efficacy
-  #
-  # coverage = target coverage
-  # orv_dur = length of vaccination campaign
-  # campaign_day = Day of campaign start
-  # USAGE:
-  # times<-1:100
-  # xstrt<-c(S=.999,E=0,I=.001,R=0,K=0)
-  # par<-c(B=.5, r=1/7, g = 1/7, vax_eff = .8, coverage = 0, orv_dur = 10, campaign_day = 80)
-  # out<-as.data.frame(lsoda(xstrt,times,simod,par))
-  # plot(out$time,out$I,type="l")
-  #
-  #
-  # par<-c(B=.5, r=1/7, g = 1/7, vax_eff = .8, coverage = .99, orv_dur = 10, campaign_day = 50)
-  # out<-as.data.frame(lsoda(xstrt,times,simod,par))
-  # lines(out$time,out$I,col="red")
+################
+# Parameters
+# B = transmission rate
+# 1/r = latent period
+# 1/g = infectious period
+# vax_eff = vaccine efficacy
+#
+# coverage = target coverage
+# orv_dur = length of vaccination campaign
+# campaign_day = Day of campaign start
+# USAGE:
+# times<-1:100
+# xstrt<-c(S=.999,E=0,I=.001,R=0,K=0)
+# par<-c(B=.5, r=1/7, g = 1/7, vax_eff = .8, coverage = 0, orv_dur = 10, campaign_day = 80)
+# out<-as.data.frame(lsoda(xstrt,times,simod,par))
+# plot(out$time,out$I,type="l")
+#
+#
+# par<-c(B=.5, r=1/7, g = 1/7, vax_eff = .8, coverage = .99, orv_dur = 10, campaign_day = 50)
+# out<-as.data.frame(lsoda(xstrt,times,simod,par))
+# lines(out$time,out$I,col="red")
 
+simod <- function(t, x, parms) {
   S <- x[1]
   E <- x[2]
   I <- x[3]
