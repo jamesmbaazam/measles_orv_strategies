@@ -84,28 +84,35 @@ dose10_FCC_ft <- calc_freezing_time(mf314_available = sc_model_params$mf314_quan
                                     , small_icepacks_quantity = dose10_FCC_vaxCarr_icepack_needs_total)
 
 
-#Initial volume of ice required 
+#Initial volume of ice required in litres
 dose10_FCC_init_iceVol <- dose10_FCC_RCW25_icepack_vol + dose10_FCC_vaxCarr_icepack_vol
 
-##team days calculations
-#size of near population
 
+################################################################################
+##team days calculations
+################################################################################
+
+#size of near population
 dose10_FCC_near_pop <- extract_near_pop(site_data, site_rows_selected = 1)
 dose10_FCC_far_pop <- extract_far_pop(site_data, site_rows_selected = 1)
 
 
 
-dose10_FCC_far_trip_capacity <- calc_dose_capacity(vial_type = 'dose10' 
+dose10_vaxCarr_cap_ice <- calc_dose_capacity(vial_type = 'dose10' 
                                                    , vax_vol = sc_model_params$dose10_vial_vol[1]
                                                    , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
                                                    , with_ice = T)
 
 
-dose10_FCC_far_trip_eff_doses <- dose10_FCC_far_trip_capacity * (1 - dose10_wr_mt)  #The effective number of doses a team has is the total capacity they can carry less of how many are expected to be wasted.
+dose10_FCC_far_trip_eff_doses <- calc_effective_doses(dose_quantity = dose10_vaxCarr_cap_ice
+                                                      , wastage = sc_model_params$dose10_wr_mt
+                                                      )  #The effective number of doses a team has is the total capacity they can carry less of how many are expected to be wasted.
 
-team_days_fixed_dose10_FCC <- round(dose10_FCC_near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
-team_days_mobile_dose10_FCC <- round(dose10_FCC_far_pop / dose10_FCC_far_trip_eff_doses, 1)
-
+team_days_fixed_dose10_FCC <- round(site_data$near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
+team_days_mobile_dose10_FCC <- calc_dose10_team_days(target_pop = site_data$far_pop
+                                                     , dose10_wastage = sc_model_params$dose10_wr_mt
+                                                     , vaxCarr_capacity = dose10_vaxCarr_cap_ice
+                                                     )
 
 #######
 # Team allocation calculations and output
@@ -312,19 +319,24 @@ mixed_FCC_init_icepack_quant <- mixed_FCC_RCW25_icepack_needs + mixed_FCC_vaxCar
 
 
 ##team days calculations
-#size of near population 
 
-mixed_FCC_near_pop <- extract_near_pop(site_data, site_rows_selected = 1)
-mixed_FCC_far_pop <- extract_far_pop(site_data, site_rows_selected = 1)
-
-mixed_FCC_far_trip_capacity <- calc_dose_capacity(vial_type = 'monodose' 
+#how many doses can be transported in the vaccine carrier?
+monodose_vaxCarr_cap_ice <- calc_dose_capacity(vial_type = 'monodose' 
                                                   , vax_vol = sc_model_params$monodose_vial_vol
                                                   , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
                                                   , with_ice = T)
 
 
-team_days_fixed_mixed_FCC<- round(mixed_FCC_near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
-team_days_mobile_mixed_FCC <- round(mixed_FCC_far_pop / mixed_FCC_far_trip_capacity, 1)
+team_days_fixed_mixed_FCC <- round(site_data$near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
+
+team_days_mobile_mixed_FCC <- calc_monodose_team_days(target_pop = site_data$far_pop
+                                                      , team_performance = sc_model_params$vax_rate['mobile_team']
+                                                      ,  carrier_vol_capacity = monodose_vaxCarr_cap_ice
+                                                      )
+    
+    
+    
+#round(site_data$far_pop / monodose_vaxCarr_cap_ice, 1)
 
 
 #######
@@ -335,11 +347,11 @@ team_days_mobile_mixed_FCC <- round(mixed_FCC_far_pop / mixed_FCC_far_trip_capac
 site_teams_mixed_FCC <- extract_site_team_size(site_data, site_rows_selected = 1)
 
 ##############################################################################
-#' Calculations for partial OCC strategy, i.e 10-dose FCC for near population and monodose OCC for far population
+#' Strategy 4: Mixed strategy B (Partial OCC strategy); 10-dose FCC for fixed teams, Monodose OCC for mobile teams
 ##############################################################################
 
 part_OCC_dose10_quant <- calc_doses_required(df = site_data
-                                             ,  site_rows_selected = 1
+                                             , site_rows_selected = 1
                                              , is_dose10 = T
                                              , pop_type = 'near')
 
@@ -371,6 +383,8 @@ part_OCC_doses_needed <- part_OCC_dose10_final + part_OCC_monodose_final
 #   part_OCC_dose10_vaxCarr_needs <- ceiling(part_OCC_dose10_final / 500) # vaccine carrier. Source: Excel sheet for Appendix 23
 # }
 
+
+#determine passive cold chain needs
 part_OCC_dose10_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
                                                               , vial_type = 'dose10'
                                                               , vax_vol = sc_model_params$dose10_vial_vol[1]
@@ -451,18 +465,23 @@ part_OCC_init_icepack_quant <- part_OCC_RCW25_icepack_needs + part_OCC_vaxCarr_i
 ##team days calculations
 #size of near population 
 
-part_OCC_near_pop <- extract_near_pop(site_data, site_rows_selected = 1)
-part_OCC_far_pop <- extract_far_pop(site_data, site_rows_selected = 1)
+# part_OCC_near_pop <- extract_near_pop(site_data, site_rows_selected = 1)
+# part_OCC_far_pop <- extract_far_pop(site_data, site_rows_selected = 1)
 
 
-part_OCC_far_trip_capacity <- calc_dose_capacity(vial_type = 'monodose' 
+monodose_vaxCarr_cap_noIce <- calc_dose_capacity(vial_type = 'monodose' 
                                                  , vax_vol = sc_model_params$monodose_vial_vol
                                                  , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
                                                  , with_ice = F)
 
 
-team_days_fixed_part_OCC <- round(part_OCC_near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
-team_days_mobile_part_OCC <- round(part_OCC_far_pop / part_OCC_far_trip_capacity, 1)
+team_days_fixed_part_OCC <- round(site_data$near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
+team_days_mobile_part_OCC <- calc_monodose_team_days(target_pop = site_data$far_pop,
+                                                     team_performance = sc_model_params$vax_rate['mobile_team']
+                                                     ,  carrier_vol_capacity = monodose_vaxCarr_cap_noIce
+                                                     )
+
+#round(site_data$far_pop / monodose_vaxCarr_cap_noIce, 1)
 
 
 #######
