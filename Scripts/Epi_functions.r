@@ -68,9 +68,9 @@ simod <- function(t, x, parms) {
 #####################################################
 p_red <- function(R, 
                   vaccine_efficacy
-                  , target_vaccination
+                  , vax_rate
                   , intervention_length
-                  , mtime = 120
+                  , mtime 
                   , LP = 7 #LP = Latent period
                   , IP = 7 #IP = Infectious period
                   , N 
