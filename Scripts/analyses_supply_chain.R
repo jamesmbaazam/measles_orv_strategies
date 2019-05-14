@@ -60,7 +60,7 @@ dose10_FCC_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'vaxCarr
                                                            , vial_type = 'dose10'
                                                            , vax_vol = dose10_vial_vol[1]
                                                            , with_ice = T
-                                                           , doses_to_transport = sc_model_params$dose10_vial_vol[1]
+                                                           , doses_to_transport = dose10_FCC_doses_needed
 )
 
 
