@@ -81,12 +81,11 @@ p_red <- function(R,
   xstrt <- c(S = 1 - 1 / N, E = 0, I = 1 / N, R = 0, K = 0) # starting values as proportions. Starts with 1 infected and remaining being susceptible
   beta <- R / IP # transmission rate
   t <- 1
-  for (i in 1:length(steps)) {
+  for(i in 1:length(steps)){
     par <- c(B = beta 
       , r = 1 / LP
       , g = 1 / IP
       , vax_eff = vaccine_efficacy
-      , coverage = target_vaccination #to be an output from this model
       , orv_dur = intervention_length #SC output
       , campaign_day = steps[i]
     )
