@@ -19,99 +19,14 @@ RCW25_icepack_needs <-  compute_rcw25_icepacks(sc_model_params$ambient_temp[1])
 vaxCarr_icepack_needs <- compute_vaxCarr_icepacks(sc_model_params$ambient_temp[1])
 
 
-##########################################
-# Calculations for monodose-only FCC
-##########################################
 
-monodose_FCC_doses_ft <- calc_doses_required(df = site_data
-                                             ,  site_rows_selected = 1
-                                             , is_dose10 = F
-                                             , pop_type = 'near')
-
-monodose_FCC_doses_mt <- calc_doses_required(df = site_data
-                                             ,  site_rows_selected = 1
-                                             , is_dose10 = F
-                                             , pop_type = 'far')
-
-monodose_FCC_doses <-  monodose_FCC_doses_ft + monodose_FCC_doses_mt 
-
-monodose_FCC_doses_needed <- fudge_doses(buffer_size = sc_model_params$buffer_stock, doses = monodose_FCC_doses) # apply buffer. This formula doesn't seem to be making any impact
-
-# number of RCW25s needed, based on the volume of the vaccine indicated (Without ice, 1 RCW25 can transport 1301 vials/doses and a vaccine carrier can transport 170 vials/doses. With ice, the numbers are 616 and 77 per our calculations)
-
-monodose_FCC_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
-                                                           , vial_type = 'monodose'
-                                                           , vax_vol = sc_model_params$monodose_vial_vol
-                                                           , with_ice = T
-                                                           , doses_to_transport = monodose_FCC_doses_needed
-)
-
-monodose_FCC_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
-                                                             , vial_type = 'monodose'
-                                                             , vax_vol = sc_model_params$monodose_vial_vol
-                                                             , with_ice = T
-                                                             , doses_to_transport = monodose_FCC_doses_needed
-)
-
-# Monodose FCC RCW25 icepack needs
-monodose_FCC_vaxCarr_icepack_needs_total <- vaxCarr_icepack_needs * monodose_FCC_vaxCarr_needs # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
-monodose_FCC_vaxCarr_icepack_vol <- monodose_FCC_vaxCarr_icepack_needs_total * 0.4 # total volume of ice packs needed is simply the above calculation * 0.6L
-
-
-# Monodose FCC Vaccine carrier icepack needs
-monodose_FCC_RCW25_icepack_needs_total <- RCW25_icepack_needs * monodose_FCC_RCW25_needs # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
-monodose_FCC_RCW25_icepack_vol <- monodose_FCC_RCW25_icepack_needs_total * 0.6 # total volume of ice packs needed is simply the above calculation * 0.6L
-
-#total needs
-monodose_FCC_init_icepack_quant <- monodose_FCC_RCW25_icepack_needs_total + monodose_FCC_vaxCarr_icepack_needs_total
-###
-# outputs for monodose FCC calculations
-###
-#ice_packs_required_monodose_FCC <- monodose_FCC_RCW25_icepack_needs_total + monodose_FCC_vaxCarr_icepack_needs_total
-
-
-monodose_FCC_ft <- calc_freezing_time(mf314_available = sc_model_params$mf314_quant
-                                      , large_icepacks_quantity = monodose_FCC_RCW25_icepack_needs_total 
-                                      , small_icepacks_quantity = monodose_FCC_vaxCarr_icepack_needs_total)
-# output
-#Init_ice_freezeTime_monodose_FCC <- monodose_FCC_ft # Time it takes to freeze depends on how many freezers are available and their capacity. I currently assume that we only use the MF314 freezer, which is the largest, and I specify the quantity at the beginning of this script
-
-monodose_FCC_init_iceVol <- monodose_FCC_RCW25_icepack_vol + monodose_FCC_vaxCarr_icepack_vol# we only need 0.6L ice packs to tra
-
-monodose_FCC_near_pop <- extract_near_pop(site_data, site_rows_selected = 1)
-monodose_FCC_far_pop <- extract_far_pop(site_data, site_rows_selected = 1)
-
-#this calculates the number of doses we can transport for the far campaign. We will then find out if we can transport more or less irrespective of how many we are expected to vaccinate, i.e, team performance/vaccination rate
-monodose_FCC_far_trip_capacity <- calc_dose_capacity(vial_type = 'monodose' 
-                                                     , vax_vol = sc_model_params$monodose_vial_vol
-                                                     , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
-                                                     , with_ice = T)
-
-#monodose_FCC_mt_vax_capacity <- ifelse(monodose_FCC_far_trip_capacity < tp_mobile, monodose_FCC_far_trip_capacity, tp_mobile) #if how much we can carry is less than the expected vaccination rate, then the volume constraint becomes the denominator. mt = mobile team
-
-team_days_fixed_monodose_FCC <- round(monodose_FCC_near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
-team_days_mobile_monodose_FCC <- round(monodose_FCC_far_pop / monodose_FCC_far_trip_capacity, 1)
-
-
-#output for team days required for fixed teams
-#tdf_monodoseFCC <- team_days_fixed_monodose_FCC
-
-#output for team days required for mobile teams
-#tdm_monodoseFCC <- team_days_mobile_monodose_FCC
-
-#######
-# Team allocation calculations and output
-#######
-
-#Extract size of allocated team from the sites table
-site_teams_monodoseFCC <- extract_site_team_size(site_data, site_rows_selected = 1)
 
 ##########################################
-# Calculations for 10-dose only FCC
+# Strategy 1: 10-dose only FCC; This will be the baseline
 ##########################################
 
 dose10_FCC_doses_near_pop <-  calc_doses_required(df = site_data
-                                                  ,  site_rows_selected = 1
+                                                  , site_rows_selected = 1
                                                   , is_dose10 = T
                                                   , pop_type = 'near')
 
