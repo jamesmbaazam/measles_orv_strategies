@@ -581,18 +581,18 @@ td_results <- tibble(
 ###############################
 
 #how many doses of the 10-dose vials can we transport in a vaccine carrier?
-monodose_OCC_far_trip_capacity <- calc_dose_capacity(vial_type = 'monodose' 
-                                                     , vax_vol = 21.09
-                                                     , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
-                                                     , with_ice = F)
-#how many doses of the 10-dose vials can we transport in a vaccine carrier?
-dose10_FCC_far_trip_capacity <- calc_dose_capacity(vial_type = 'dose10' 
-                                                   , vax_vol = dose10_vial_vol[1]
-                                                   , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
-                                                   , with_ice = T)
+# monodose_OCC_far_trip_capacity <- calc_dose_capacity(vial_type = 'monodose' 
+#                                                      , vax_vol = 21.09
+#                                                      , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
+#                                                      , with_ice = F)
+# #how many doses of the 10-dose vials can we transport in a vaccine carrier?
+# dose10_FCC_far_trip_capacity <- calc_dose_capacity(vial_type = 'dose10' 
+#                                                    , vax_vol = dose10_vial_vol[1]
+#                                                    , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
+#                                                    , with_ice = T)
 
 
-monodose_OCC_far_trip_capacity_expanded <- seq(monodose_OCC_far_trip_capacity, dose10_FCC_far_trip_capacity, 5) #just a vector of possible increasing volume capacities to consider. The idea is to increase it to as high as the capacity for 10-dose carriage per trip.
+monodose_OCC_far_trip_capacity_expanded <- seq(monodose_vaxCarr_cap_noIce, dose10_FCC_far_trip_capacity, 5) #just a vector of possible increasing volume capacities to consider. The idea is to increase it to as high as the capacity for 10-dose carriage per trip.
 
 
 #mobile team days using monodose OCC
