@@ -51,6 +51,16 @@ extract_site_team_size <- function(df, site_rows_selected) { # for now, we are o
 }
 
 
+
+##########
+#calc_effective_doses(): adjusts for wastage and determines the actual number of doses we may be transporting
+##########
+calc_effective_doses <- function(dose_quantity, wastage){
+   eff_doses <- dose_quantity*(1 - wastage/100)
+   return(eff_doses)
+}
+
+
 ################################################################################
 #' print_site_team_dur(): Calculates and outputs to the UI how long the allocated 
 #' teams will spend on a site
@@ -145,7 +155,7 @@ calc_dose10_team_days <- function(target_pop,
                                   vaxCarr_capacity,
                                   team_performance = tp_mobile)  #how many you are expected to vaccinate on average per day 
 {
-   effective_doses <- ceiling(vaxCarr_capacity * (1 - dose10_wastage)) #effectively, how many vaccinations is a mobile team actually undertaking?
+   effective_doses <- ceiling(vaxCarr_capacity * (1 - dose10_wastage/100)) #effectively, how many vaccinations is a mobile team actually undertaking?
    if ((effective_doses >= target_pop) & (target_pop <= team_performance)) {
       return(1) #we can carry more doses than the target population size and are within the maximum kids we are expected to vaccinate, so it'll take us 1 day
    }
@@ -252,13 +262,6 @@ fudge_doses <- function(buffer_size, doses){
    req_doses <- doses * (1 + buffer_size / 100)
    return(req_doses)
 }
-
-
-
-
-
-
-
 
 
 ##########
