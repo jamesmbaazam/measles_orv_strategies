@@ -361,10 +361,10 @@ part_OCC_monodose_quant <- calc_doses_required(df = site_data
                                                , pop_type = 'far')
 
 
-
+part_OCC_dose10_quant_adj <- part_OCC_dose10_quant*(1 + sc_model_params$dose10_wr_ft/100)
 # part_OCC_doses <- part_OCC_dose10_quant + part_OCC_monodose_quant
 
-part_OCC_dose10_final <- fudge_doses(doses = part_OCC_dose10_quant
+part_OCC_dose10_final <- fudge_doses(doses = part_OCC_dose10_quant_adj
                                      , buffer_size = sc_model_params$buffer_stock
                                      )
 
