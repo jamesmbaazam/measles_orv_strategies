@@ -43,15 +43,16 @@ require(deSolve)
 # lines(out$time,out$I,col="red")
 
 simod <- function(t, x, parms) {
-  S <- x[1]
-  E <- x[2]
-  I <- x[3]
-  R <- x[4]
-  K <- x[5] #class for tracking new infections
+  S <- x['S']
+  E <- x['E']
+  I <- x['I']
+  R <- x['R']
+  K <- x['K'] #class for tracking new infections
   #
   with(as.list(parms), {
     #Q <- ifelse(t < campaign_day | t > campaign_day + orv_dur, 0, (-log(1 - coverage) / orv_dur)) #-log(1 - coverage) / orv_dur what is this formula?
-    Q <- ifelse(t < campaign_day | t > campaign_day + orv_dur, 0, vax_rate/S)
+   # Q <- ifelse(t < campaign_day | t > campaign_day + orv_dur, 0, vax_rate/S)
+    Q <- ifelse(t < campaign_delay + immunity_delay | t > campaign_delay + orv_dur + immunity_delay, 0, vax_rate/S)
     dS <- -B * S * I - vax_eff * Q * S
     dE <- B * S * I - r * E
     dI <- r * E - g * I
