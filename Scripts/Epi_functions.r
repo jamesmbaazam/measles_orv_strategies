@@ -70,6 +70,7 @@ simod <- function(t, x, parms) {
 p_red <- function(R, 
                   vaccine_efficacy
                   , vax_rate
+                  , delay
                   , intervention_length
                   , mtime 
                   , LP = 7 #LP = Latent period
@@ -88,9 +89,11 @@ p_red <- function(R,
       , g = 1 / IP
       , vax_eff = vaccine_efficacy
       , orv_dur = intervention_length #SC output
-      , campaign_day = steps[i]
+      , campaign_delay = delay
+      , vax_rate = vax_rate
     )
     out <- as.data.frame(lsoda(xstrt, steps, simod, par))
+   # campaign_day = steps[i]
     p_red[t] <- out$K[dim(out)[1]]
     t <- t + 1
     cat("step ", i, "of ", floor(mtime / step), ".\r")
@@ -109,18 +112,18 @@ p_red <- function(R,
   res <- list(
     out = cbind(steps, p_red / max(p_red))
     , R = R
-    , vaccine_efficacy = vaccine_efficacy
+  #  , vaccine_efficacy = vaccine_efficacy
   #  , target_vaccination = target_vaccination
     , intervention_length = intervention_length
-    , mtime = mtime
-    , LP = LP
-    , IP = IP
-    , N = N
-    , step = step
+  #  , mtime = mtime
+   # , LP = LP
+   # , IP = IP
+  #  , N = N
+  #  , step = step
    # , virgin = outv$I #infected individuals from the no-intervention counterfactual
-    , vfs = fs
-  , campaign_time = t
-  , model_step = i
+ #   , vfs = fs
+ # , campaign_time = t
+ # , model_step = i
   )
   class(res) <- "p_red"
   return(res)
