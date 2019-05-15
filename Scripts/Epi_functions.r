@@ -47,7 +47,7 @@ simod <- function(t, x, parms) {
   E <- x['E']
   I <- x['I']
   R <- x['R']
-  K <- x['K'] #class for tracking new infections
+  K <- x['K'] #cumulative incidence
   #
   with(as.list(parms), {
     #Q <- ifelse(t < campaign_day | t > campaign_day + orv_dur, 0, (-log(1 - coverage) / orv_dur)) #-log(1 - coverage) / orv_dur what is this formula?
