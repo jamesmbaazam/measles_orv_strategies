@@ -21,7 +21,7 @@ source('scripts/analyses_supply_chain.R')
 
 #parameters
 steps = 1:60
-beta <- R0 / IP
+beta <- orv_model_params$R0/orv_model_params$IP
 immunity_delay <- 7 # seven days before people are immune
 delay_to_start <- dplyr::rename(freezing_time_results, delay_to_start = time)
 campaign_duration <- subset(td_results, team_type == 'Mobile team', select = -team_type)
@@ -52,7 +52,7 @@ xstrt <- c(S = site_data$far_pop
 par_dose10FCC <- c(B = beta 
                    , r = 1 / orv_model_params$LP
                    , g = 1 / orv_model_params$IP
-                   , vax_eff = vaccine_efficacy
+                   , vax_eff = orv_model_params$vaccine_efficacy
                    , immunity_delay = orv_model_params$immune_response_timing
                    , orv_dur = as.numeric(subset(sc_to_epi_inputs, strategy == '10-dose FCC')['team_days'])
                    , campaign_delay = as.numeric(subset(delay_to_start, strategy == '10-dose FCC')['delay_to_start'])
@@ -63,7 +63,7 @@ par_dose10FCC <- c(B = beta
 par_monodoseFCC <- c(B = beta 
                      , r = 1 / orv_model_params$LP
                      , g = 1 / orv_model_params$IP
-                     , vax_eff = vaccine_efficacy
+                     , vax_eff = orv_model_params$vaccine_efficacy
                      , immunity_delay = orv_model_params$immune_response_timing
                      , orv_dur = as.numeric(subset(sc_to_epi_inputs, strategy == 'Monodose FCC')['team_days'])
                      , campaign_delay = as.numeric(subset(delay_to_start, strategy == 'Monodose FCC')['delay_to_start'])
@@ -75,7 +75,7 @@ par_monodoseFCC <- c(B = beta
 par_mixedFCC <- c(B = beta 
                   , r = 1 / orv_model_params$LP
                   , g = 1 / orv_model_params$IP
-                  , vax_eff = vaccine_efficacy
+                  , vax_eff = orv_model_params$vaccine_efficacy
                   , immunity_delay = orv_model_params$immune_response_timing
                   , orv_dur = as.numeric(subset(sc_to_epi_inputs, strategy == 'Mixed FCC')['team_days'])
                   , campaign_delay = as.numeric(subset(delay_to_start, strategy == 'Mixed FCC')['delay_to_start'])
@@ -86,7 +86,7 @@ par_mixedFCC <- c(B = beta
 par_partOCC <- c(B = beta 
                  , r = 1 / orv_model_params$LP
                  , g = 1 / orv_model_params$IP
-                 , vax_eff = vaccine_efficacy
+                 , vax_eff = orv_model_params$vaccine_efficacy
                  , immunity_delay = orv_model_params$immune_response_timing
                  , orv_dur = as.numeric(subset(sc_to_epi_inputs, strategy == 'Part OCC')['team_days'])
                  , campaign_delay = as.numeric(subset(delay_to_start, strategy == 'Part OCC')['delay_to_start'])
