@@ -619,13 +619,13 @@ td_results <- tibble(
 #                                                      , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
 #                                                      , with_ice = F)
 # #how many doses of the 10-dose vials can we transport in a vaccine carrier?
-# dose10_FCC_far_trip_capacity <- calc_dose_capacity(vial_type = 'dose10' 
+# dose10_vaxCarr_cap_ice <- calc_dose_capacity(vial_type = 'dose10' 
 #                                                    , vax_vol = dose10_vial_vol[1]
 #                                                    , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
 #                                                    , with_ice = T)
 
 
-monodose_OCC_far_trip_capacity_expanded <- seq(monodose_vaxCarr_cap_noIce, dose10_FCC_far_trip_capacity, 5) #just a vector of possible increasing volume capacities to consider. The idea is to increase it to as high as the capacity for 10-dose carriage per trip.
+monodose_OCC_far_trip_capacity_expanded <- seq(monodose_vaxCarr_cap_noIce, dose10_vaxCarr_cap_ice, 5) #just a vector of possible increasing volume capacities to consider. The idea is to increase it to as high as the capacity for 10-dose carriage per trip.
 
 
 #mobile team days using monodose OCC
@@ -639,12 +639,12 @@ team_days_mobile_monodose_noIce <- unlist(purrr::map(monodose_OCC_far_trip_capac
 #Considering wastage ranging from 0% to 100%, with 0% meaning no wastage and 100%, wastage of whole vial. MSF considers an average of 15% wastage rate in field operations. 
 wastage_dose10_mt_vect <- round(seq(0, 1, length.out = length(team_days_mobile_monodose_noIce)), 3) 
 
-#dose10_FCC_far_trip_eff_doses_vect <- ceiling(dose10_FCC_far_trip_capacity * (1 - wastage_dose10_mt_vect)) #effectively, how many vaccinations is a mobile team actually undertaking?
+#dose10_FCC_far_trip_eff_doses_vect <- ceiling(dose10_vaxCarr_cap_ice * (1 - wastage_dose10_mt_vect)) #effectively, how many vaccinations is a mobile team actually undertaking?
 
 team_days_mobile_dose10_Ice <-  purrr::map_dbl(.x = wastage_dose10_mt_vect,
                                                   .f = calc_dose10_team_days, 
                                                   target_pop = site_data$far_pop, 
-                                                  vaxCarr_capacity = dose10_FCC_far_trip_capacity,
+                                                  vaxCarr_capacity = dose10_vaxCarr_cap_ice,
                                                   team_performance = tp_mobile)
                                         #there's a division by zero here, returning an infinity, so we'll replace it with NA to allow for better manipulation
 
@@ -654,12 +654,12 @@ team_days_mobile_dose10_Ice <- ifelse(!is.infinite(team_days_mobile_dose10_Ice),
 #data.frame(wastage = wastage_dose10_mt_vect, team_days = team_days_mobile_dose10_Ice)
 
 #x-axis of plot: ratio of increasing vaccine carrier volume capacity for monodose vs fixed for 10-dose
-ratio_monodose_dose10_vaxCarr_capacity <- round(monodose_OCC_far_trip_capacity_expanded / dose10_FCC_far_trip_capacity, 3)
+ratio_monodose_dose10_vaxCarr_capacity <- round(monodose_OCC_far_trip_capacity_expanded / dose10_vaxCarr_cap_ice, 3)
 
 
 team_days_output <- tibble(
     dose10_wastage = wastage_dose10_mt_vect,
-    vaxCarr_dose10_capacity = dose10_FCC_far_trip_capacity,
+    vaxCarr_dose10_capacity = dose10_vaxCarr_cap_ice,
     vaxCarr_monodose_capacity = monodose_OCC_far_trip_capacity_expanded,
     vaxCarr_capacity_ratio = ratio_monodose_dose10_vaxCarr_capacity,
     team_days_dose10_far_FCC = team_days_mobile_dose10_Ice,
