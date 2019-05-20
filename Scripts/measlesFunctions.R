@@ -24,17 +24,47 @@
 # maxTime is the maximum time the code can run for (even if there are infected individuals remaining, in which case a warning is given)
 
 
+# INITIALIZEPOP() is a function that initializes the school population, using the first 2 generations of cases as inputs
+
+initializePop <- function(N, initPropImmune, I0) {
+  immune <- floor(N * initPropImmune)
+  pop <- data.frame(
+    Sus1 = N - immune,
+    Sus2 = 0,
+    Exp1 = 0,
+    Exp2 = 0,
+    Exp3 = 0,
+    Exp4 = 0,
+    Exp5 = 0,
+    Exp6 = 0,
+    Exp7 = 0,
+    Exp8 = 0,
+    Exp9 = 0,
+    Exp10 = 0,
+    Inf1 = I0,
+    Inf2 = 0,
+    Inf3 = 0,
+    Inf4 = 0,
+    Inf5 = 0,
+    Inf6 = 0,
+    Rec = immune
+  )
+}
+
+
 # STEP() is a function that updates the various classes (S,E1...E10,I1...I10,R) and
 # returns a dataframe containing the epidemic progression.
 
-step <- function(pop, beta, browse=FALSE, runType = "stochastic") {
+step <- function(pop, R0, browse = FALSE, runType = "deterministic") {
   if (browse) browser()
+  beta <- R0 / length(grep('Inf', names(pop)))
   totalPop <- sum(pop)
   totalInf <- sum(pop[, grep("Inf", names(pop))])
-  prob.t <- 1 - exp(-beta * totalInf / totalPop)
+ # prob.t <- 1 - exp(-beta * totalInf / totalPop)
   switch(runType,
     "deterministic" = {
-      newE <- pop$Sus * prob.t
+    #  newE <- pop$Sus1 * prob.t
+      newE <- -beta * pop$Sus1 * totalInf 
     },
     "stochastic" = {
       newE <- ifelse(pop$Sus > 0, rbinom(1, pop$Sus, prob.t), 0)
@@ -43,7 +73,8 @@ step <- function(pop, beta, browse=FALSE, runType = "stochastic") {
     }
   )
   updatePop <- data.frame(
-    Sus = pop$Sus - newE
+    Sus1 = pop$Sus1 - newE
+    , Sus2 = pop$Sus2
     , Exp1 = newE
     , Exp2 = pop$Exp1
     , Exp3 = pop$Exp2
@@ -69,12 +100,12 @@ step <- function(pop, beta, browse=FALSE, runType = "stochastic") {
 # VACCINATE() is a function that moves some susceptible individuals in the immune class, based on an
 # expected or actual level of coverage during an outbreak response vaccination.
 
-vaccinate <- function(pop, vaxProp, browse=FALSE, runType = "stochastic") {
+vaccinate <- function(pop, tp, v, browse = FALSE, runType = "deterministic") {
   if (browse) browser()
   totalPop <- sum(pop)
   switch(runType,
     "deterministic" = {
-      newR <- round(pop$Sus * vaxProp)
+      newR <- round(pop$Sus1  - tp*v)
     },
     "stochastic" = {
       newR <- ifelse(pop$Sus > 0, rbinom(1, pop$Sus, vaxProp), 0)
@@ -83,7 +114,8 @@ vaccinate <- function(pop, vaxProp, browse=FALSE, runType = "stochastic") {
     }
   )
   updatePop <- data.frame(
-    Sus = pop$Sus - newR
+    Sus1 = pop$Sus1 - newR
+    , Sus2 = round(pop$Sus1  - tp*(1 - v))
     , Exp1 = pop$Exp1
     , Exp2 = pop$Exp2
     , Exp3 = pop$Exp3
@@ -249,32 +281,6 @@ spCalc <- function(useRe, useR0) {
   useRe / useR0
 }
 
-# INITIALIZEPOP() is a function that initializes the school population, using the first 2 generations of cases as inputs
-
-initializePop <- function(N, initPropImmune, G2, G1 = 1) {
-  immune <- floor(N * initPropImmune)
-  distSecondary <- rmultinom(1, G2, c(1, 2, 3, 2, 2))
-  pop <- data.frame(
-    Sus = N - immune - G2 - G1,
-    Exp1 = distSecondary[5],
-    Exp2 = distSecondary[4],
-    Exp3 = distSecondary[3],
-    Exp4 = distSecondary[2],
-    Exp5 = distSecondary[1],
-    Exp6 = 0,
-    Exp7 = 0,
-    Exp8 = 0,
-    Exp9 = 0,
-    Exp10 = 0,
-    Inf1 = 0,
-    Inf2 = 0,
-    Inf3 = 0,
-    Inf4 = 0,
-    Inf5 = G1,
-    Inf6 = 0,
-    Rec = immune
-  )
-}
 
 # EPIDURATION() is a function that extracts the epidemic duration from the simulation output
 epiDuration <- function(ii, output) {
