@@ -163,15 +163,24 @@ runSimulations <- function(R0 # transmission coeficient
   simResults <- data.frame(time = 0, pop) #at time 0 we have the initial population specified
   if (browse) browser()
   time <- time + 1
-  while (pop$Sus1 > 0 & time < run_time) {
-    if (!is.na(vaxDay) & (time < vaxDay  | time > vaxDay + orv_duration )) {
+  while (simResults[time, 'Sus1'] > 0) {
+ # for (time in 1: run_time) {
+    if (simResults[time, 'Sus1'] > 0 & !is.na(vaxDay) & (time < vaxDay  | time > vaxDay + orv_duration )) {
       simResults <- rbind(simResults, data.frame(time, step(pop = simResults[time, -1], R0 = R0)))
-    }else if (!is.na(vaxDay) & (time >= vaxDay  & time <= vaxDay + orv_duration )){
+    }else if (simResults[time, 'Sus1'] > 0 & !is.na(vaxDay) & (time >= vaxDay  & time <= vaxDay + orv_duration )){
       simResults <- rbind(simResults, data.frame(time, step(pop = vaccinate(simResults[time, -1], v = vax_eff, tp = team_performance), R0 = R0)))
-    }else if (is.na(vaxDay)){
+    }else if (simResults[time, 'Sus1'] > 0 & is.na(vaxDay)){
       simResults <- rbind(simResults, data.frame(time, step(pop = simResults[time, -1], R0 = R0)))
+    }else if(simResults[time, 'Sus1'] <= 0){
+      break
     }
-  time <- time + 1  
+ time <- time + 1
+ }
+  
+  if(time < run_time){
+    for (i in time:run_time){
+      simResults <- rbind(simResults, data.frame(time = i, simResults[i - 1, -1]))
+    }
   }
   
   susTS <- rowSums(subset(simResults, select = grep("Sus", names(simResults))))
