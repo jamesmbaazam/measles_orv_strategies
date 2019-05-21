@@ -1,7 +1,5 @@
-library(ggplot2)
-
-
-
+#packages
+library(ggplot2) # to prevent errors from me specifying theme settings here
 
 ########################################################
 #Supply chain parameters
@@ -66,15 +64,6 @@ dose10_wr_mt <- dose10_wr_ft*2 #value between 0 and 100; #wastage rate for mobil
 # DATA
 # icepack_quants <- read_excel('/data/passiveCC_icepack_quantity_data.xlsx')
 # vax_storage_capacity <- read_excel('/data/passiveCC_vaccine_storage_capacity_data.xlsx')
-
-#############################################
-#Epidemiological parameters
-#############################################
-
-#far_pop <- 500
-R0 <- 18
-
-
 
 ######################################################
 #Plot parameters
