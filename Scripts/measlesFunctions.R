@@ -28,7 +28,7 @@
 
 initializePop <- function(N, initPropImmune, I0) {
   immune <- floor(N * initPropImmune)
-  pop <- data.frame(
+ data.frame(
     Sus1 = N - immune,
     Sus2 = 0,
     Exp1 = 0,
@@ -55,27 +55,18 @@ initializePop <- function(N, initPropImmune, I0) {
 # STEP() is a function that updates the various classes (S,E1...E10,I1...I10,R) and
 # returns a dataframe containing the epidemic progression.
 
-step <- function(pop, R0, browse = FALSE, runType = "deterministic") {
+step <- function(pop, R0, browse = FALSE) {
   if (browse) browser()
   beta <- R0 / length(grep('Inf', names(pop)))
   totalPop <- sum(pop)
   totalInf <- sum(pop[, grep("Inf", names(pop))])
- # prob.t <- 1 - exp(-beta * totalInf / totalPop)
-  switch(runType,
-    "deterministic" = {
-    #  newE <- pop$Sus1 * prob.t
-      newE <- -beta * pop$Sus1 * totalInf 
-    },
-    "stochastic" = {
-      newE <- ifelse(pop$Sus > 0, rbinom(1, pop$Sus, prob.t), 0)
-    }, {
-      stop("Unknown runType.")
-    }
-  )
+  
+  incidence <- round(beta * pop$Sus1 * totalInf) 
+
   updatePop <- data.frame(
-    Sus1 = pop$Sus1 - newE
+    Sus1 = pop$Sus1 - incidence
     , Sus2 = pop$Sus2
-    , Exp1 = newE
+    , Exp1 = incidence
     , Exp2 = pop$Exp1
     , Exp3 = pop$Exp2
     , Exp4 = pop$Exp3
@@ -97,25 +88,31 @@ step <- function(pop, R0, browse = FALSE, runType = "deterministic") {
   return(updatePop)
 }
 
-# VACCINATE() is a function that moves some susceptible individuals in the immune class, based on an
-# expected or actual level of coverage during an outbreak response vaccination.
 
-vaccinate <- function(pop, tp, v, browse = FALSE, runType = "deterministic") {
+##################################################################################
+#' VACCINATE() is a function that moves some susceptible individuals to the immune 
+#' class, based on a daily vaccination rate expected of teams.
+##################################################################################
+
+#'params:
+#'1. tp = team performance/expected number of vaccinations per day
+#'2. v = vaccine efficacy between 0 and 1
+#'
+vaccinate <- function(pop, tp, v, browse = FALSE) {
   if (browse) browser()
+  
   totalPop <- sum(pop)
-  switch(runType,
-    "deterministic" = {
-      newR <- round(pop$Sus1  - tp*v)
-    },
-    "stochastic" = {
-      newR <- ifelse(pop$Sus > 0, rbinom(1, pop$Sus, vaxProp), 0)
-    }, {
-      stop("Unknown runType.")
-    }
-  )
+  
+  #calculate the vaccination "rate" from the team performance
+ # vax_rate <-  ifelse(pop$Sus1 > tp, tp/totalPop, pop$Sus1/totalPop)
+  vax_rate <-  ifelse(pop$Sus1 > tp, tp, pop$Sus1)
+  #calculate the proportions of individuals who'll be immunised and those who'll fail immunisation
+  newly_immunised_batch <- round(v * vax_rate)
+  failed_immunisation_batch <- round((1- v) * vax_rate)
+  
   updatePop <- data.frame(
-    Sus1 = pop$Sus1 - newR
-    , Sus2 = round(pop$Sus1  - tp*(1 - v))
+    Sus1 = round(pop$Sus1 - newly_immunised_batch)
+    , Sus2 = round(failed_immunisation_batch)
     , Exp1 = pop$Exp1
     , Exp2 = pop$Exp2
     , Exp3 = pop$Exp3
@@ -132,111 +129,105 @@ vaccinate <- function(pop, tp, v, browse = FALSE, runType = "deterministic") {
     , Inf4 = pop$Inf4
     , Inf5 = pop$Inf5
     , Inf6 = pop$Inf6
-    , Rec = pop$Rec + newR
+    , Rec = pop$Rec + newly_immunised_batch
   )
 
   return(updatePop)
 }
 
-# RUNSIMULATIONS() is a wrapper for the step function. It feeds STEP()  with initial values and outputs
-# a list of dataframes containing the epidemic progression (and "collapsed" classes) for each
-# simulation of the scenario.
 
-runSimulations <- function(sims = NUMSIMS, beta, # transmission coeficient
-                           maxTime = 1825, # five years!
-                           pop = scenarioInit,
-                           vaxDay = NA,
-                           coverage = NA,
-                           browse = FALSE) {
-  results <- list()
-  for (sim in 1:sims) {
-    time <- 0
-    popSize <- sum(pop)
-    infections <- sum(pop[, grep("Inf", names(pop))]) + sum(pop[, grep("Exp", names(pop))])
-    simResults <- data.frame(time, pop)
-    # Because the initilization assumes the second generation of cases has already been infected by the start
-    # of the simulation, finish the infectious period of the index case with no new infections:
-    time <- time + 1
-    simResults <- rbind(simResults, data.frame(time, step(pop = simResults[time, -1], beta = 0)))
-    time <- time + 1
-    simResults <- rbind(simResults, data.frame(time, step(pop = simResults[time, -1], beta = 0)))
-    while (infections > 0 && time <= maxTime) {
-      time <- time + 1
-      if (!is.na(vaxDay) & time == vaxDay) {
-        if (browse) browser()
-        simResults <- rbind(simResults, data.frame(time, step(pop = vaccinate(simResults[time, -1], coverage), beta = beta)))
-      } else {
-        simResults <- rbind(simResults, data.frame(time, step(pop = simResults[time, -1], beta = beta)))
-      }
-      infections <- sum(simResults[time, grep("Inf", names(simResults))]) + sum(simResults[time, grep("Exp", names(simResults))])
+##################################################################################
+#' RUNSIMULATIONS() is a wrapper for the step function. It feeds STEP()  with 
+#' initial values and outputs a list of dataframes containing the epidemic progression 
+#' (and "collapsed" classes) for each simulation of the scenario.
+##################################################################################
+
+runSimulations <- function(R0 # transmission coeficient
+                           , run_time 
+                           , pop 
+                           , vaxDay = NA
+                           , orv_duration 
+                           , vax_eff
+                           , team_performance
+                           , time_to_immunity
+                           , browse = FALSE
+                           ) {
+  
+  time <- 0
+  simResults <- data.frame(time = 0, pop) #at time 0 we have the initial population specified
+  if (browse) browser()
+  time <- time + 1
+  while (pop$Sus1 > 0 & time < run_time) {
+    if (!is.na(vaxDay) & (time < vaxDay  | time > vaxDay + orv_duration )) {
+      simResults <- rbind(simResults, data.frame(time, step(pop = simResults[time, -1], R0 = R0)))
+    }else if (!is.na(vaxDay) & (time >= vaxDay  & time <= vaxDay + orv_duration )){
+      simResults <- rbind(simResults, data.frame(time, step(pop = vaccinate(simResults[time, -1], v = vax_eff, tp = team_performance), R0 = R0)))
+    }else if (is.na(vaxDay)){
+      simResults <- rbind(simResults, data.frame(time, step(pop = simResults[time, -1], R0 = R0)))
     }
-    if (time == maxTime & infections > 0) {
-      warning("Epidemic duration exceeds maximum time of simulation.")
-      endTime <- NA
-    } else {
-      endTime <- time # record the number of days the epidemic lasted
-    }
-    exposedTS <- rowSums(subset(simResults, select = grep("Exp", names(simResults))))
-    infectiousTS <- rowSums(subset(simResults, select = grep("Inf", names(simResults))))
-
-
-    results[[sim]] <- list(
+  time <- time + 1  
+  }
+  
+  susTS <- rowSums(subset(simResults, select = grep("Sus", names(simResults))))
+  exposedTS <- rowSums(subset(simResults, select = grep("Exp", names(simResults))))
+  infectiousTS <- rowSums(subset(simResults, select = grep("Inf", names(simResults))))
+  
+    epi_out <- list(
       Detailed = simResults
       , Collapsed = data.frame(
         time = simResults$time
-        , totalSus = simResults$Sus
+        , totalSus = susTS
         , totalExp = exposedTS
         , totalInf = infectiousTS
         , totalRec = simResults$Rec
       )
-      , epiDuration = endTime
       , epiTotal = sum(simResults$Inf5)
     )
+    return(epi_out)
   }
-  return(results)
-}
+
 
 # RUNSCENARIO() runs a specified number of simulations for a given scenario.
-runScenario <- function(scenarioParams
-                        , numSims = NUMSIMS
-                        ## PARAMETERS (adjustable)
-                        , schoolSize = 1200 # Number of students in the school
-                        , vaccinationDay = as.numeric(vaxDate - startDate) # Days between when the first case developed a rash to when students are vaccinated in response to the outbreak
-                        , orvCoverage =  0.93 # Proportion of students vaccinated in response to the outbreak
-                        , secondGen = 5 # Number of students infected by the first case
-                        , browse = F) {
-  with(as.list(scenarioParams), {
-    if (browse) browser()
-    effReproNumber <- secondGen * scaleSecondGen
-    if (vaccinate) {
-      outputs <- runSimulations(numSims, beta = betaCalc(R0, schoolSize), pop = initializePop(schoolSize, initPropImmune = 1 - spCalc(effReproNumber, R0), G2 = secondGen), vaxDay = vaccinationDay, coverage = orvCoverage)
-    } else {
-      outputs <- runSimulations(numSims, beta = betaCalc(R0, schoolSize), pop = initializePop(schoolSize, initPropImmune = 1 - spCalc(effReproNumber, R0), G2 = secondGen))
-    }
-    modelParams <- list(schoolSize = schoolSize, vaccinationDay = vaccinationDay, orvCoverage = orvCoverage, secondGen = secondGen)
-    return(
-      list(
-        parameters = c(scenarioParams, modelParams)
-        , results = sapply(1:numSims, epiTraj, output = outputs)
-        , epiDur = sapply(1:numSims, epiDuration, output = outputs)
-        , epiTot = sapply(1:numSims, epiTotal, output = outputs)
-      )
-    )
-  })
-}
-
-## - Plotting functions - ##
-
-# EPICURVE() plots the epidemic curve, given a timeseries of cases
-epiCurve <- function(cases, add=T, day0=startDate, useMar=c(3, 4, 1, 1), ...) {
-  if (!add) {
-    par(mfrow = c(1, 1), mar = useMar)
-  }
-  barplot(cases, space = 0, xpd = FALSE, ...)
-  # axis(1,as.Date(paste(format(day0,'%Y'),1:6,'01',sep='-'))-day0,NA)
-  # axis(1,as.Date(paste(format(day0,'%Y'),1:6,'15',sep='-'))-day0,c(month.abb[1:5],''), F)
-  return()
-}
+# runScenario <- function(scenarioParams
+#                         , numSims = NUMSIMS
+#                         ## PARAMETERS (adjustable)
+#                         , schoolSize = 1200 # Number of students in the school
+#                         , vaccinationDay = as.numeric(vaxDate - startDate) # Days between when the first case developed a rash to when students are vaccinated in response to the outbreak
+#                         , orvCoverage =  0.93 # Proportion of students vaccinated in response to the outbreak
+#                         , secondGen = 5 # Number of students infected by the first case
+#                         , browse = F) {
+#   with(as.list(scenarioParams), {
+#     if (browse) browser()
+#     effReproNumber <- secondGen * scaleSecondGen
+#     if (vaccinate) {
+#       outputs <- runSimulations(numSims, beta = betaCalc(R0, schoolSize), pop = initializePop(schoolSize, initPropImmune = 1 - spCalc(effReproNumber, R0), G2 = secondGen), vaxDay = vaccinationDay, coverage = orvCoverage)
+#     } else {
+#       outputs <- runSimulations(numSims, beta = betaCalc(R0, schoolSize), pop = initializePop(schoolSize, initPropImmune = 1 - spCalc(effReproNumber, R0), G2 = secondGen))
+#     }
+#     modelParams <- list(schoolSize = schoolSize, vaccinationDay = vaccinationDay, orvCoverage = orvCoverage, secondGen = secondGen)
+#     return(
+#       list(
+#         parameters = c(scenarioParams, modelParams)
+#         , results = sapply(1:numSims, epiTraj, output = outputs)
+#         , epiDur = sapply(1:numSims, epiDuration, output = outputs)
+#         , epiTot = sapply(1:numSims, epiTotal, output = outputs)
+#       )
+#     )
+#   })
+# }
+# 
+# ## - Plotting functions - ##
+# 
+# # EPICURVE() plots the epidemic curve, given a timeseries of cases
+# epiCurve <- function(cases, add=T, day0=startDate, useMar=c(3, 4, 1, 1), ...) {
+#   if (!add) {
+#     par(mfrow = c(1, 1), mar = useMar)
+#   }
+#   barplot(cases, space = 0, xpd = FALSE, ...)
+#   # axis(1,as.Date(paste(format(day0,'%Y'),1:6,'01',sep='-'))-day0,NA)
+#   # axis(1,as.Date(paste(format(day0,'%Y'),1:6,'15',sep='-'))-day0,c(month.abb[1:5],''), F)
+#   return()
+# }
 
 # EPIHIST() is a function that plots histograms of the output from many simulation runs
 
