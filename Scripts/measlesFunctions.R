@@ -57,11 +57,17 @@ initializePop <- function(N, initPropImmune, I0) {
 
 step <- function(pop, R0, browse = FALSE) {
   if (browse) browser()
-  beta <- R0 / length(grep('Inf', names(pop)))
+  beta <- R0 / length(grep('Inf', names(pop))) #will this formula hold?
   totalPop <- sum(pop)
   totalInf <- sum(pop[, grep("Inf", names(pop))])
+  inf_prob <- 1 - exp(-beta * totalInf / totalPop) #infection probability at any time t is 1 minus the probability of escaping infection
   
-  incidence <- round(beta * pop$Sus1 * totalInf) 
+  incidence <- round(pop$Sus1 * totalInf * inf_prob)
+  # if(newE > pop$Sus1){
+  #   incidence <- newE
+  # }else {
+  #   incidence <- pop$Sus1
+  # } #if the new infections are more than the susceptibles, that's fine else infect the remaining susceptibles
 
   updatePop <- data.frame(
     Sus1 = pop$Sus1 - incidence
