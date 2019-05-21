@@ -80,6 +80,7 @@ R0 <- 18
 #Plot parameters
 ######################################################
 #Control parameters
+display_plots <- FALSE
 save_plots <- FALSE
 
 
