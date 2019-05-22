@@ -69,7 +69,8 @@ dose10_wr_mt <- dose10_wr_ft*2 #value between 0 and 100; #wastage rate for mobil
 #Plot parameters
 ######################################################
 #Control parameters
-display_plots <- FALSE
+display_epi_plots <- TRUE
+display_sc_plots <- FALSE
 save_plots <- FALSE
 
 
