@@ -181,11 +181,11 @@ runSimulations <- function(R0 # transmission coeficient
  time <- time + 1
  }
   
-  if(time < run_time){
-    for (i in time:run_time){
-      simResults <- rbind(simResults, data.frame(time = i, simResults[i - 1, -1]))
-    }
-  }
+  # if(time < run_time){
+  #   for (i in time:run_time){
+  #     simResults <- rbind(simResults, data.frame(time = i, simResults[i - 1, -1]))
+  #   }
+  # }
   
   susTS <- rowSums(subset(simResults, select = grep("Sus", names(simResults))))
   exposedTS <- rowSums(subset(simResults, select = grep("Exp", names(simResults))))
