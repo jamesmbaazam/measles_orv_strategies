@@ -307,6 +307,10 @@ epiTotal <- function(ii, output) {
 }
 
 # EPITRAJ() is a function that extracts the epidemic curve from the simulation output
-epiTraj <- function(ii, output) {
-  output[[ii]]$Detailed$Inf5
+epiTraj <- function(ii = NA, output) {
+  if(!is.na(ii)){
+    output[[ii]]$Detailed$Inf5
+  }else{
+    output$Detailed$Inf5
+  }
 }
