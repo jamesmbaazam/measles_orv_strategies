@@ -121,19 +121,29 @@ orv_plot_dat <- orv_plot_dat %>% mutate(strategy = factor(strategy))
 
 
 #plot of cases
-SusProgression_plot <- ggplot(data = orv_plot_dat) + 
-    geom_point(aes(x = time, y = totalSus   , color = strategy)) + 
-    geom_line(aes(x = time, y = totalSus    , color = strategy)) +
+Incidence_plot <- ggplot(data = orv_plot_dat) + 
+    geom_point(aes(x = time, y = totalInf   , color = strategy)) + 
+    geom_line(aes(x = time, y = totalInf    , color = strategy)) +
     labs(x = 'time (days)', y = 'Susceptibles') + 
     scale_color_manual(name = "Strategy"
                       , values = c('green', 'blue', 'black', 'red')
                        , labels = c("10-dose FCC", "Monodose FCC", "Mixed FCC", 'Part OCC')
                        , breaks = c("dose10FCC", "monodoseFCC", "mixedFCC", 'partOCC')
                        )
+plot(Incidence_plot)
+
+
+#plot of susceptibles
+SusProgression_plot <- ggplot(data = orv_plot_dat) + 
+    geom_point(aes(x = time, y = totalSus   , color = strategy)) + 
+    geom_line(aes(x = time, y = totalSus    , color = strategy)) +
+    labs(x = 'time (days)', y = 'Susceptibles') + 
+    scale_color_manual(name = "Strategy"
+                       , values = c('green', 'blue', 'black', 'red')
+                       , labels = c("10-dose FCC", "Monodose FCC", "Mixed FCC", 'Part OCC')
+                       , breaks = c("dose10FCC", "monodoseFCC", "mixedFCC", 'partOCC')
+    )
 plot(SusProgression_plot)
-
-
-
 
 
 
