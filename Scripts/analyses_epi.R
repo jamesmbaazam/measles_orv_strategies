@@ -36,6 +36,9 @@ campaign_duration <- subset(td_results, team_type == 'Mobile team', select = -te
 sc_to_epi_inputs <- left_join(campaign_duration, delay_to_start, by = 'strategy')
 
 
+###############################################################################
+#Running the simulations for each strategy
+###############################################################################
 
 
 
@@ -43,6 +46,7 @@ out_dose10FCC <- runSimulations(
     R0 = orv_model_params$R0 # transmission coeficient
     , run_time = orv_model_params$model_time # 1 yr!
     , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.5, I0 = 1)
+    , strategy = 'dose10FCC'
     , vaxDay = as.numeric(subset(delay_to_start, strategy == '10-dose FCC')['delay_to_start'])
     , orv_duration = as.numeric(subset(sc_to_epi_inputs, strategy == '10-dose FCC')['team_days'])
     , vax_eff = orv_model_params$vaccine_efficacy
@@ -56,6 +60,7 @@ out_monodoseFCC <- runSimulations(
     R0 = orv_model_params$R0 # transmission coeficient
     , run_time = orv_model_params$model_time # 1 yr!
     , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.5, I0 = 1)
+    , strategy = 'monodoseFCC'
     , vaxDay = as.numeric(subset(delay_to_start, strategy == 'Monodose FCC')['delay_to_start'])
     , orv_duration = as.numeric(subset(sc_to_epi_inputs, strategy == 'Monodose FCC')['team_days'])
     , vax_eff = orv_model_params$vaccine_efficacy
@@ -68,6 +73,7 @@ out_mixedFCC <- runSimulations(
     R0 = orv_model_params$R0 # transmission coeficient
     , run_time = orv_model_params$model_time # 1 yr!
     , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.5, I0 = 1)
+    , strategy = 'mixedFCC'
     , vaxDay = as.numeric(subset(delay_to_start, strategy == 'Mixed FCC')['delay_to_start'])
     , orv_duration = as.numeric(subset(sc_to_epi_inputs, strategy == 'Mixed FCC')['team_days'])
     , vax_eff = orv_model_params$vaccine_efficacy
@@ -80,6 +86,7 @@ out_partOCC <- runSimulations(
     R0 = orv_model_params$R0 # transmission coeficient
     , run_time = orv_model_params$model_time # 1 yr!
     , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.5, I0 = 1)
+    , strategy = 'partOCC'
     , vaxDay = as.numeric(subset(delay_to_start, strategy == 'Part OCC')['delay_to_start'])
     , orv_duration = as.numeric(subset(sc_to_epi_inputs, strategy == 'Part OCC')['team_days'])
     , vax_eff = orv_model_params$vaccine_efficacy
