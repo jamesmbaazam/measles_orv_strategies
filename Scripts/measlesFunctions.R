@@ -176,7 +176,8 @@ runSimulations <- function(R0 # transmission coeficient
     }else if (is.na(vaxDay)){
       simResults <- rbind(simResults, data.frame(time, step(pop = simResults[time, -1], R0 = R0)))
     }
- time <- time + 1
+    epiDur <- time
+    time <- time + 1
  }
   
   # if(time < run_time){
