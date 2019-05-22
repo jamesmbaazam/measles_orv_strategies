@@ -62,21 +62,22 @@ step <- function(pop, R0, browse = FALSE) {
   totalInf <- sum(pop[, grep("Inf", names(pop))])
   inf_prob <- 1 - exp(-beta * totalInf / totalPop) #infection probability at any time t is 1 minus the probability of escaping infection
   
-  incidence <- pop$Sus1 * totalInf * inf_prob
+  incidence1 <- pop$Sus1 * inf_prob
   
-  if(incidence > pop$Sus1){
-    incidence <- pop$Sus1
+  if(incidence1 > pop$Sus1){
+    incidence1 <- pop$Sus1
   }
-  # if(newE > pop$Sus1){
-  #   incidence <- newE
-  # }else {
-  #   incidence <- pop$Sus1
-  # } #if the new infections are more than the susceptibles, that's fine else infect the remaining susceptibles
   
+  incidence2 <- pop$Sus2 * inf_prob
+  
+  if(incidence2 > pop$Sus2){
+      incidence2 <- pop$Sus2
+  }
+ 
   updatePop <- data.frame(
-    Sus1 = pop$Sus1 - incidence
-    , Sus2 = pop$Sus2
-    , Exp1 = incidence
+    Sus1 = pop$Sus1 - incidence1
+    , Sus2 = pop$Sus2 - incidence2
+    , Exp1 = incidence1 + incidence2
     , Exp2 = pop$Exp1
     , Exp3 = pop$Exp2
     , Exp4 = pop$Exp3
