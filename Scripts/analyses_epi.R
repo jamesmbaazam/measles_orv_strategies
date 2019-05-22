@@ -130,7 +130,11 @@ Incidence_plot <- ggplot(data = orv_plot_dat) +
                        , labels = c("10-dose FCC", "Monodose FCC", "Mixed FCC", 'Part OCC')
                        , breaks = c("dose10FCC", "monodoseFCC", "mixedFCC", 'partOCC')
                        )
-plot(Incidence_plot)
+
+if (display_epi_plots) {
+    plot(Incidence_plot)  
+}
+
 
 
 #plot of susceptibles
@@ -143,7 +147,8 @@ SusProgression_plot <- ggplot(data = orv_plot_dat) +
                        , labels = c("10-dose FCC", "Monodose FCC", "Mixed FCC", 'Part OCC')
                        , breaks = c("dose10FCC", "monodoseFCC", "mixedFCC", 'partOCC')
     )
+if (display_epi_plots) {
 plot(SusProgression_plot)
-
+}
 
 
