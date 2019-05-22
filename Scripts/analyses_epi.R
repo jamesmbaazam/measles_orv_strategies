@@ -40,8 +40,6 @@ sc_to_epi_inputs <- left_join(campaign_duration, delay_to_start, by = 'strategy'
 #Running the simulations for each strategy
 ###############################################################################
 
-
-
 out_dose10FCC <- runSimulations(
     R0 = orv_model_params$R0 # transmission coeficient
     , run_time = orv_model_params$model_time # 1 yr!
@@ -53,6 +51,8 @@ out_dose10FCC <- runSimulations(
     , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
     , time_to_immunity = orv_model_params$immune_response_timing
     , browse = F)
+
+
 
 #View(out_dose10FCC$Detailed)
 
@@ -67,6 +67,8 @@ out_monodoseFCC <- runSimulations(
     , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
     , time_to_immunity = orv_model_params$immune_response_timing
     , browse = F)
+
+
 #View(out_monodoseFCC$Detailed)
 
 out_mixedFCC <- runSimulations(
@@ -80,6 +82,8 @@ out_mixedFCC <- runSimulations(
     , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
     , time_to_immunity = orv_model_params$immune_response_timing
     , browse = F)
+
+
 #View(out_mixedFCC$Detailed)
 
 out_partOCC <- runSimulations(
@@ -94,22 +98,39 @@ out_partOCC <- runSimulations(
     , time_to_immunity = orv_model_params$immune_response_timing
     , browse = F)
 
+
 #View(out_partOCC$Detailed)
 
 
 
-incidence_plot <- ggplot(data = out_dose10FCC$Detailed) + geom_point(aes(x = time, y = Sus1)) + geom_line(aes(x = time, y = Sus1 )) +
-    geom_point(data = out_monodoseFCC$Detailed, aes(x = time, y = Sus1), color = 'red') + geom_line(data = out_monodoseFCC$Detailed, aes(x = time, y = Sus1), color = 'red') +
-    geom_point(data = out_mixedFCC$Detailed, aes(x = time, y = Sus1), color = 'blue') + geom_line(data = out_mixedFCC$Detailed, aes(x = time, y = Sus1), color = 'blue') +
-    geom_point(data = out_partOCC$Detailed, aes(x = time, y = Sus1), color = 'green') + geom_line(data = out_partOCC$Detailed, aes(x = time, y = Sus1), color = 'green') +
-    labs(x = 'time (days)', y = 'Incidence')
 
-plot(incidence_plot)
+################################################################################
+#Plotting the SC decision's consequence on the epidemic
+
+################################################################################
+
+#pre-processing the orv model output
+#1. Combine this into a single df
+orv_plot_dat <- rbind(out_dose10FCC$Collapsed
+                          , out_monodoseFCC$Collapsed
+                          , out_mixedFCC$Collapsed 
+                          , out_partOCC$Collapsed
+                          )
+
+orv_plot_dat <- orv_plot_dat %>% mutate(strategy = factor(strategy))
 
 
-
-
-
+#plot of cases
+SusProgression_plot <- ggplot(data = orv_plot_dat) + 
+    geom_point(aes(x = time, y = totalSus   , color = strategy)) + 
+    geom_line(aes(x = time, y = totalSus    , color = strategy)) +
+    labs(x = 'time (days)', y = 'Susceptibles') + 
+    scale_color_manual(name = "Strategy"
+                      , values = c('green', 'blue', 'black', 'red')
+                       , labels = c("10-dose FCC", "Monodose FCC", "Mixed FCC", 'Part OCC')
+                       , breaks = c("dose10FCC", "monodoseFCC", "mixedFCC", 'partOCC')
+                       )
+plot(SusProgression_plot)
 
 
 
