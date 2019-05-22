@@ -1,3 +1,5 @@
+rm(list = ls())
+
 #packages
 library('ggplot2')
 library('dplyr')
