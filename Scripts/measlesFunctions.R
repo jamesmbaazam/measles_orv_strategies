@@ -119,10 +119,10 @@ vaccinate <- function(pop, tp, v, browse = FALSE) {
   # vax_rate <-  ifelse(pop$Sus1 > tp, tp, pop$Sus1)
   #calculate the proportions of individuals who'll be immunised and those who'll fail immunisation
   newly_immunised_batch <- v * vax_rate * pop$Sus1
-  failed_immunisation_batch <- (1- v) * vax_rate * pop$Sus1
+  failed_immunisation_batch <- (1 - v) * vax_rate * pop$Sus1
   
   updatePop <- data.frame(
-    Sus1 = pop$Sus1 - newly_immunised_batch
+    Sus1 = pop$Sus1 - newly_immunised_batch - failed_immunisation_batch 
     , Sus2 = failed_immunisation_batch
     , Exp1 = pop$Exp1
     , Exp2 = pop$Exp2
