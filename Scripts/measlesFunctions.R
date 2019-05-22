@@ -28,7 +28,7 @@
 
 initializePop <- function(N, initPropImmune, I0) {
   immune <- floor(N * initPropImmune)
- data.frame(
+  data.frame(
     Sus1 = N - immune,
     Sus2 = 0,
     Exp1 = 0,
@@ -65,14 +65,14 @@ step <- function(pop, R0, browse = FALSE) {
   incidence <- pop$Sus1 * totalInf * inf_prob
   
   if(incidence > pop$Sus1){
-      incidence <- pop$Sus1
+    incidence <- pop$Sus1
   }
   # if(newE > pop$Sus1){
   #   incidence <- newE
   # }else {
   #   incidence <- pop$Sus1
   # } #if the new infections are more than the susceptibles, that's fine else infect the remaining susceptibles
-
+  
   updatePop <- data.frame(
     Sus1 = pop$Sus1 - incidence
     , Sus2 = pop$Sus2
@@ -94,7 +94,7 @@ step <- function(pop, R0, browse = FALSE) {
     , Inf6 = pop$Inf5
     , Rec = pop$Rec + pop$Inf6
   )
-
+  
   return(updatePop)
 }
 
@@ -115,7 +115,7 @@ vaccinate <- function(pop, tp, v, browse = FALSE) {
   
   #calculate the vaccination "rate" from the team performance
   vax_rate <-  ifelse(pop$Sus1 > tp, tp/totalPop, pop$Sus1/totalPop)
- # vax_rate <-  ifelse(pop$Sus1 > tp, tp, pop$Sus1)
+  # vax_rate <-  ifelse(pop$Sus1 > tp, tp, pop$Sus1)
   #calculate the proportions of individuals who'll be immunised and those who'll fail immunisation
   newly_immunised_batch <- v * vax_rate * pop$Sus1
   failed_immunisation_batch <- (1- v) * vax_rate * pop$Sus1
@@ -141,7 +141,7 @@ vaccinate <- function(pop, tp, v, browse = FALSE) {
     , Inf6 = pop$Inf6
     , Rec = pop$Rec + newly_immunised_batch
   )
-
+  
   return(updatePop)
 }
 
@@ -156,19 +156,20 @@ runSimulations <- function(R0 # transmission coeficient
                            , run_time 
                            , pop 
                            , vaxDay = NA
-                           , orv_duration 
+                           , orv_duration
+                           , strategy
                            , vax_eff
                            , team_performance
                            , time_to_immunity
                            , browse = FALSE
-                           ) {
+) {
   
   time <- 0
   simResults <- data.frame(time = 0, pop) #at time 0 we have the initial population specified
   if (browse) browser()
   time <- time + 1
   while (simResults[time, 'Sus1'] > 0) {
- # for (time in 1: run_time) {
+    # for (time in 1: run_time) {
     if (!is.na(vaxDay) & (time < vaxDay  | time > vaxDay + orv_duration )) {
       simResults <- rbind(simResults, data.frame(time, step(pop = simResults[time, -1], R0 = R0)))
     }else if (!is.na(vaxDay) & (time >= vaxDay  & time <= vaxDay + orv_duration)){
@@ -178,7 +179,7 @@ runSimulations <- function(R0 # transmission coeficient
     }
     epiDur <- time
     time <- time + 1
- }
+  }
   
   # if(time < run_time){
   #   for (i in time:run_time){
@@ -190,19 +191,21 @@ runSimulations <- function(R0 # transmission coeficient
   exposedTS <- rowSums(subset(simResults, select = grep("Exp", names(simResults))))
   infectiousTS <- rowSums(subset(simResults, select = grep("Inf", names(simResults))))
   
-    epi_out <- list(
-      Detailed = simResults
-      , Collapsed = data.frame(
-        time = simResults$time
-        , totalSus = susTS
-        , totalExp = exposedTS
-        , totalInf = infectiousTS
-        , totalRec = simResults$Rec
-      )
-      , epiTotal = sum(simResults$Inf5)
+  epi_out <- list(
+    Detailed = data.frame(simResults, strategy = strategy)
+    , Collapsed = data.frame(
+      time = simResults$time
+      , totalSus = susTS
+      , totalExp = exposedTS
+      , totalInf = infectiousTS
+      , totalRec = simResults$Rec
+      , strategy = strategy
     )
-    return(epi_out)
-  }
+    , epiTotal = sum(simResults$Inf5)
+    , strategy = strategy
+  )
+  return(epi_out)
+}
 
 
 # RUNSCENARIO() runs a specified number of simulations for a given scenario.
