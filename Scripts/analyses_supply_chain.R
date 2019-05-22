@@ -590,13 +590,13 @@ td_results <- tibble(
     # td_presentation_plot <- td_plot + presentation_plot_theme
     # 
     #arrange the plots on a grid
-    sc_results_barplot <- grid.arrange(ft_plot, 
-                # iceVol_plot, 
-                 td_plot,
-                 ncol = 2)
+
     
-    if(display_plots){
-        plot(sc_results_barplot)
+    if(display_sc_plots){
+        sc_results_barplot <- grid.arrange(ft_plot, 
+                                           # iceVol_plot, 
+                                           td_plot,
+                                           ncol = 2)
     }
 
 #'Towards the isocline!! We have determined that the mixed FCC and monodose FCC
@@ -759,10 +759,10 @@ storage_vs_team_days <- ggplot(data = team_days_output) +
          #, title = 'Monodose for far campaigns out of cold chain (10 dose value shown in red)'
          )
 
-sc_results_wastage_storage <- grid.arrange(wastage_vs_team_days, storage_vs_team_days, ncol = 1)
+ 
 
-if(display_plots){
-   plot(sc_results_wastage_storage) 
+if(display_sc_plots){
+    sc_results_wastage_storage <-  grid.arrange(wastage_vs_team_days, storage_vs_team_days, ncol = 1)
 }
 
 
@@ -819,7 +819,7 @@ team_days_intersection_plot <- ggplot(data = team_days_output) +
          y = 'Mobile team days',
          color = 'Wastage (10-dose)') 
 
-if(display_plots){
+if(display_sc_plots){
    plot(team_days_intersection_plot) 
 }
 
@@ -856,7 +856,7 @@ isocline_plot <- ggplot(isocline_df %>% filter(wastage_isocline > 0.6666667)) +
     labs(x = 'Vaccine carrier capacity ratio (monodose vs 10-dose)',
          y = 'Open vial wastage (10-dose)')
 
-if(display_plots){
+if(display_sc_plots){
 plot(isocline_plot)
 }
 
