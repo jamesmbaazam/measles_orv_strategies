@@ -50,6 +50,7 @@ out_dose10FCC <- runSimulations(
     , time_to_immunity = orv_model_params$immune_response_timing
     , browse = F)
 
+#View(out_dose10FCC$Detailed)
 
 out_monodoseFCC <- runSimulations(
     R0 = orv_model_params$R0 # transmission coeficient
@@ -61,7 +62,7 @@ out_monodoseFCC <- runSimulations(
     , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
     , time_to_immunity = orv_model_params$immune_response_timing
     , browse = F)
-
+#View(out_monodoseFCC$Detailed)
 
 out_mixedFCC <- runSimulations(
     R0 = orv_model_params$R0 # transmission coeficient
@@ -73,7 +74,7 @@ out_mixedFCC <- runSimulations(
     , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
     , time_to_immunity = orv_model_params$immune_response_timing
     , browse = F)
-
+#View(out_mixedFCC$Detailed)
 
 out_partOCC <- runSimulations(
     R0 = orv_model_params$R0 # transmission coeficient
@@ -86,7 +87,7 @@ out_partOCC <- runSimulations(
     , time_to_immunity = orv_model_params$immune_response_timing
     , browse = F)
 
-
+#View(out_partOCC$Detailed)
 
 
 
