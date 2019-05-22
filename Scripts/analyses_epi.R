@@ -124,7 +124,7 @@ orv_plot_dat <- orv_plot_dat %>% mutate(strategy = factor(strategy))
 Incidence_plot <- ggplot(data = orv_plot_dat) + 
     geom_point(aes(x = time, y = totalInf   , color = strategy)) + 
     geom_line(aes(x = time, y = totalInf    , color = strategy)) +
-    labs(x = 'time (days)', y = 'Susceptibles') + 
+    labs(x = 'time (days)', y = 'Incidence') + 
     scale_color_manual(name = "Strategy"
                       , values = c('green', 'blue', 'black', 'red')
                        , labels = c("10-dose FCC", "Monodose FCC", "Mixed FCC", 'Part OCC')
