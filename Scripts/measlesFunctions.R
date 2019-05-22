@@ -63,6 +63,10 @@ step <- function(pop, R0, browse = FALSE) {
   inf_prob <- 1 - exp(-beta * totalInf / totalPop) #infection probability at any time t is 1 minus the probability of escaping infection
   
   incidence <- pop$Sus1 * totalInf * inf_prob
+  
+  if(incidence > pop$Sus1){
+      incidence <- pop$Sus1
+  }
   # if(newE > pop$Sus1){
   #   incidence <- newE
   # }else {
