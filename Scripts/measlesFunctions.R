@@ -62,7 +62,7 @@ step <- function(pop, R0, browse = FALSE) {
   totalInf <- sum(pop[, grep("Inf", names(pop))])
   inf_prob <- 1 - exp(-beta * totalInf / totalPop) #infection probability at any time t is 1 minus the probability of escaping infection
   
-  incidence <- round(pop$Sus1 * totalInf * inf_prob)
+  incidence <- pop$Sus1 * totalInf * inf_prob
   # if(newE > pop$Sus1){
   #   incidence <- newE
   # }else {
@@ -113,12 +113,12 @@ vaccinate <- function(pop, tp, v, browse = FALSE) {
   vax_rate <-  ifelse(pop$Sus1 > tp, tp/totalPop, pop$Sus1/totalPop)
  # vax_rate <-  ifelse(pop$Sus1 > tp, tp, pop$Sus1)
   #calculate the proportions of individuals who'll be immunised and those who'll fail immunisation
-  newly_immunised_batch <- round(v * vax_rate * pop$Sus1)
-  failed_immunisation_batch <- round((1- v) * vax_rate * pop$Sus1)
+  newly_immunised_batch <- v * vax_rate * pop$Sus1
+  failed_immunisation_batch <- (1- v) * vax_rate * pop$Sus1
   
   updatePop <- data.frame(
-    Sus1 = round(pop$Sus1 - newly_immunised_batch)
-    , Sus2 = round(failed_immunisation_batch)
+    Sus1 = pop$Sus1 - newly_immunised_batch
+    , Sus2 = failed_immunisation_batch
     , Exp1 = pop$Exp1
     , Exp2 = pop$Exp2
     , Exp3 = pop$Exp3
