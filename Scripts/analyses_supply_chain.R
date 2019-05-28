@@ -42,13 +42,16 @@ dose10_FCC_doses_near_pop_req <- dose10_FCC_doses_near_pop * (1 + sc_model_param
 dose10_FCC_doses_far_pop_req <- dose10_FCC_doses_far_pop * (1 + sc_model_params$dose10_wr_mt/100)
 
 #apply buffer
-dose10_FCC_doses_needed <- fudge_doses(doses = ceiling(dose10_FCC_doses_near_pop_req + dose10_FCC_doses_far_pop_req)
+dose10_FCC_doses_needed <- apply_buffer(doses = ceiling(dose10_FCC_doses_near_pop_req + dose10_FCC_doses_far_pop_req)
                                        , buffer_size = sc_model_params$buffer_stock
 )  
 
 
 
 #determine passive cold chain needs
+#Here, I am assuming that vaccine carriers are transported with ice but without vaccines to the site.
+#'The RCW25s are used to transport the vaccines to the site and then transferred into the vax carrier for 
+#'for administration.
 dose10_FCC_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
                                                          , vial_type = 'dose10'
                                                          , vax_vol = sc_model_params$dose10_vial_vol[1]
@@ -140,7 +143,7 @@ monodose_FCC_doses_mt <- calc_doses_required(df = site_data
 monodose_FCC_doses <-  monodose_FCC_doses_ft + monodose_FCC_doses_mt 
 
 # apply buffer
-monodose_FCC_doses_needed <- fudge_doses(buffer_size = sc_model_params$buffer_stock
+monodose_FCC_doses_needed <- apply_buffer(buffer_size = sc_model_params$buffer_stock
                                          , doses = monodose_FCC_doses
                                          ) 
 
@@ -230,11 +233,11 @@ mixed_FCC_monodose_quant <- calc_doses_required(df = site_data
 mixed_FCC_dose10_quant_adj <- mixed_FCC_dose10_quant*(1 + sc_model_params$dose10_wr_ft/100)
 
 #apply the buffer to both doses
-mixed_FCC_dose10_final <- fudge_doses(doses = mixed_FCC_dose10_quant_adj
+mixed_FCC_dose10_final <- apply_buffer(doses = mixed_FCC_dose10_quant_adj
                                       , buffer_size = sc_model_params$buffer_stock
                                       )
 
-mixed_FCC_monodose_final <- fudge_doses(doses = mixed_FCC_monodose_quant
+mixed_FCC_monodose_final <- apply_buffer(doses = mixed_FCC_monodose_quant
                                         , buffer_size = sc_model_params$buffer_stock
                                         )
 
@@ -364,11 +367,11 @@ part_OCC_monodose_quant <- calc_doses_required(df = site_data
 part_OCC_dose10_quant_adj <- part_OCC_dose10_quant*(1 + sc_model_params$dose10_wr_ft/100)
 # part_OCC_doses <- part_OCC_dose10_quant + part_OCC_monodose_quant
 
-part_OCC_dose10_final <- fudge_doses(doses = part_OCC_dose10_quant_adj
+part_OCC_dose10_final <- apply_buffer(doses = part_OCC_dose10_quant_adj
                                      , buffer_size = sc_model_params$buffer_stock
                                      )
 
-part_OCC_monodose_final <- fudge_doses(doses = part_OCC_monodose_quant
+part_OCC_monodose_final <- apply_buffer(doses = part_OCC_monodose_quant
                                        , buffer_size = sc_model_params$buffer_stock
                                        )
 
