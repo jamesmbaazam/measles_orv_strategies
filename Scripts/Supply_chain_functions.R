@@ -258,7 +258,7 @@ calc_doses_required <- function(df, site_rows_selected, is_dose10 = T, pop_type)
 #more doses than needed
 ###########################################################
 
-fudge_doses <- function(buffer_size, doses){
+apply_buffer <- function(buffer_size, doses){
    req_doses <- doses * (1 + buffer_size / 100)
    return(req_doses)
 }
