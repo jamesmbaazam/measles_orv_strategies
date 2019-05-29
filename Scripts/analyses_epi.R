@@ -114,17 +114,17 @@ if (display_epi_plots) {
 
 
 #plot of susceptibles
-SusProgression_plot <- ggplot(data = orv_plot_dat) + 
-    geom_point(aes(x = time, y = totalSus   , color = strategy)) + 
-    geom_line(aes(x = time, y = totalSus    , color = strategy)) +
-    labs(x = 'time (days)', y = 'Susceptibles') + 
-    scale_color_manual(name = "Strategy"
-                       , values = c('green', 'blue', 'black', 'red')
-                       , labels = c("10-dose FCC", "Monodose FCC", "Mixed FCC", 'Part OCC')
-                       , breaks = c("dose10FCC", "monodoseFCC", "mixedFCC", 'partOCC')
-    )
-if (display_epi_plots) {
-plot(SusProgression_plot)
-}
-
+# SusProgression_plot <- ggplot(data = orv_plot_dat) + 
+#     geom_point(aes(x = time, y = totalSus   , color = strategy)) + 
+#     geom_line(aes(x = time, y = totalSus    , color = strategy)) +
+#     labs(x = 'time (days)', y = 'Susceptibles') + 
+#     scale_color_manual(name = "Strategy"
+#                        , values = c('green', 'blue', 'black', 'red')
+#                        , labels = c("10-dose FCC", "Monodose FCC", "Mixed FCC", 'Part OCC')
+#                        , breaks = c("dose10FCC", "monodoseFCC", "mixedFCC", 'partOCC')
+#     )
+# if (display_epi_plots) {
+# plot(SusProgression_plot)
+# }
+# 
 
