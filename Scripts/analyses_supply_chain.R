@@ -350,7 +350,14 @@ team_days_mobile_mixed_FCC <- calc_monodose_team_days(target_pop = site_data$far
 site_teams_mixed_FCC <- extract_site_team_size(site_data, site_rows_selected = 1)
 
 ##############################################################################
-#' Strategy 4: Mixed strategy B (Partial OCC strategy); 10-dose FCC for fixed teams, Monodose OCC for mobile teams
+#' Strategy 4a: Mixed strategy B (Partial OCC strategy); 10-dose FCC for fixed teams, Monodose OCC for mobile teams
+#' # In this sub-strategy, we assume that both teams have to be dispatched at the same time. So, the fact that the mobile
+#' teams do not need ice does not cut the delay time. Maybe, it does because you only have to freeze ice for the fixed teams
+#' This strategy doesn't seem logical but the following might be the justifications:
+#' 1. The available transport can be maximised if it does only one trip and saves fuel
+#' 2. Access road nature makes it impossible to do two trips
+#' 3. Mobile teams cannot work autonomously as people may not be aware they are coming and hence, they
+#' have to wait for the fixed teams so the people realise that the campaign has been sanctioned.
 ##############################################################################
 
 part_OCC_dose10_quant <- calc_doses_required(df = site_data
