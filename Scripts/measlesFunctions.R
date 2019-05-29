@@ -99,7 +99,6 @@ step <- function(pop, R0, browse = FALSE) {
   return(updatePop)
 }
 
-
 ##################################################################################
 #' VACCINATE() is a function that moves some susceptible individuals to the immune 
 #' class, based on a daily vaccination rate expected of teams.
@@ -158,7 +157,7 @@ runSimulations <- function(R0 # transmission coeficient
                            , pop 
                            , vaxDay = NA
                            , orv_duration
-                           , strategy
+                           , strategy_name
                            , vax_eff
                            , team_performance
                            , time_to_immunity
@@ -194,17 +193,17 @@ runSimulations <- function(R0 # transmission coeficient
   infectiousTS <- rowSums(subset(simResults, select = grep("Inf", names(simResults))))
   
   epi_out <- list(
-    Detailed = data.frame(simResults, strategy = strategy)
+    Detailed = data.frame(simResults, strategy = strategy_name)
     , Collapsed = data.frame(
       time = simResults$time
       , totalSus = susTS
       , totalExp = exposedTS
       , totalInf = infectiousTS
       , totalRec = simResults$Rec
-      , strategy = strategy
+      , strategy = strategy_name
     )
     , epiTotal = sum(simResults$Inf5)
-    , strategy = strategy
+    , strategy = strategy_name
   )
   return(epi_out)
 }
