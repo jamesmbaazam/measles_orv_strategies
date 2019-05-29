@@ -71,7 +71,7 @@ for (i in 1:length(strategy_list)) {
         , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.25, I0 = 1)
         , strategy_name = strategy_list[i]
         , vaxDay = as.numeric(subset(delay_to_start, strategy == strategy_name)['delay_to_start'])
-        , orv_duration = as.numeric(subset(sc_to_epi_inputs, strategy == strategy_name)['mobile']) #for now we're only looking at the far campaigns 
+        , orv_duration = as.numeric(subset(sc_to_epi_inputs, strategy == strategy_name)['mobile_team']) #for now we're only looking at the far campaigns 
         , vax_eff = orv_model_params$vaccine_efficacy
         , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
         , time_to_immunity = orv_model_params$immune_response_timing
@@ -114,17 +114,17 @@ if (display_epi_plots) {
 
 
 #plot of susceptibles
-SusProgression_plot <- ggplot(data = orv_plot_dat) + 
-    geom_point(aes(x = time, y = totalSus   , color = strategy)) + 
-    geom_line(aes(x = time, y = totalSus    , color = strategy)) +
-    labs(x = 'time (days)', y = 'Susceptibles') + 
-    scale_color_manual(name = "Strategy"
-                       , values = c('green', 'blue', 'black', 'red')
-                       , labels = c("10-dose FCC", "Monodose FCC", "Mixed FCC", 'Part OCC')
-                       , breaks = c("dose10FCC", "monodoseFCC", "mixedFCC", 'partOCC')
-    )
-if (display_epi_plots) {
-plot(SusProgression_plot)
-}
-
+# SusProgression_plot <- ggplot(data = orv_plot_dat) + 
+#     geom_point(aes(x = time, y = totalSus   , color = strategy)) + 
+#     geom_line(aes(x = time, y = totalSus    , color = strategy)) +
+#     labs(x = 'time (days)', y = 'Susceptibles') + 
+#     scale_color_manual(name = "Strategy"
+#                        , values = c('green', 'blue', 'black', 'red')
+#                        , labels = c("10-dose FCC", "Monodose FCC", "Mixed FCC", 'Part OCC')
+#                        , breaks = c("dose10FCC", "monodoseFCC", "mixedFCC", 'partOCC')
+#     )
+# if (display_epi_plots) {
+# plot(SusProgression_plot)
+# }
+# 
 
