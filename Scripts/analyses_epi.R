@@ -129,18 +129,18 @@ orv_plot_dat <- orv_plot_dat %>% mutate(strategy = factor(strategy))
 
 
 #plot of cases
-Incidence_plot <- ggplot(data = orv_plot_dat) + 
-    geom_point(aes(x = time, y = totalInf   , color = strategy)) + 
-    geom_line(aes(x = time, y = totalInf    , color = strategy)) +
-    labs(x = 'time (days)', y = 'Incidence') + 
+fin_epi_size <- ggplot(data = orv_plot_dat %>% group_by(strategy)) + 
+    geom_point(aes(x = time, y = Inf5, group = strategy)) + 
+    geom_line(aes(x = time, y = Inf5, color = strategy)) +
+    labs(x = 'Time (days)', y = 'Final epidemic size') + 
     scale_color_manual(name = "Strategy"
                       , values = c('green', 'blue', 'black', 'red')
                        , labels = c("10-dose FCC", "Monodose FCC", "Mixed FCC", 'Part OCC')
-                       , breaks = c("dose10FCC", "monodoseFCC", "mixedFCC", 'partOCC')
+                       , breaks = c("dose10_fcc", "monodose_fcc", "mixed_fcc", 'part_occ')
                        )
 
 if (display_epi_plots) {
-    plot(Incidence_plot)  
+    plot(fin_epi_size)  
 }
 
 
