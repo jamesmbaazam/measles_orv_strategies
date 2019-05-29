@@ -48,68 +48,35 @@ sc_to_epi_inputs <- left_join(campaign_duration, delay_to_start, by = 'strategy'
 #Running the simulations for each strategy
 ###############################################################################
 
-out_dose10FCC <- runSimulations(
-    R0 = orv_model_params$R0 # transmission coeficient
-    , run_time = orv_model_params$model_time # 1 yr!
-    , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.5, I0 = 1)
-    , strategy = 'dose10_fcc'
-    , vaxDay = as.numeric(subset(delay_to_start, strategy == '10-dose FCC')['delay_to_start'])
-    , orv_duration = as.numeric(subset(sc_to_epi_inputs, strategy == '10-dose FCC')['orv_length'])
-    , vax_eff = orv_model_params$vaccine_efficacy
-    , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
-    , time_to_immunity = orv_model_params$immune_response_timing
-    , browse = F)
 
+# orv_strategy_results <- purrr:::map_df(strategy_list 
+#                                , runSimulations
+#                              #  , strategy 
+#                                , vaxDay = as.numeric(subset(delay_to_start, strategy == strategy_list)['delay_to_start'])
+#                                , orv_duration = as.numeric(subset(sc_to_epi_inputs, strategy == strategy_list)['orv_length'])
+#                                , R0 = orv_model_params$R0 # transmission coeficient
+#                                , run_time = orv_model_params$model_time # 1 yr!
+#                                , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.5, I0 = 1)
+#                                , vax_eff = orv_model_params$vaccine_efficacy
+#                                , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
+#                                , time_to_immunity = orv_model_params$immune_response_timing
+#                                , browse = F
+#                                )
 
-
-#View(out_dose10FCC$Detailed)
-
-out_monodoseFCC <- runSimulations(
-    R0 = orv_model_params$R0 # transmission coeficient
-    , run_time = orv_model_params$model_time # 1 yr!
-    , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.5, I0 = 1)
-    , strategy = 'monodose_fcc'
-    , vaxDay = as.numeric(subset(delay_to_start, strategy == 'Monodose FCC')['delay_to_start'])
-    , orv_duration = as.numeric(subset(sc_to_epi_inputs, strategy == 'Monodose FCC')['orv_length'])
-    , vax_eff = orv_model_params$vaccine_efficacy
-    , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
-    , time_to_immunity = orv_model_params$immune_response_timing
-    , browse = F)
-
-
-#View(out_monodoseFCC$Detailed)
-
-out_mixedFCC <- runSimulations(
-    R0 = orv_model_params$R0 # transmission coeficient
-    , run_time = orv_model_params$model_time # 1 yr!
-    , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.5, I0 = 1)
-    , strategy = 'mixed_fcc'
-    , vaxDay = as.numeric(subset(delay_to_start, strategy == 'Mixed FCC')['delay_to_start'])
-    , orv_duration = as.numeric(subset(sc_to_epi_inputs, strategy == 'Mixed FCC')['orv_length'])
-    , vax_eff = orv_model_params$vaccine_efficacy
-    , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
-    , time_to_immunity = orv_model_params$immune_response_timing
-    , browse = F)
-
-
-#View(out_mixedFCC$Detailed)
-
-out_partOCC <- runSimulations(
-    R0 = orv_model_params$R0 # transmission coeficient
-    , run_time = orv_model_params$model_time # 1 yr!
-    , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.5, I0 = 1)
-    , strategy = 'part_fcc'
-    , vaxDay = as.numeric(subset(delay_to_start, strategy == 'Part OCC')['delay_to_start'])
-    , orv_duration = as.numeric(subset(sc_to_epi_inputs, strategy == 'Part OCC')['orv_length'])
-    , vax_eff = orv_model_params$vaccine_efficacy
-    , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
-    , time_to_immunity = orv_model_params$immune_response_timing
-    , browse = F)
-
-
-#View(out_partOCC$Detailed)
-
-
+orv_strategy_results <- list()
+for (i in 1:length(strategy_list)) {
+    orv_strategy_results[[strategy_list[i]]] <- runSimulations(
+        R0 = orv_model_params$R0 # transmission coeficient
+        , run_time = orv_model_params$model_time # 1 yr!
+        , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.5, I0 = 1)
+        , strategy_name = strategy_list[i]
+        , vaxDay = as.numeric(subset(delay_to_start, strategy == strategy_name)['delay_to_start'])
+        , orv_duration = as.numeric(subset(sc_to_epi_inputs, strategy == strategy_name)['mobile']) #for now we're only looking at the far campaigns 
+        , vax_eff = orv_model_params$vaccine_efficacy
+        , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
+        , time_to_immunity = orv_model_params$immune_response_timing
+        , browse = F) 
+}
 
 
 ################################################################################
