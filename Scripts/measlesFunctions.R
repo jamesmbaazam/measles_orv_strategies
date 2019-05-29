@@ -314,3 +314,8 @@ epiTraj <- function(ii = NA, output) {
     output$Detailed$Inf5
   }
 }
+
+#EXTRACT_ORV_RESULTS() is a function that extracts the orv simulation result types, i.e, Collapsed OR Detailed
+extract_orv_results <- function(results_df, output_type){ #results_df is the list of dataframes resulting from running runSimulation(). output_type= c('Collapsed', 'Detailed')
+  results_df[[output_type]]
+}
