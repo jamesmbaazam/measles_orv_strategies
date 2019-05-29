@@ -68,7 +68,7 @@ for (i in 1:length(strategy_list)) {
     orv_strategy_results[[strategy_list[i]]] <- runSimulations(
         R0 = orv_model_params$R0 # transmission coeficient
         , run_time = orv_model_params$model_time # 1 yr!
-        , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.5, I0 = 1)
+        , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.25, I0 = 1)
         , strategy_name = strategy_list[i]
         , vaxDay = as.numeric(subset(delay_to_start, strategy == strategy_name)['delay_to_start'])
         , orv_duration = as.numeric(subset(sc_to_epi_inputs, strategy == strategy_name)['mobile']) #for now we're only looking at the far campaigns 
