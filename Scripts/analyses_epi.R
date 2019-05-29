@@ -119,11 +119,12 @@ out_partOCC <- runSimulations(
 
 #pre-processing the orv model output
 #1. Combine this into a single df
-orv_plot_dat <- rbind(out_dose10FCC$Collapsed
-                          , out_monodoseFCC$Collapsed
-                          , out_mixedFCC$Collapsed 
-                          , out_partOCC$Collapsed
-                          )
+
+orv_results_detailed <- orv_strategy_results %>% 
+    purrr::map('Detailed')
+
+
+orv_plot_dat <- do.call("rbind", args = c(orv_results_detailed, make.row.names = F))
 
 orv_plot_dat <- orv_plot_dat %>% mutate(strategy = factor(strategy))
 
