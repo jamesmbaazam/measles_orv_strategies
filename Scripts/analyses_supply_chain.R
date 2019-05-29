@@ -424,6 +424,11 @@ part_OCC_monodose_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = '
                                                                   , with_ice = F
                                                                   , doses_to_transport = part_OCC_monodose_final)
 
+#' Question: If we need more than 1 vaccine carrier for the doses, how do we translate that? Does that translate into
+#' how many teams we'll need or how many trips should be undertaken by a single team? The latter will draw in the 
+#' need for a rule for how the distance of the site from the base translates to trips in days and how that will affect
+#' the team days and campaign duration.
+
 #total passive cold chain needs
 
 #RCW25
