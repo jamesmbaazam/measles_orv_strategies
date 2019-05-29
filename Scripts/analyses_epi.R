@@ -31,9 +31,17 @@ source('scripts/analyses_supply_chain.R')
 
 
 #SC outputs as inputs to Epi model
+#1. Delays caused by preparing teams and logistics
 delay_to_start <- dplyr::rename(freezing_time_results, delay_to_start = time)
-campaign_duration <- subset(td_results, team_type == 'Mobile team', select = -team_type)
+#campaign_duration <- subset(td_results, team_type == 'Mobile team', select = -team_type)
+
+#2. The site campaign duration is assumed to be the slowest of the two team types
+campaign_duration <- spread(td_results, key = team_type, value = team_days) %>%
+    rowwise() %>% 
+    mutate(orv_length = max(fixed_post, mobile_team))
+
 sc_to_epi_inputs <- left_join(campaign_duration, delay_to_start, by = 'strategy')
+
 
 
 ###############################################################################
