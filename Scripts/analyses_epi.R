@@ -70,8 +70,8 @@ for (i in 1:length(strategy_list)) {
         , run_time = orv_model_params$model_time # 1 yr!
         , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.25, I0 = 1)
         , strategy_name = strategy_list[i]
-        , vaxDay = as.numeric(subset(delay_to_start, strategy == strategy_name)['delay_to_start'])
-        , orv_duration = as.numeric(subset(sc_to_epi_inputs, strategy == strategy_name)['mobile_team']) #for now we're only looking at the far campaigns 
+        , vaxDay = as.numeric(subset(delay_to_start, strategy == strategy_list[i])['delay_to_start'])
+        , orv_duration = as.numeric(subset(sc_to_epi_inputs, strategy == strategy_list[i])['mobile_team']) #for now we're only looking at the far campaigns 
         , vax_eff = orv_model_params$vaccine_efficacy
         , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
         , time_to_immunity = orv_model_params$immune_response_timing
