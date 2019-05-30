@@ -85,21 +85,31 @@ for (i in 1:length(strategy_list)) {
 ################################################################################
 
 #pre-processing the orv model output
-#1. Combine this into a single df
-
+#1A. Extract the detailed dynamics and bind them into one df
 orv_results_detailed <- orv_strategy_results %>% 
     purrr::map('Detailed')
+#data for plotting
+epi_dyn_detailed <- do.call("rbind", args = c(orv_results_detailed, make.row.names = F)) %>% 
+    mutate(strategy = factor(strategy))
+
+#1B. Extract the sub-summed results and bind them into one df
+orv_results_collapsed <- orv_strategy_results %>% 
+    purrr::map('Collapsed')
+#data for plotting
+epi_dyn_summed <- do.call("rbind", args = c(orv_results_collapsed, make.row.names = F)) %>% 
+    mutate(strategy = factor(strategy))
 
 
-orv_plot_dat <- do.call("rbind", args = c(orv_results_detailed, make.row.names = F))
-
-orv_plot_dat <- orv_plot_dat %>% mutate(strategy = factor(strategy))
 
 
-#plot of cases
-fin_epi_size <- ggplot(data = orv_plot_dat %>% group_by(strategy)) + 
-    geom_point(aes(x = time, y = Inf5, group = strategy)) + 
-    geom_line(aes(x = time, y = Inf5, color = strategy)) +
+################################################################################
+#Plots
+################################################################################
+
+#1. Final epidemic size taken to be class I5 of I1 to I6: Just an assumption
+fin_epi_size <- ggplot(data = epi_dyn_detailed) + 
+    geom_point(aes(x = time, y = Inf5, color = strategy), size = 2) + 
+    geom_line(aes(x = time, y = Inf5, color = strategy), size = 1) +
     labs(x = 'Time (days)', y = 'Final epidemic size') + 
     scale_color_manual(name = "Strategy"
                       , values = c('green', 'blue', 'black', 'red')
