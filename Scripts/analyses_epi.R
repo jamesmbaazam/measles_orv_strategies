@@ -44,6 +44,8 @@ sc_to_epi_inputs <- left_join(campaign_duration, delay_to_start, by = 'strategy'
 
 
 
+
+
 ###############################################################################
 #Running the simulations for each strategy
 ###############################################################################
@@ -140,3 +142,9 @@ if (display_epi_plots) {
 # if (display_epi_plots) {
 #     plot(incidence_plot)  
 # }
+
+#################################################################################
+#Sensitivity on number of freezers
+#################################################################################
+
+#mf314_quant <- 1:10 #we currently run the sc model on only one freezer. What if the base has more than 1?
