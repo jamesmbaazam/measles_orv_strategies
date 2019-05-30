@@ -111,20 +111,22 @@ if (display_epi_plots) {
     plot(fin_epi_size)  
 }
 
+#View(head(orv_plot_dat %>% filter(strategy == 'monodose_fcc'), n = 20))
 
 
-#plot of susceptibles
-# SusProgression_plot <- ggplot(data = orv_plot_dat) + 
-#     geom_point(aes(x = time, y = totalSus   , color = strategy)) + 
-#     geom_line(aes(x = time, y = totalSus    , color = strategy)) +
-#     labs(x = 'time (days)', y = 'Susceptibles') + 
+
+#2. Incidence: This plot is just a backward translation of the final size plot because the model is deterministic
+
+# incidence_plot <- ggplot(data = epi_dyn_detailed) + 
+#     geom_point(aes(x = time, y = Exp1, color = strategy), size = 2) + 
+#     geom_line(aes(x = time, y = Exp1, color = strategy), size = 1) +
+#     labs(x = 'Time (days)', y = 'New cases (exposed)') + 
 #     scale_color_manual(name = "Strategy"
 #                        , values = c('green', 'blue', 'black', 'red')
 #                        , labels = c("10-dose FCC", "Monodose FCC", "Mixed FCC", 'Part OCC')
-#                        , breaks = c("dose10FCC", "monodoseFCC", "mixedFCC", 'partOCC')
+#                        , breaks = c("dose10_fcc", "monodose_fcc", "mixed_fcc", 'part_occ')
 #     )
-# if (display_epi_plots) {
-# plot(SusProgression_plot)
-# }
 # 
-
+# if (display_epi_plots) {
+#     plot(incidence_plot)  
+# }
