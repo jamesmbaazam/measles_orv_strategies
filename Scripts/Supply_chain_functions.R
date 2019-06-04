@@ -231,26 +231,48 @@ calc_transport_equipment_needs <- function(equip_type, vial_type, vax_vol, with_
 #'10-dose and 1 vaccine vial per monodose
 
 #calc_doses_required(): calculates number of doses needed based on the target population size; indicate if you need doses for the near or far people; the type of vial you need calcalations for; and the row numbers of the sites you want to analyse
-calc_doses_required <- function(df, site_rows_selected, is_dose10 = T, pop_type){ #df is the dataframe of added sites; site_row = row numbers to analyse; is.dose10, if false, means monodose; #pop_type = c(near, far)
+calc_doses_required <- function(df
+                                , site_rows_selected = 1
+                                , pop_type
+                                , ovwastage
+                                , buffer_size = 0
+                                , is_dose10 = T
+                                ){ #df is the dataframe of added sites; site_row = row numbers to analyse; is.dose10, if false, means monodose; #pop_type = c(near, far), ovwastage = open vial wastage, buffer = safety stock to cushion uncertainty
    selected_sites <- df %>% 
             dplyr::slice(site_rows_selected)
    
    if(pop_type == 'near' & is_dose10 == T){
-      doses_required <- selected_sites %>% 
+      dose_quant <- selected_sites %>% 
             dplyr::summarise(sum(.$near_pop))
-      return(ceiling(as.numeric(doses_required) / 10))
+      
+      doses_required <- dose_quant * (1 + buffer_size / 100) * (1 + ovwastage / 100)  #apply buffer and wastage cushion 
+      
+      return(ceiling(as.numeric(doses_required)))
+      
       }else if(pop_type == 'near' & is_dose10 == F){
-         doses_required <- selected_sites %>% 
+         dose_quant <- selected_sites %>% 
             dplyr::summarise(sum(.$near_pop))
+         
+         doses_required <- dose_quant * (1 + buffer_size / 100) * (1 + ovwastage / 100)
+         
          return(as.numeric(doses_required))
+         
       } else if(pop_type == 'far' & is_dose10 == T){
-         doses_required <- selected_sites %>% 
+         dose_quant <- selected_sites %>% 
             dplyr::summarise(sum(.$far_pop))
-         return(as.numeric(ceiling(doses_required / 10)))
+         
+         doses_required <- dose_quant * (1 + buffer_size / 100) * (1 + ovwastage / 100)
+         
+         return(as.numeric(ceiling(doses_required)))
+         
       }else if(pop_type == 'far' & is_dose10 == F){
-         doses_required <- selected_sites %>% 
+         dose_quant <- selected_sites %>% 
             dplyr::summarise(sum(.$far_pop))
+         
+         doses_required <- dose_quant * (1 + buffer_size / 100) * (1 + ovwastage / 100)
+         
          return(as.numeric(doses_required))
+         
       } else{
          stop('Error in dose calculation function; check your inputs')
       }
@@ -273,9 +295,9 @@ calc_doses_required <- function(df, site_rows_selected, is_dose10 = T, pop_type)
 
 calc_freezing_time <- function(mf314_available, large_icepacks_quantity, small_icepacks_quantity){
    ceiling(
-      (1/mf314_available)*((large_icepacks_quantity / mf314_largepack_fr) + (small_icepacks_quantity / mf314_smallpack_fr)) 
+      (1/mf314_available)*((large_icepacks_quantity / mf314_largepack_fr) + (small_icepacks_quantity / mf314_smallpack_fr))
    )
-   
+
 }
 
 ################
