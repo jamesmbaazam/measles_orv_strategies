@@ -25,70 +25,155 @@ vaxCarr_icepack_needs <- compute_vaxCarr_icepacks(sc_model_params$ambient_temp[1
 # Strategy 1: 10-dose only FCC; This will be the baseline
 ##########################################
 
-dose10_FCC_doses_near_pop <-  calc_doses_required(df = site_data
+#################
+#fixed team calculations
+################
+
+#doses needed for near population
+dose10_FCC_doses_fixedT <-  calc_doses_required(df = site_data
                                                   , site_rows_selected = 1
                                                   , is_dose10 = T
-                                                  , pop_type = 'near')
-
-dose10_FCC_doses_far_pop <-  calc_doses_required(df = site_data
-                                                 ,  site_rows_selected = 1
-                                                 , is_dose10 = T
-                                                 , pop_type = 'far')
-
-#adjustment for wastage (fixed post teams)
-dose10_FCC_doses_near_pop_req <- dose10_FCC_doses_near_pop * (1 + sc_model_params$dose10_wr_ft/100)
-
-#adjustment for wastage (mobile team)
-dose10_FCC_doses_far_pop_req <- dose10_FCC_doses_far_pop * (1 + sc_model_params$dose10_wr_mt/100)
-
-#apply buffer
-dose10_FCC_doses_needed <- apply_buffer(doses = ceiling(dose10_FCC_doses_near_pop_req + dose10_FCC_doses_far_pop_req)
-                                       , buffer_size = sc_model_params$buffer_stock
-)  
+                                                  , pop_type = 'near'
+                                                  , ovwastage = sc_model_params$dose10_wr_ft
+                                                  , buffer_size = sc_model_params$buffer_stock)
 
 
+# #adjustment for wastage (fixed post teams)
+# dose10_FCC_doses_near_pop_req <- dose10_FCC_doses_near_pop * (1 + /100)
+# 
+# #apply buffer
+# dose10_FCC_doses_needed_fTeam <- apply_buffer(doses = ceiling(dose10_FCC_doses_near_pop_req)
+#                                         , buffer_size = 
+# )  
 
 #determine passive cold chain needs
+######################################
 #Here, I am assuming that vaccine carriers are transported with ice but without vaccines to the site.
 #'The RCW25s are used to transport the vaccines to the site and then transferred into the vax carrier for 
 #'for administration.
-dose10_FCC_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
+#'
+#'
+
+dose10_FCC_RCW25_needs_fixedT <- calc_transport_equipment_needs(equip_type = 'rcw25'
                                                          , vial_type = 'dose10'
                                                          , vax_vol = sc_model_params$dose10_vial_vol[1]
                                                          , with_ice = T
-                                                         , doses_to_transport = dose10_FCC_doses_needed
+                                                         , doses_to_transport = dose10_FCC_doses_fixedT
 )
 
-dose10_FCC_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
+dose10_FCC_vaxCarr_needs_fixedT <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
                                                            , vial_type = 'dose10'
                                                            , vax_vol = dose10_vial_vol[1]
                                                            , with_ice = T
-                                                           , doses_to_transport = dose10_FCC_doses_needed
+                                                           , doses_to_transport = dose10_FCC_doses_fixedT
 )
 
 
-# 10-dose FCC RCW25 icepack needs
-dose10_FCC_vaxCarr_icepack_needs_total <- vaxCarr_icepack_needs * dose10_FCC_vaxCarr_needs # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
-dose10_FCC_vaxCarr_icepack_vol <- dose10_FCC_vaxCarr_icepack_needs_total * 0.4 # total volume of ice packs needed is simply the above calculation * 0.6L
+#################
+#Mobile team calculations
+################
+dose10_FCC_doses_mobileT <-  calc_doses_required(df = site_data
+                                                 ,  site_rows_selected = 1
+                                                 , is_dose10 = T
+                                                 , pop_type = 'far'
+                                                 , ovwastage = sc_model_params$dose10_wr_mt
+                                                 , buffer_size = sc_model_params$buffer_stock
+                                                 )
+#determine passive cold chain needs
+######################################
+#Here, I am assuming that mobile teams only need a vaccine carrier. 
+#' vaccine carriers are transported with ice and vaccines to the site.
+
+dose10_FCC_vaxCarr_needs_mobileT <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
+                                                                  , vial_type = 'dose10'
+                                                                  , vax_vol = dose10_vial_vol[1]
+                                                                  , with_ice = T
+                                                                  , doses_to_transport = dose10_FCC_doses_mobileT
+)
 
 
-# 10-dose FCC Vaccine carrier icepack needs
-dose10_FCC_RCW25_icepack_needs_total <- RCW25_icepack_needs * dose10_FCC_RCW25_needs # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
-dose10_FCC_RCW25_icepack_vol <- dose10_FCC_RCW25_icepack_needs_total * 0.6 # total volume of ice packs needed is simply the above calculation * 0.6L
+
+# #adjustment for wastage (mobile team)
+# dose10_FCC_doses_far_pop_req <- dose10_FCC_doses_far_pop * (1 + sc_model_params$dose10_wr_mt/100)
+
+# #apply buffer
+# dose10_FCC_doses_needed <- apply_buffer(doses = ceiling(dose10_FCC_doses_far_pop_req)
+#                                        , buffer_size = sc_model_params$buffer_stock
+# )  
+
+
+
+
+
+# dose10_FCC_RCW25_needs <- calc_transport_equipment_needs(equip_type = 'rcw25'
+#                                                          , vial_type = 'dose10'
+#                                                          , vax_vol = sc_model_params$dose10_vial_vol[1]
+#                                                          , with_ice = T
+#                                                          , doses_to_transport = dose10_FCC_doses_needed
+# )
+# 
+# dose10_FCC_vaxCarr_needs <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
+#                                                            , vial_type = 'dose10'
+#                                                            , vax_vol = dose10_vial_vol[1]
+#                                                            , with_ice = T
+#                                                            , doses_to_transport = dose10_FCC_doses_needed
+# )
+
+##############################################
+#Ice pack needs # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
+###############################################
+#Fixed post
+dose10_FCC_RCW25_icepack_needs_fixedT <- calc_icepack_tot_quant(equipment_quantity = dose10_FCC_RCW25_needs_fixedT
+                                                                  , icepacks_per_equipment = RCW25_icepack_needs
+                                                                  ) # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
+dose10_FCC_vaxCarr_icepack_needs_fixedT <- calc_icepack_tot_quant(equipment_quantity = dose10_FCC_vaxCarr_needs_fixedT
+                                                                , icepacks_per_equipment = vaxCarr_icepack_needs
+) 
+
+#mobile teams
+dose10_FCC_vaxCarr_icepack_needs_mobileT <- calc_icepack_tot_quant(equipment_quantity = dose10_FCC_vaxCarr_needs_mobileT
+                                                                  , icepacks_per_equipment = vaxCarr_icepack_needs
+                                                                  )
+
+
+#dose10_FCC_RCW25_icepack_vol <- dose10_FCC_RCW25_icepack_needs_total * 0.6 # total volume of ice packs needed is simply the above calculation * 0.6L
 
 
 
 # Initial number of icepacks required
-dose10_FCC_init_icepack_quant <- dose10_FCC_RCW25_icepack_needs_total + dose10_FCC_vaxCarr_icepack_needs_total
+#dose10_FCC_init_icepack_quant <- dose10_FCC_RCW25_icepack_needs_total + dose10_FCC_vaxCarr_icepack_needs_total
 
+
+############################################
 # freezing time: # Time it takes to freeze depends on how many freezers are available and their capacity. I currently assume that we only use the MF314 freezer, which is the largest, and I specify the quantity at the beginning of this script
-dose10_FCC_ft <- calc_freezing_time(mf314_available = sc_model_params$mf314_quant
-                                    , large_icepacks_quantity = dose10_FCC_RCW25_icepack_needs_total 
-                                    , small_icepacks_quantity = dose10_FCC_vaxCarr_icepack_needs_total)
+##############################################
+
+#fixed post team
+dose10_FCC_freezetime_fixedT <- calc_freezing_time(mf314_available = sc_model_params$mf314_quant
+                                    , large_icepacks_quantity = dose10_FCC_RCW25_icepack_needs_fixedT 
+                                    , small_icepacks_quantity = dose10_FCC_vaxCarr_icepack_needs_fixedT)
+
+dose10_FCC_freezetime_mobileT <- calc_freezing_time(mf314_available = sc_model_params$mf314_quant
+                                                   , large_icepacks_quantity = 0
+                                                   , small_icepacks_quantity = dose10_FCC_vaxCarr_icepack_needs_mobileT)
+
+
+
+
+######################################################
+#When will the campaign start?
+######################################################
+#TODO I will modify the function so that it returns which team heads out first if the routing is 'asap"
+dose10_FCC_delay <- calc_campaign_start(fixedT_freeze_time = dose10_FCC_freezetime_fixedT
+                                        , mobileT_freeze_time = dose10_FCC_freezetime_mobileT
+                                        , team_routing = 'asap')
+
+
+
 
 
 #Initial volume of ice required in litres
-dose10_FCC_init_iceVol <- dose10_FCC_RCW25_icepack_vol + dose10_FCC_vaxCarr_icepack_vol
+#dose10_FCC_init_iceVol <- dose10_FCC_RCW25_icepack_vol + dose10_FCC_vaxCarr_icepack_vol
 
 
 ################################################################################
