@@ -253,15 +253,15 @@ calc_doses_required <- function(df, site_rows_selected, is_dose10 = T, pop_type)
       }
    }
 
-###########################################################
-#buffer_doses(): account for factors that'll require us to transport
-#more doses than needed
-###########################################################
-
-apply_buffer <- function(buffer_size, doses){
-   req_doses <- doses * (1 + buffer_size / 100)
-   return(req_doses)
-}
+# ###########################################################
+# #buffer_doses(): account for factors that'll require us to transport
+# #more doses than needed
+# ###########################################################
+# 
+# apply_buffer <- function(buffer_size, doses){
+#    req_doses <- doses * (1 + buffer_size / 100)
+#    return(req_doses)
+# }
 
 
 ##########
