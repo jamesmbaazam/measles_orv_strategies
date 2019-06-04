@@ -289,6 +289,32 @@ calc_doses_required <- function(df
 # }
 
 
+##############################################
+#Ice pack quantity needed
+###############################################
+calc_icepack_tot_quant <- function(equipment_quantity # options: rcw25, vaxCarr
+                                   , icepacks_per_equipment
+){
+   return(equipment_quantity * icepacks_per_equipment)
+}
+   
+##############################################
+#Ice pack volume needed
+###############################################   
+calc_icepack_tot_vol <- function(equipment_type #options: large = 0.6L, small = 0.4L
+                                 , icepack_quantity
+                                 ){
+   if (equipment_type == 'rcw25') {
+      return(0.6 * icepack_quantity)
+      
+   }else if (equipment_type == 'vaxCarr') {
+      return(0.4 * icepack_quantity)
+   }else{
+      stop('Check inputs')
+   }
+}  
+
+
 ##########
 #calc_freezing_time()
 ##########
