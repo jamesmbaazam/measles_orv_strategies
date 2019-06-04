@@ -300,6 +300,22 @@ calc_freezing_time <- function(mf314_available, large_icepacks_quantity, small_i
 
 }
 
+
+##########
+#calc_campaign_start(): Calculates the delay to the start of a campaign based on routing rules: sequential or parallel
+##########
+calc_campaign_start <- function(fixedT_freeze_time
+                                , mobileT_freeze_time
+                                , team_routing # routing: "asap" or "parallel"
+) {
+   if (team_routing == 'asap') {
+     return(start_day = min(fixedT_freeze_time, mobileT_freeze_time))
+   } else if (team_routing == 'parallel'){
+      return(sum(fixedT_freeze_time, mobileT_freeze_time))
+   }
+}
+
+
 ################
 #plotting functions
 ###################
