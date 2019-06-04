@@ -226,6 +226,9 @@ calc_transport_equipment_needs <- function(equip_type, vial_type, vax_vol, with_
 ################################################################################
 #' Full Cold Chain (FCC) calculations
 ################################################################################
+#'It is worth noting that the number of doses for a target population is the same for both 10-dose and monodose.
+#'However, the number of vials or vaccines for the same number of doses changes, i.e, 10 doses per vaccine vial for
+#'10-dose and 1 vaccine vial per monodose
 
 #calc_doses_required(): calculates number of doses needed based on the target population size; indicate if you need doses for the near or far people; the type of vial you need calcalations for; and the row numbers of the sites you want to analyse
 calc_doses_required <- function(df, site_rows_selected, is_dose10 = T, pop_type){ #df is the dataframe of added sites; site_row = row numbers to analyse; is.dose10, if false, means monodose; #pop_type = c(near, far)
