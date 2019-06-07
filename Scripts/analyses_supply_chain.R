@@ -21,6 +21,158 @@ vaxCarr_icepack_needs <- compute_vaxCarr_icepacks(sc_model_params$ambient_temp[1
 
 
 
+
+
+############################################################################
+#analyse_strategy(): calculates the logistical needs and time to commence a campaign
+############################################################################
+
+
+analyse_strategy <- function(mf314 = sc_model_params$mf314_quant
+                             , site_details = site_data
+                             , fixed_team_dose10 # options = if "T", 10 dose, else monodose
+                             , fixed_team_with_ice # options = if "T", ice is used, else, no ice
+                             , mobile_team_dose10 # options = if "T", 10 dose, else monodose
+                             , mobile_team_with_ice # options = if "T", ice is used, else, no ice
+                             , team_dispatch #options = "parallel", "asap"
+                             , dose10_vial_volume = sc_model_params$dose10_vial_vol[1]
+                             , monodose_vial_volume
+){
+   
+#################
+#fixed team calculations
+################
+
+#doses needed for near population
+doses_fixed_team <-  calc_doses_required(df = site_details
+                                                , site_rows_selected = 1
+                                                , is_dose10 = fixed_team_dose10
+                                                , pop_type = 'near'
+                                                , ovwastage = sc_model_params$dose10_wr_ft
+                                                , buffer_size = sc_model_params$buffer_stock
+                                         
+                                         )
+
+doses_mobile_team <-  calc_doses_required(df = site_details
+                                          ,  site_rows_selected = 1
+                                          , is_dose10 = T
+                                          , pop_type = 'far'
+                                          , ovwastage = sc_model_params$dose10_wr_mt
+                                          , buffer_size = sc_model_params$buffer_stock
+)
+
+#determine passive cold chain needs
+######################################
+#Here, I am assuming that vaccine carriers are transported with ice but without vaccines to the site.
+#'The RCW25s are used to transport the vaccines to the site and then transferred into the vax carrier for 
+#'for administration.
+#'
+#'
+
+RCW25_needs_fixed_team <- calc_transport_equipment_needs(equip_type = 'rcw25'
+                                                                , vial_type = 'dose10'
+                                                                , vax_vol = dose10_vial_volume
+                                                                , with_ice = fixed_team_with_ice
+                                                                , doses_to_transport = doses_fixed_team
+                                                         )
+
+vaxCarr_needs_fixed_team <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
+                                                                  , vial_type = 'dose10'
+                                                                  , vax_vol = dose10_vial_volume
+                                                                  , with_ice = fixed_team_with_ice
+                                                                  , doses_to_transport = doses_fixed_team
+                                                                  )
+
+
+#################
+#Mobile team calculations
+################
+
+#determine passive cold chain needs
+######################################
+#Here, I am assuming that mobile teams only need a vaccine carrier. 
+#' vaccine carriers are transported with ice and vaccines to the site.
+
+vaxCarr_needs_mobile_team <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
+                                                                   , vial_type = 'dose10'
+                                                                   , vax_vol = dose10_vial_vol[1]
+                                                                   , with_ice = T
+                                                                   , doses_to_transport = dose10_FCC_doses_mobileT
+)
+
+
+
+##############################################
+#Ice pack needs # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
+###############################################
+#Fixed post
+RCW25_icepack_needs_fixed_team <- calc_icepack_tot_quant(equipment_quantity = RCW25_needs_fixed_team
+                                                                , icepacks_per_equipment = RCW25_icepack_needs
+) # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
+vaxCarr_icepack_needs_fixed_team <- calc_icepack_tot_quant(equipment_quantity = vaxCarr_needs_fixed_team
+                                                                  , icepacks_per_equipment = vaxCarr_icepack_needs
+) 
+
+#mobile teams
+vaxCarr_icepack_needs_mobile_team <- calc_icepack_tot_quant(equipment_quantity = vaxCarr_needs_mobile_team
+                                                                   , icepacks_per_equipment = vaxCarr_icepack_needs
+)
+
+
+#dose10_FCC_RCW25_icepack_vol <- dose10_FCC_RCW25_icepack_needs_total * 0.6 # total volume of ice packs needed is simply the above calculation * 0.6L
+
+
+
+# Initial number of icepacks required
+#dose10_FCC_init_icepack_quant <- dose10_FCC_RCW25_icepack_needs_total + dose10_FCC_vaxCarr_icepack_needs_total
+
+
+############################################
+# freezing time: # Time it takes to freeze depends on how many freezers are available and their capacity. I currently assume that we only use the MF314 freezer, which is the largest, and I specify the quantity at the beginning of this script
+##############################################
+
+#fixed post team
+freezing_time_fixed_team <- calc_freezing_time(mf314_available = mf314
+                                                   , large_icepacks_quantity = RCW25_icepack_needs_fixed_team 
+                                                   , small_icepacks_quantity = vaxCarr_icepack_needs_fixed_team
+                                               )
+
+freezing_time_mobile_team <- calc_freezing_time(mf314_available = mf314
+                                                    , large_icepacks_quantity = 0
+                                                    , small_icepacks_quantity = vaxCarr_icepack_needs_mobile_team
+                                                )
+
+
+
+
+######################################################
+#When will the campaign start?
+######################################################
+#TODO I will modify the function so that it returns which team heads out first if the routing is 'asap"
+campaign_delay <- calc_campaign_start(fixedT_freeze_time = freezing_time_fixed_team
+                                        , mobileT_freeze_time = freezing_time_mobile_team
+                                        , team_routing = team_dispatch
+                                      )
+
+
+
+return(data.frame(fixed_team_doses = doses_fixed_team
+                  , mobile_team_doses = doses_mobile_team
+                  , fixed_team_RCW25 = RCW25_needs_fixed_team
+                  , fixed_team_vaxCarr = vaxCarr_needs_fixed_team
+                  , fixed_team_icepacks_large = RCW25_icepack_needs_fixed_team
+                  , fixed_team_icepacks_small = vaxCarr_icepack_needs_fixed_team
+                  , mobile_team_icepacks_large = RCW25_icepack_needs_mobile_team
+                  , mobile_team_icepacks_small = vaxCarr_icepack_needs_mobile_team
+                  , fixed_team_freezing_time = freezing_time_fixed_team
+                  , mobile_team_freezing_time = freezing_time_mobile_team
+                  , campaign_start = campaign_delay)
+       )
+
+}
+
+
+
 ##########################################
 # Strategy 1: 10-dose only FCC; This will be the baseline
 ##########################################
