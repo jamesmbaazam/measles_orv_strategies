@@ -334,10 +334,19 @@ calc_campaign_start <- function(fixedT_freeze_time
                                 , mobileT_freeze_time
                                 , team_routing # routing: "asap" or "parallel"
 ) {
+   team_prep_delays <- c(fixed_team = fixedT_freeze_time, mobile_team = mobileT_freeze_time)
    if (team_routing == 'asap') {
-     return(start_day = min(fixedT_freeze_time, mobileT_freeze_time))
+      asap_campaign_day = min(team_prep_delays)
+      faster_team =  names(which(team_prep_delays == asap_campaign_day))
+     return(list(start_day = asap_campaign_day
+                 , which_team_first = faster_team
+                 )
+     )
    } else if (team_routing == 'parallel'){
-      return(sum(fixedT_freeze_time, mobileT_freeze_time))
+      parallel_campaign_day = sum(fixedT_freeze_time, mobileT_freeze_time)
+      return(list(start_day = parallel_campaign_day
+                  , which_team_first = 'both')
+             )
    }
 }
 
