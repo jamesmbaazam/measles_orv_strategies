@@ -10,18 +10,6 @@ source('./scripts/parameters.R')
 source('./scripts/supply_chain_functions.R')
 
 
-######################################
-#ice packs needed for each passive cold chain
-######################################
-
-RCW25_icepack_needs <-  compute_rcw25_icepacks(sc_model_params$ambient_temp[1])
-
-vaxCarr_icepack_needs <- compute_vaxCarr_icepacks(sc_model_params$ambient_temp[1])
-
-
-
-
-
 
 ############################################################################
 #analyse_strategy(): calculates the logistical needs and time to commence a campaign
@@ -29,6 +17,7 @@ vaxCarr_icepack_needs <- compute_vaxCarr_icepacks(sc_model_params$ambient_temp[1
 
 
 analyse_strategy <- function(mf314 = sc_model_params$mf314_quant
+                             , ambient_temperature = sc_model_params$ambient_temp[1]
                              , site_details = site_data
                              , fixed_team_dose10 # options = if "T", 10 dose, else monodose
                              , fixed_team_with_ice # options = if "T", ice is used, else, no ice
@@ -38,7 +27,15 @@ analyse_strategy <- function(mf314 = sc_model_params$mf314_quant
                              , dose10_vial_volume = sc_model_params$dose10_vial_vol[1]
                              , monodose_vial_volume
 ){
-   
+
+######################################
+#ice packs needed for each passive cold chain
+######################################
+
+RCW25_icepack_needs <-  compute_rcw25_icepacks(ambient_temperature)
+
+vaxCarr_icepack_needs <- compute_vaxCarr_icepacks(ambient_temperature)
+    
 #################
 #fixed team calculations
 ################
