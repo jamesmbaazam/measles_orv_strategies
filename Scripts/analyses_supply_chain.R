@@ -16,8 +16,8 @@ source('./scripts/supply_chain_functions.R')
 #'the logistical needs and time to commence a campaign for each strategy
 ############################################################################
 
-analyse_strategy <- function(strategy_name
-                             , mf314 = sc_model_params$mf314_quant
+analyse_strategy <- function(strategy_name,
+                              mf314 = sc_model_params$mf314_quant
                              , ambient_temperature = sc_model_params$ambient_temp[1]
                              , site_details = site_data
                              , site_row = 1 #which site to analyse
@@ -62,14 +62,14 @@ doses_mobile_team <-  calc_doses_required(df = site_details
 
 RCW25_required_fixed_team <- calc_transport_equipment_needs(equip_type = 'rcw25'
                                                                 , vial_type = ifelse(fixed_team_with_dose10, 'dose10', "monodose")
-                                                                , vax_vol = dose10_vial_volume
+                                                                , vax_vol = ifelse(fixed_team_with_dose10, dose10_vial_volume, monodose_vial_volume)
                                                                 , with_ice = fixed_team_with_ice
                                                                 , doses_to_transport = doses_fixed_team
                                                          )
 
 vaxCarr_required_fixed_team <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
                                                                   , vial_type = ifelse(fixed_team_with_dose10, 'dose10', "monodose")
-                                                                  , vax_vol = dose10_vial_volume
+                                                                  , vax_vol = ifelse(fixed_team_with_dose10, dose10_vial_volume, monodose_vial_volume)
                                                                   , with_ice = fixed_team_with_ice
                                                                   , doses_to_transport = doses_fixed_team
                                                                   )
@@ -86,11 +86,11 @@ vaxCarr_required_fixed_team <- calc_transport_equipment_needs(equip_type = 'vaxC
 RCW25_required_mobile_team <- 0
 
 vaxCarr_required_mobile_team <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
-                                                                   , vial_type = 'dose10'
-                                                                   , vax_vol = dose10_vial_volume
+                                                                   , vial_type = ifelse(mobile_team_with_dose10, 'dose10', "monodose")
+                                                                   , vax_vol = ifelse(mobile_team_with_dose10, dose10_vial_volume, monodose_vial_volume)
                                                                    , with_ice = mobile_team_with_ice
                                                                    , doses_to_transport = doses_mobile_team
-)
+                                                               )
 
 
 
@@ -104,18 +104,18 @@ RCW25_icepack_needs <-  compute_rcw25_icepacks(sc_model_params$ambient_temp[1])
 vaxCarr_icepack_needs <- compute_vaxCarr_icepacks(sc_model_params$ambient_temp[1])
 
 #Fixed post
-RCW25_icepack_needs_fixed_team <- calc_icepack_tot_quant(equipment_quantity = RCW25_required_fixed_team
+RCW25_icepack_needs_fixed_team <- calc_icepack_tot_quant(equipment_quantity = ifelse(fixed_team_with_ice, RCW25_required_fixed_team, 0)
                                                                 , icepacks_per_equipment = RCW25_icepack_needs
 ) # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
-vaxCarr_icepack_needs_fixed_team <- calc_icepack_tot_quant(equipment_quantity = vaxCarr_required_fixed_team
+vaxCarr_icepack_needs_fixed_team <- calc_icepack_tot_quant(equipment_quantity = ifelse(fixed_team_with_ice, vaxCarr_required_fixed_team, 0)
                                                                   , icepacks_per_equipment = vaxCarr_icepack_needs
 ) 
 
 #mobile teams
-RCW25_icepack_needs_mobile_team <- calc_icepack_tot_quant(equipment_quantity = vaxCarr_required_mobile_team
+RCW25_icepack_needs_mobile_team <- calc_icepack_tot_quant(equipment_quantity = ifelse(mobile_team_with_ice, RCW25_required_mobile_team, 0)
                                                           , icepacks_per_equipment = RCW25_icepack_needs
                                                           )
-vaxCarr_icepack_needs_mobile_team <- calc_icepack_tot_quant(equipment_quantity = vaxCarr_required_mobile_team
+vaxCarr_icepack_needs_mobile_team <- calc_icepack_tot_quant(equipment_quantity = ifelse(mobile_team_with_ice, vaxCarr_required_mobile_team, 0)
                                                                    , icepacks_per_equipment = vaxCarr_icepack_needs
                                                             )
 
@@ -134,13 +134,13 @@ vaxCarr_icepack_needs_mobile_team <- calc_icepack_tot_quant(equipment_quantity =
 
 #fixed post team
 freezing_time_fixed_team <- calc_freezing_time(mf314_available = mf314
-                                                   , large_icepacks_quantity = RCW25_icepack_needs_fixed_team 
-                                                   , small_icepacks_quantity = vaxCarr_icepack_needs_fixed_team
+                                                   , large_icepacks_quantity = ifelse(fixed_team_with_ice, RCW25_icepack_needs_fixed_team, 0) 
+                                                   , small_icepacks_quantity = ifelse(fixed_team_with_ice, vaxCarr_icepack_needs_fixed_team, 0)
                                                )
 
 freezing_time_mobile_team <- calc_freezing_time(mf314_available = mf314
-                                                    , large_icepacks_quantity = 0
-                                                    , small_icepacks_quantity = vaxCarr_icepack_needs_mobile_team
+                                                    , large_icepacks_quantity = ifelse(mobile_team_with_ice, RCW25_icepack_needs_mobile_team, 0)
+                                                    , small_icepacks_quantity = ifelse(mobile_team_with_ice, vaxCarr_icepack_needs_mobile_team, 0)
                                                 )
 
 
@@ -155,8 +155,8 @@ campaign_delay <- calc_campaign_start(fixedT_freeze_time = freezing_time_fixed_t
                                         , team_routing = team_dispatch
                                       )
 
-out <- data.frame(strategy = strategy_name
-                  , fixed_team_vial_type = ifelse(fixed_team_with_dose10, 'dose10', 'monodose')
+out <- data.frame(strategy = strategy_name,
+                  fixed_team_vial_type = ifelse(fixed_team_with_dose10, 'dose10', 'monodose')
                   , ft_doses_required = doses_fixed_team
                   , mobile_team_vial_type = ifelse(mobile_team_with_dose10, 'dose10', 'monodose')
                   , mt_doses_required = doses_mobile_team
@@ -178,44 +178,91 @@ return(out)
 
 }
 
-strategy <- expand.grid(fixed_team_with_dose10 = c(T, F)
+#all possible combinations
+strategy_scenarios <- expand.grid(fixed_team_with_dose10 = c(T, F)
                         , fixed_team_with_ice = c(T, F)
                         , mobile_team_with_dose10 = c(T, F)
                         , mobile_team_with_ice = c(T, F)
                         , team_dispatch = c('parallel', 'asap')
                         )
 
-
-dose10_fcc_asap <- analyse_strategy(strategy = 'dose10_fcc'
-                         , fixed_team_with_dose10 = T
+# 10-dose fcc
+dose10_fcc_asap <- analyse_strategy(strategy = 'dose10_fcc_asap',
+                          fixed_team_with_dose10 = T
                          , fixed_team_with_ice = T
                          , mobile_team_with_dose10 = T
                          , mobile_team_with_ice = T
                          , team_dispatch = 'asap'
                          )
-dose10_fcc_parallel <- analyse_strategy(strategy = 'dose10_fcc'
+dose10_fcc_parallel <- analyse_strategy(strategy = 'dose10_fcc_parallel'
                              , fixed_team_with_dose10 = T
                              , fixed_team_with_ice = T
                              , mobile_team_with_dose10 = T
                              , mobile_team_with_ice = T
                              , team_dispatch = 'parallel'
                              )
-
-monodose_fcc_asap <- analyse_strategy(strategy = 'dose10_fcc'
-                                    , fixed_team_with_dose10 = T
+# monodose fcc
+monodose_fcc_asap <- analyse_strategy(strategy = 'monodose_fcc_asap'
+                                    , fixed_team_with_dose10 = F
                                     , fixed_team_with_ice = T
-                                    , mobile_team_with_dose10 = T
+                                    , mobile_team_with_dose10 = F
                                     , mobile_team_with_ice = T
                                     , team_dispatch = 'asap'
-)
-monodose_fcc_parallel <- analyse_strategy(strategy = 'dose10_fcc'
-                                        , fixed_team_with_dose10 = T
+                                    )
+
+monodose_fcc_parallel <- analyse_strategy(strategy = 'monodose_fcc_parallel'
+                                        , fixed_team_with_dose10 = F
                                         , fixed_team_with_ice = T
-                                        , mobile_team_with_dose10 = T
+                                        , mobile_team_with_dose10 = F
                                         , mobile_team_with_ice = T
                                         , team_dispatch = 'parallel'
+                                        )
+#mixed fcc
+mixed_fcc_asap <- analyse_strategy(strategy = 'part_occ_asap'
+                                  , fixed_team_with_dose10 = T
+                                  , fixed_team_with_ice = T
+                                  , mobile_team_with_dose10 = F
+                                  , mobile_team_with_ice = T
+                                  , team_dispatch = 'asap'
 )
 
+mixed_fcc_parallel <- analyse_strategy(strategy = 'part_occ_parallel'
+                                      , fixed_team_with_dose10 = T
+                                      , fixed_team_with_ice = T
+                                      , mobile_team_with_dose10 = F
+                                      , mobile_team_with_ice = T
+                                      , team_dispatch = 'parallel'
+)
+
+#part occ
+part_occ_asap <- analyse_strategy(strategy = 'part_occ_asap'
+                                      , fixed_team_with_dose10 = T
+                                      , fixed_team_with_ice = T
+                                      , mobile_team_with_dose10 = F
+                                      , mobile_team_with_ice = F
+                                      , team_dispatch = 'asap'
+)
+
+part_occ_parallel <- analyse_strategy(strategy = 'part_occ_parallel'
+                                  , fixed_team_with_dose10 = T
+                                  , fixed_team_with_ice = T
+                                  , mobile_team_with_dose10 = F
+                                  , mobile_team_with_ice = F
+                                  , team_dispatch = 'parallel'
+)
+
+strategy_output <- rbind(dose10_fcc_asap
+                         , dose10_fcc_parallel
+                         , monodose_fcc_asap
+                         , monodose_fcc_parallel
+                         , mixed_fcc_asap
+                         , mixed_fcc_parallel
+                         , part_occ_asap
+                         , part_occ_parallel
+                         )
+
+
+View(strategy_output)
 #' ##########################################
 #' # Strategy 1: 10-dose only FCC; This will be the baseline
 #' ##########################################
