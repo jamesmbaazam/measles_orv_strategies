@@ -1,4 +1,4 @@
-rm(list = ls())
+#rm(list = ls())
 
 #packages
 library('ggplot2')
@@ -76,13 +76,15 @@ epi_dyn_summed <- do.call("rbind", args = c(orv_results_collapsed, make.row.name
 ################################################################################
 
 #1. Final epidemic size taken to be class I5 of I1 to I6: Just an assumption
-fin_epi_size <- ggplot(data = epi_dyn_detailed) + 
+fin_epi_size <- ggplot(data = epi_dyn_detailed %>% filter(time <= 100)) + 
     geom_point(aes(x = time, y = Inf5, color = strategy), size = 2) + 
     geom_line(aes(x = time, y = Inf5, color = strategy), size = 1) +
     labs(x = 'Time (days)', y = 'Final epidemic size') + 
+    guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
+    theme(legend.position = 'bottom') +
     scale_color_manual(name = "Strategy"
                       , values = c('green', 'blue', 'black', 'red', 'orange')
-                       , labels = c("10-dose FCC (Parallel)", "Monodose FCC (Parallel)", "Mixed FCC (Parallel)", 'Part OCC (Asap)')
+                       , labels = x_axis_labels
                        , breaks = strategy_names_subset
                        )
 
@@ -90,6 +92,9 @@ if (display_epi_plots) {
     plot(fin_epi_size)  
 }
 
+if(save_plots){
+    ggsave(file = 'figures/final_epi_size.pdf', plot = fin_epi_size)
+}
 #View(head(orv_plot_dat %>% filter(strategy == 'monodose_fcc'), n = 20))
 
 
