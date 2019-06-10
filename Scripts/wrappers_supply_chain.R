@@ -231,8 +231,10 @@ analyse_team_days <- function(strategy_name
     
     out <- data.frame(strategy = strategy_name
                       , ft_vial_type = ifelse(fixed_team_with_dose10, 'dose10', 'monodose')
+                      , ft_with_ice = ifelse(fixed_team_with_ice, 'yes', 'no')
                       , ft_team_days = team_days_fixed_team
                       , mt_vial_type = ifelse(mobile_team_with_dose10, 'dose10', 'monodose')
+                      , mt_with_ice = ifelse(mobile_team_with_ice, 'yes', 'no')
                       , mt_team_days = team_days_mobile_team
     )
     
