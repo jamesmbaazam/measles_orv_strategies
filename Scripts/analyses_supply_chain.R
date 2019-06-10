@@ -159,9 +159,9 @@ campaign_delay <- calc_campaign_start(fixedT_freeze_time = freezing_time_fixed_t
                                       )
 
 out <- data.frame(strategy = strategy_name,
-                  fixed_team_vial_type = ifelse(fixed_team_with_dose10, 'dose10', 'monodose')
+                  ft_vial_type = ifelse(fixed_team_with_dose10, 'dose10', 'monodose')
                   , ft_doses_required = doses_fixed_team
-                  , mobile_team_vial_type = ifelse(mobile_team_with_dose10, 'dose10', 'monodose')
+                  , mt_vial_type = ifelse(mobile_team_with_dose10, 'dose10', 'monodose')
                   , mt_doses_required = doses_mobile_team
                   , ft_RCW25 = RCW25_required_fixed_team
                   , mt_RCW25 = RCW25_required_mobile_team
