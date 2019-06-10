@@ -190,82 +190,93 @@ strategy_scenarios <- expand.grid(fixed_team_with_dose10 = c(T, F)
                         )
 
 # 10-dose fcc
-dose10_fcc_asap <- analyse_strategy(strategy = 'dose10_fcc_asap',
+dose10_fcc_asap = data.frame(strategy_name = 'dose10_fcc_asap',
                           fixed_team_with_dose10 = T
                          , fixed_team_with_ice = T
                          , mobile_team_with_dose10 = T
                          , mobile_team_with_ice = T
                          , team_dispatch = 'asap'
-                         )
-dose10_fcc_parallel <- analyse_strategy(strategy = 'dose10_fcc_parallel'
+                         ),
+dose10_fcc_parallel = data.frame(strategy_name = 'dose10_fcc_parallel'
                              , fixed_team_with_dose10 = T
                              , fixed_team_with_ice = T
                              , mobile_team_with_dose10 = T
                              , mobile_team_with_ice = T
                              , team_dispatch = 'parallel'
-                             )
+                             ),
 # monodose fcc
-monodose_fcc_asap <- analyse_strategy(strategy = 'monodose_fcc_asap'
+monodose_fcc_asap = data.frame(strategy_name = 'monodose_fcc_asap'
                                     , fixed_team_with_dose10 = F
                                     , fixed_team_with_ice = T
                                     , mobile_team_with_dose10 = F
                                     , mobile_team_with_ice = T
                                     , team_dispatch = 'asap'
-                                    )
+                                    ),
 
-monodose_fcc_parallel <- analyse_strategy(strategy = 'monodose_fcc_parallel'
+monodose_fcc_parallel = data.frame(strategy_name = 'monodose_fcc_parallel'
                                         , fixed_team_with_dose10 = F
                                         , fixed_team_with_ice = T
                                         , mobile_team_with_dose10 = F
                                         , mobile_team_with_ice = T
                                         , team_dispatch = 'parallel'
-                                        )
+                                        ),
 #mixed fcc
-mixed_fcc_asap <- analyse_strategy(strategy = 'part_occ_asap'
+mixed_fcc_asap = data.frame(strategy_name = 'part_occ_asap'
                                   , fixed_team_with_dose10 = T
                                   , fixed_team_with_ice = T
                                   , mobile_team_with_dose10 = F
                                   , mobile_team_with_ice = T
                                   , team_dispatch = 'asap'
-)
+                      ),
 
-mixed_fcc_parallel <- analyse_strategy(strategy = 'part_occ_parallel'
+mixed_fcc_parallel = data.frame(strategy_name = 'part_occ_parallel'
                                       , fixed_team_with_dose10 = T
                                       , fixed_team_with_ice = T
                                       , mobile_team_with_dose10 = F
                                       , mobile_team_with_ice = T
                                       , team_dispatch = 'parallel'
-)
+                          ),
 
 #part occ
-part_occ_asap <- analyse_strategy(strategy = 'part_occ_asap'
+part_occ_asap = data.frame(strategy_name = 'part_occ_asap'
                                       , fixed_team_with_dose10 = T
                                       , fixed_team_with_ice = T
                                       , mobile_team_with_dose10 = F
                                       , mobile_team_with_ice = F
                                       , team_dispatch = 'asap'
-)
+                     ),
 
-part_occ_parallel <- analyse_strategy(strategy = 'part_occ_parallel'
+part_occ_parallel = data.frame(strategy_name = 'part_occ_parallel'
                                   , fixed_team_with_dose10 = T
                                   , fixed_team_with_ice = T
                                   , mobile_team_with_dose10 = F
                                   , mobile_team_with_ice = F
                                   , team_dispatch = 'parallel'
+                         )
 )
 
-strategy_output <- rbind(dose10_fcc_asap
-                         , dose10_fcc_parallel
-                         , monodose_fcc_asap
-                         , monodose_fcc_parallel
-                         , mixed_fcc_asap
-                         , mixed_fcc_parallel
-                         , part_occ_asap
-                         , part_occ_parallel
-                         )
 
 
-View(strategy_output)
+#'Run the campaign delay analysis function over a number of defined scenarios
+#'TODO: change the for loop to an lapply function for efficiency
+#'
+campaign_delay_results <- list()
+strategy_names <- names(strategy_analysis_list)
+for (i in seq_along(strategy_analysis_list)) {
+    campaign_delay_results[[strategy_names[i]]] <- analyse_prep_delay(
+        strategy_name = strategy_names[i]
+        , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names[i]]]$fixed_team_with_dose10
+        , fixed_team_with_ice = strategy_analysis_list[[strategy_names[i]]]$fixed_team_with_ice
+        , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names[i]]]$mobile_team_with_dose10
+        , mobile_team_with_ice = strategy_analysis_list[[strategy_names[i]]]$mobile_team_with_ice
+        , team_dispatch = strategy_analysis_list[[strategy_names[i]]]$team_dispatch
+        )
+    }
+
+#Convert the list of dataframes output into a single data frame
+strategy_campaign_prep_delays <- do.call(rbind, args = c(campaign_delay_results, make.row.names = F))
+
+View(strategy_campaign_prep_delays)
 #' ##########################################
 #' # Strategy 1: 10-dose only FCC; This will be the baseline
 #' ##########################################
