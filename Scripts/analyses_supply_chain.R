@@ -141,12 +141,18 @@ View(sc_analysis_output)
 
 #Data wrangling for plots: convert the wide table to long
 strategy_team_days_long <- strategy_team_days %>%
-    select(-c(ft_vial_type, mt_vial_type)) %>% 
+    select(-c(ft_vial_type, mt_vial_type)) %>%
+    filter(strategy == strategy_names_subset) %>% 
     dplyr::rename(strategy_name = strategy, fixed_team = ft_team_days, mobile_team = mt_team_days) %>% 
     gather('team_type', 'team_days', c(fixed_team, mobile_team)) %>% 
     mutate(team_type = factor(team_type))
 
-
+strategy_logistical_needs_long <- sc_analysis_output %>% 
+    select(strategy, ft_RCW25, ft_vaxCarr, mt_RCW25, mt_vaxCarr) %>%
+    gather('equip_name', 'equip_quantity', 2:5) %>% 
+    separate(col = 'equip_name', into = c('team_type', 'equip_name'), sep = '_') %>% 
+    mutate(team_type = factor(if_else(team_type == 'ft', 'fixed_team', 'mobile_team')))
+    
 
 #' #' Question: If we need more than 1 vaccine carrier for the doses, how do we translate that? Does that translate into
 #' #' how many teams we'll need or how many trips should be undertaken by a single team? The latter will draw in the 
@@ -154,6 +160,7 @@ strategy_team_days_long <- strategy_team_days %>%
 #' #' the team days and campaign duration.
 #' 
 
+x_axis_labels <- c('10 dose FCC (parallel)', 'Monodose FCC (parallel)', 'Mixed FCC (parallel)', 'Part OCC (asap)')
 
 #Plot 1: Delay before a campaign can commence
 campaign_delay_plot <- ggplot(data = strategy_campaign_prep_delays,
@@ -162,11 +169,15 @@ campaign_delay_plot <- ggplot(data = strategy_campaign_prep_delays,
     geom_bar(stat = "identity", fill = "steelblue") +
     labs(#title = 'Freezing time required per strategy',
         x = 'Strategy'
-        , y = "Freezing time required (days)"
+        , y = "Campaign delay (days)"
     ) + 
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    scale_x_discrete(labels = x_axis_labels) + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     shiny_plot_theme
 
+if(save_plots){
+ggsave(filename = 'figures/campaign_commencement_delay.pdf', plot = campaign_delay_plot, device = 'pdf')
+}
 #Plot 2: Number of days required by teams to complete the campaign
 
 #team days plot
@@ -179,23 +190,51 @@ team_days_plot <- ggplot(data = strategy_team_days_long,
     geom_bar(stat = 'identity',
              position = 'dodge'
     ) +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     labs(#title = 'Number of days per team type and strategy',
         x = 'Strategy'
         ,  y = "Team days"
     ) +
+    scale_x_discrete(labels = x_axis_labels) +
     scale_fill_manual(values = c("royalblue4", "tomato3"),
                       name = "Team type",
-                      breaks = team_type_list) +
+                      labels = c('fixed team', 'mobile team')) +
     shiny_plot_theme
 
-# ft_presentation_plot <- ft_plot + presentation_plot_theme
-# iceVol_presentation_plot <- iceVol_plot + presentation_plot_theme
-# td_presentation_plot <- td_plot + presentation_plot_theme
-#
-#arrange the plots on a grid
+if(save_plots){
+ggsave(filename = 'figures/team_days.pdf', plot = team_days_plot, device = 'pdf')
+}
 
 
+#Plot logistical needs of each strategy
+#rcw25 and vaccine carrier needs
+logistical_needs <- ggplot(data = strategy_logistical_needs_long,
+                         aes(x = strategy,
+                             y = equip_quantity,
+                             fill = equip_name
+                         )
+) +
+    geom_bar(stat = 'identity',
+             position = 'dodge'
+    ) + 
+    facet_wrap('team_type') +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    labs(#title = 'Number of days per team type and strategy',
+        x = 'Strategy'
+        ,  y = "Equipment quantity"
+    ) +
+    scale_x_discrete(labels = x_axis_labels) +
+    scale_fill_manual(values = c("royalblue4", "tomato3"),
+                      name = "Equipment",
+                      labels = c('RCW 25', 'Vaccine carrier')) +
+    shiny_plot_theme
+
+if(save_plots){
+    ggsave(filename = 'figures/logistical_needs.pdf', plot = logistical_needs, device = 'pdf')
+}
+
+
+#Combine all into one plot
 if(display_sc_plots){
     sc_results_barplot <- grid.arrange(campaign_delay_plot,
                                        # iceVol_plot,
