@@ -139,6 +139,13 @@ strategy_team_days <- do.call(rbind, args = c(team_days_results, make.row.names 
 sc_analysis_output <- left_join(strategy_campaign_prep_delays, strategy_team_days, by = 'strategy')
 View(sc_analysis_output)
 
+#Data wrangling for plots: convert the wide table to long
+strategy_team_days_long <- strategy_team_days %>%
+    select(-c(ft_vial_type, mt_vial_type)) %>% 
+    dplyr::rename(strategy_name = strategy, fixed_team = ft_team_days, mobile_team = mt_team_days) %>% 
+    gather('team_type', 'team_days', c(fixed_team, mobile_team)) %>% 
+    mutate(team_type = factor(team_type))
+
 
 
 #' #' Question: If we need more than 1 vaccine carrier for the doses, how do we translate that? Does that translate into
@@ -161,12 +168,6 @@ campaign_delay_plot <- ggplot(data = strategy_campaign_prep_delays,
     shiny_plot_theme
 
 #Plot 2: Number of days required by teams to complete the campaign
-#Quick detour (Data wrangling): convert the wide table to long
-strategy_team_days_long <- strategy_team_days %>%
-    select(-c(ft_vial_type, mt_vial_type)) %>% 
-    dplyr::rename(strategy_name = strategy, fixed_team = ft_team_days, mobile_team = mt_team_days) %>% 
-    gather('team_type', 'team_days', c(fixed_team, mobile_team)) %>% 
-    mutate(team_type = factor(team_type))
 
 #team days plot
 team_days_plot <- ggplot(data = strategy_team_days_long,
