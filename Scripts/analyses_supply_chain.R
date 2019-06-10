@@ -16,19 +16,22 @@ source('./scripts/supply_chain_functions.R')
 #'the logistical needs and time to commence a campaign for each strategy
 ############################################################################
 
-analyse_strategy <- function(strategy_name,
-                              mf314 = sc_model_params$mf314_quant
-                             , ambient_temperature = sc_model_params$ambient_temp[1]
-                             , site_details = site_data
-                             , site_row = 1 #which site to analyse
+analyse_prep_delay <- function(strategy_name
                              , fixed_team_with_dose10 # options = if "T", 10 dose, else monodose
                              , fixed_team_with_ice # options = if "T", ice is used, else, no ice
                              , mobile_team_with_dose10 # options = if "T", 10 dose, else monodose
                              , mobile_team_with_ice # options = if "T", ice is used, else, no ice
                              , team_dispatch #options = "parallel", "asap"
+                             
+                             #defaults follow: can do sensitivity analyses on them as well
+                             
+                             , site_details = site_data
+                             , site_row = 1 #which site to analyse
+                             , mf314 = sc_model_params$mf314_quant
+                             , ambient_temperature = sc_model_params$ambient_temp[1]
                              , dose10_vial_volume = sc_model_params$dose10_vial_vol[1]
                              , monodose_vial_volume = sc_model_params$monodose_vial_vol
-){
+                             ){
 
 #################
 #fixed team calculations
