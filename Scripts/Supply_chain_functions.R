@@ -55,8 +55,8 @@ extract_site_team_size <- function(df, site_rows_selected) { # for now, we are o
 ##########
 #calc_effective_doses(): adjusts for wastage and determines the actual number of doses we may be transporting
 ##########
-calc_effective_doses <- function(dose_quantity, wastage){
-   eff_doses <- dose_quantity*(1 - wastage/100)
+calc_effective_doses <- function(dose_quantity, ovwastage){
+   eff_doses <- dose_quantity*(1 - ovwastage/100)
    return(eff_doses)
 }
 
