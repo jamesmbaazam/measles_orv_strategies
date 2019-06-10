@@ -154,7 +154,8 @@ campaign_delay_plot <- ggplot(data = strategy_campaign_prep_delays,
 ) +
     geom_bar(stat = "identity", fill = "steelblue") +
     labs(#title = 'Freezing time required per strategy',
-        y = "Freezing time required (days)"
+        x = 'Strategy'
+        , y = "Freezing time required (days)"
     ) + 
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     shiny_plot_theme
