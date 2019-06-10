@@ -181,14 +181,19 @@ return(out)
 
 }
 
+##########################################################
+#Strategies to analyse
+###########################################################
 #all possible combinations
-strategy_scenarios <- expand.grid(fixed_team_with_dose10 = c(T, F)
-                        , fixed_team_with_ice = c(T, F)
-                        , mobile_team_with_dose10 = c(T, F)
-                        , mobile_team_with_ice = c(T, F)
-                        , team_dispatch = c('parallel', 'asap')
-                        )
+# strategy_scenarios <- expand.grid(fixed_team_with_dose10 = c(T, F)
+#                         , fixed_team_with_ice = c(T, F)
+#                         , mobile_team_with_dose10 = c(T, F)
+#                         , mobile_team_with_ice = c(T, F)
+#                         , team_dispatch = c('parallel', 'asap')
+#                         )
 
+#List of strategies
+strategy_analysis_list <- list(
 # 10-dose fcc
 dose10_fcc_asap = data.frame(strategy_name = 'dose10_fcc_asap',
                           fixed_team_with_dose10 = T
