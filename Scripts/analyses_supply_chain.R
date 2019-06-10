@@ -95,22 +95,22 @@ part_occ_parallel = data.frame(strategy_name = 'part_occ_parallel'
 #'TODO: change the for loop to an lapply function for efficiency
 ##########################################################################
 campaign_delay_results <- list()
-strategy_names <- names(strategy_analysis_list)
-for (i in seq_along(strategy_analysis_list)) {
-    campaign_delay_results[[strategy_names[i]]] <- analyse_prep_delay(
-        strategy_name = strategy_names[i]
-        , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names[i]]]$fixed_team_with_dose10
-        , fixed_team_with_ice = strategy_analysis_list[[strategy_names[i]]]$fixed_team_with_ice
-        , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names[i]]]$mobile_team_with_dose10
-        , mobile_team_with_ice = strategy_analysis_list[[strategy_names[i]]]$mobile_team_with_ice
-        , team_dispatch = strategy_analysis_list[[strategy_names[i]]]$team_dispatch
+strategy_names_subset <- names(strategy_analysis_list)[c(2, 4, 6, 7)]
+for (i in seq_along(strategy_names_subset)) {
+    campaign_delay_results[[strategy_names_subset[i]]] <- analyse_prep_delay(
+        strategy_name = strategy_names_subset[i]
+        , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[i]]]$fixed_team_with_dose10
+        , fixed_team_with_ice = strategy_analysis_list[[strategy_names_subset[i]]]$fixed_team_with_ice
+        , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[i]]]$mobile_team_with_dose10
+        , mobile_team_with_ice = strategy_analysis_list[[strategy_names_subset[i]]]$mobile_team_with_ice
+        , team_dispatch = strategy_analysis_list[[strategy_names_subset[i]]]$team_dispatch
         )
     }
 
 #Convert the list of dataframes output into a single data frame
 strategy_campaign_prep_delays <- do.call(rbind, args = c(campaign_delay_results, make.row.names = F))
 
-View(strategy_campaign_prep_delays)
+#View(strategy_campaign_prep_delays)
 
 
 
@@ -120,21 +120,21 @@ View(strategy_campaign_prep_delays)
 ##########################################################################
 
 team_days_results <- list()
-strategy_names <- names(strategy_analysis_list)
-for (i in seq_along(strategy_analysis_list)) {
-    team_days_results[[strategy_names[i]]] <- analyse_team_days(
-        strategy_name = strategy_names[i]
-        , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names[i]]]$fixed_team_with_dose10
-        , fixed_team_with_ice = strategy_analysis_list[[strategy_names[i]]]$fixed_team_with_ice
-        , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names[i]]]$mobile_team_with_dose10
-        , mobile_team_with_ice = strategy_analysis_list[[strategy_names[i]]]$mobile_team_with_ice
+#strategy_names <- names(strategy_analysis_list)
+for (i in seq_along(strategy_names_subset)) {
+    team_days_results[[strategy_names_subset[i]]] <- analyse_team_days(
+        strategy_name = strategy_names_subset[i]
+        , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[i]]]$fixed_team_with_dose10
+        , fixed_team_with_ice = strategy_analysis_list[[strategy_names_subset[i]]]$fixed_team_with_ice
+        , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[i]]]$mobile_team_with_dose10
+        , mobile_team_with_ice = strategy_analysis_list[[strategy_names_subset[i]]]$mobile_team_with_ice
     )
 }
 
 #Convert the list of dataframes output into a single data frame
 strategy_team_days <- do.call(rbind, args = c(team_days_results, make.row.names = F))
 
-View(strategy_team_days)
+#View(strategy_team_days)
 
 sc_analysis_output <- left_join(strategy_campaign_prep_delays, strategy_team_days, by = 'strategy')
 View(sc_analysis_output)
