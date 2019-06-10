@@ -28,58 +28,25 @@ source('scripts/analyses_supply_chain.R')
 # time_to_immunity <- 7 # seven days before people are immune
 
 
-
-
-#SC outputs as inputs to Epi model
-#1. Delays caused by preparing teams and logistics
-delay_to_start <- dplyr::rename(freezing_time_results, delay_to_start = time)
-#campaign_duration <- subset(td_results, team_type == 'Mobile team', select = -team_type)
-
-#2. The site campaign duration is assumed to be the slowest of the two team types
-campaign_duration <- spread(td_results, key = team_type, value = team_days) %>%
-    rowwise() %>% 
-    mutate(orv_length = max(fixed_post, mobile_team))
-
-sc_to_epi_inputs <- left_join(campaign_duration, delay_to_start, by = 'strategy')
-
-
-
-
-
 ###############################################################################
 #Running the simulations for each strategy
 ###############################################################################
 
-
-# orv_strategy_results <- purrr:::map_df(strategy_list 
-#                                , runSimulations
-#                              #  , strategy 
-#                                , vaxDay = as.numeric(subset(delay_to_start, strategy == strategy_list)['delay_to_start'])
-#                                , orv_duration = as.numeric(subset(sc_to_epi_inputs, strategy == strategy_list)['orv_length'])
-#                                , R0 = orv_model_params$R0 # transmission coeficient
-#                                , run_time = orv_model_params$model_time # 1 yr!
-#                                , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.5, I0 = 1)
-#                                , vax_eff = orv_model_params$vaccine_efficacy
-#                                , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
-#                                , time_to_immunity = orv_model_params$immune_response_timing
-#                                , browse = F
-#                                )
-
+strategy_names_subset <- names(strategy_analysis_list)[c(2, 4, 6, 7)]
 orv_strategy_results <- list()
-for (i in 1:length(strategy_list)) {
-    orv_strategy_results[[strategy_list[i]]] <- runSimulations(
+for (i in 1:length(strategy_names_subset)) {
+    orv_strategy_results[[strategy_names_subset[i]]] <- runSimulations(
         R0 = orv_model_params$R0 # transmission coeficient
         , run_time = orv_model_params$model_time # 1 yr!
         , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.25, I0 = 1)
-        , strategy_name = strategy_list[i]
-        , vaxDay = as.numeric(subset(delay_to_start, strategy == strategy_list[i])['delay_to_start'])
-        , orv_duration = as.numeric(subset(sc_to_epi_inputs, strategy == strategy_list[i])['mobile_team']) #for now we're only looking at the far campaigns 
+        , strategy_name = strategy_names_subset[i]
+        , vaxDay = as.numeric(subset(strategy_campaign_prep_delays, strategy == strategy_names_subset[i])['mt_freezing_time'])
+        , orv_duration = as.numeric(subset(strategy_team_days_long, strategy_name == strategy_names_subset[i] & team_type == 'mobile_team')) #for now we're only looking at the far campaigns 
         , vax_eff = orv_model_params$vaccine_efficacy
         , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
         , time_to_immunity = orv_model_params$immune_response_timing
         , browse = F) 
 }
-
 
 ################################################################################
 #Plotting the SC decision's consequence on the epidemic
@@ -114,9 +81,9 @@ fin_epi_size <- ggplot(data = epi_dyn_detailed) +
     geom_line(aes(x = time, y = Inf5, color = strategy), size = 1) +
     labs(x = 'Time (days)', y = 'Final epidemic size') + 
     scale_color_manual(name = "Strategy"
-                      , values = c('green', 'blue', 'black', 'red')
-                       , labels = c("10-dose FCC", "Monodose FCC", "Mixed FCC", 'Part OCC')
-                       , breaks = c("dose10_fcc", "monodose_fcc", "mixed_fcc", 'part_occ')
+                      , values = c('green', 'blue', 'black', 'red', 'orange')
+                       , labels = c("10-dose FCC (Parallel)", "Monodose FCC (Parallel)", "Mixed FCC (Parallel)", 'Part OCC (Asap)')
+                       , breaks = strategy_names_subset
                        )
 
 if (display_epi_plots) {
