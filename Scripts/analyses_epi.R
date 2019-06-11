@@ -41,7 +41,7 @@ for (i in 1:length(strategy_names_subset)) {
         , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.25, I0 = 1)
         , strategy_name = strategy_names_subset[i]
         , vaxDay = as.numeric(subset(strategy_campaign_prep_delays, strategy == strategy_names_subset[i])['mt_freezing_time'])
-        , orv_duration = as.numeric(subset(strategy_team_days_long, strategy_name == strategy_names_subset[i] & team_type == 'mobile_team')) #for now we're only looking at the far campaigns 
+        , orv_duration = as.numeric(subset(strategy_team_days_long, strategy_name == strategy_names_subset[i] & team_type == 'mobile_team')[ ,'team_days']) #for now we're only looking at the far campaigns 
         , vax_eff = orv_model_params$vaccine_efficacy
         , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
         , time_to_immunity = orv_model_params$immune_response_timing
@@ -76,7 +76,7 @@ epi_dyn_summed <- do.call("rbind", args = c(orv_results_collapsed, make.row.name
 ################################################################################
 
 #1. Final epidemic size taken to be class I5 of I1 to I6: Just an assumption
-fin_epi_size <- ggplot(data = epi_dyn_detailed %>% filter(time <= 100)) + 
+fin_epi_size <- ggplot(data = epi_dyn_detailed %>% filter(time <= 200)) + 
     geom_point(aes(x = time, y = Inf5, color = strategy), size = 2) + 
     geom_line(aes(x = time, y = Inf5, color = strategy), size = 1) +
     labs(x = 'Time (days)', y = 'Final epidemic size') + 
