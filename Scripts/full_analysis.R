@@ -221,9 +221,9 @@ team_days_plot <- ggplot(data = strategy_team_days_long,
     theme(legend.position = 'bottom') + 
     shiny_plot_theme
 
-if(save_plots){
-    ggsave(filename = 'figures/team_days.pdf', plot = team_days_plot, device = 'pdf')
-}
+# if(save_sc_plots){
+#     ggsave(filename = 'figures/team_days.pdf', plot = team_days_plot, device = 'pdf')
+# }
 
 
 #Plot logistical needs of each strategy
