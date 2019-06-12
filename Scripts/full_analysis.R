@@ -619,6 +619,31 @@ if (display_epi_plots) {
 if(save_epi_plots){
     ggsave(file = 'figures/cases_plot.pdf', plot = cases_plot)
 }
+
+#recovered
+ggplot(data = epi_dyn_detailed %>% filter(time <= 200)) + 
+    geom_point(aes(x = time, y = Rec, color = strategy), size = 2) + 
+    geom_line(aes(x = time, y = Rec, color = strategy), size = 1) +
+    labs(x = 'Time (days)', y = 'Recovered') + 
+    guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
+    theme(legend.position = 'bottom') +
+    scale_color_manual(name = "Strategy"
+                       , values = c('forestgreen', 'blue', 'black', 'red', 'orange')
+                       , labels = x_axis_labels
+                       , breaks = strategy_names_subset
+    )
+#Susceptibles
+ggplot(data = epi_dyn_detailed %>% filter(time <= 200)) + 
+    geom_point(aes(x = time, y = Sus1, color = strategy), size = 2) + 
+    geom_line(aes(x = time, y = Sus1, color = strategy), size = 1) +
+    labs(x = 'Time (days)', y = 'Susceptibles') + 
+    guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
+    theme(legend.position = 'bottom') +
+    scale_color_manual(name = "Strategy"
+                       , values = c('forestgreen', 'blue', 'black', 'red', 'orange')
+                       , labels = x_axis_labels
+                       , breaks = strategy_names_subset
+    )
 #View(head(orv_plot_dat %>% filter(strategy == 'monodose_fcc'), n = 20))
 
 #ggplot(epi_dyn_detailed, aes(x = time, y = epi_dyn_detailed$Inf5)) + stat_density() 
