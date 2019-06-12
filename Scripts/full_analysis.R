@@ -598,9 +598,9 @@ epi_dyn_summed <- do.call("rbind", args = c(orv_results_collapsed, make.row.name
 
 #1. Final epidemic size taken to be class I5 of I1 to I6: Just an assumption
 cases_plot <- ggplot(data = epi_dyn_detailed %>% filter(time <= 200)) + 
-    geom_point(aes(x = time, y = Inf5, color = strategy), size = 2) + 
-    geom_line(aes(x = time, y = Inf5, color = strategy), size = 1) +
-    labs(x = 'Time (days)', y = 'Final epidemic size') + 
+    geom_point(aes(x = time, y = Inf4, color = strategy), size = 2) + 
+    geom_line(aes(x = time, y = Inf4, color = strategy), size = 1) +
+    labs(x = 'Time (days)', y = 'Cases (rash appearance)') + 
     guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
     theme(legend.position = 'bottom') +
     scale_color_manual(name = "Strategy"
