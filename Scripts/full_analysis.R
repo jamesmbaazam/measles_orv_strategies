@@ -196,9 +196,9 @@ campaign_delay_plot <- ggplot(data = strategy_campaign_prep_delays,
     # theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     shiny_plot_theme
 
-if(save_plots){
-    ggsave(filename = 'figures/campaign_commencement_delay.pdf', plot = campaign_delay_plot, device = 'pdf')
-}
+# if(save_sc_plots){
+#     ggsave(filename = 'figures/campaign_commencement_delay.pdf', plot = campaign_delay_plot, device = 'pdf')
+# }
 #Plot 2: Number of days required by teams to complete the campaign
 
 #team days plot
