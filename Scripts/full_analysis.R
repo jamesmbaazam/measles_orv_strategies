@@ -252,7 +252,7 @@ logistical_needs <- ggplot(data = strategy_logistical_needs_long,
                       labels = c('RCW 25', 'Vaccine carrier')) +
     shiny_plot_theme
 
-if(save_plots){
+if(save_sc_plots){
     ggsave(filename = 'figures/logistical_needs.pdf', plot = logistical_needs, device = 'pdf')
 }
 
@@ -260,12 +260,15 @@ if(save_plots){
 #Combine all into one plot
 if(display_sc_plots){
     plot(logistical_needs)
-    sc_results_barplot <- grid.arrange(campaign_delay_plot,
+    campaign_delay_and_duration_plot <- grid.arrange(campaign_delay_plot,
                                        # iceVol_plot,
                                        team_days_plot,
                                        nrow = 2)
 }
 
+if(save_sc_plots){
+    ggsave(filename = 'figures/campaign_delay_and_duration.pdf', plot = campaign_delay_and_duration_plot, device = 'pdf')
+}
 #' #'Towards the isocline!! We have determined that the mixed FCC and monodose FCC
 #' #'are out of question now. Also, we know that vaccine wastage is a function of the landscape
 #' #' hence, is non-linear. Additionally, we know the vaccine carrier design is optimised for transporting ice.
@@ -491,7 +494,7 @@ if(display_sc_plots){
 #' }
 #' 
 #' 
-#' if(save_plots){
+#' if(save_sc_plots){
 #'  ggsave(filename = 'team_days_intersection_plot.png'
 #'         #, plot = team_days_intersection_plot + presentation_plot_theme #uncomment this line to save a powerpoint version
 #'         , team_days_intersection_plot
@@ -528,7 +531,7 @@ if(display_sc_plots){
 #' }
 #' 
 #' 
-#' if(save_plots){
+#' if(save_sc_plots){
 #'     ggsave(filename = 'mobile_team_days_isocline.png'
 #'           # , plot = isocline_plot + presentation_plot_theme #uncomment this line to save a powerpoint version
 #'           , plot = isocline_plot
@@ -613,12 +616,12 @@ if (display_epi_plots) {
     plot(cases_plot)  
 }
 
-if(save_plots){
-    ggsave(file = 'figures/final_epi_size.pdf', plot = cases_plot)
+if(save_epi_plots){
+    ggsave(file = 'figures/cases_plot.pdf', plot = cases_plot)
 }
 #View(head(orv_plot_dat %>% filter(strategy == 'monodose_fcc'), n = 20))
 
-
+#ggplot(epi_dyn_detailed, aes(x = time, y = epi_dyn_detailed$Inf5)) + stat_density() 
 
 #2. Incidence: This plot is just a backward translation of the final size plot because the model is deterministic
 
