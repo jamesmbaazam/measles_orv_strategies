@@ -8,24 +8,20 @@ library('purrr')
 library('gridExtra')
 library('tidyr')
 
-
-
-
-
 #scripts
 #source('scripts/epi_functions.R')
 source('scripts/parameters.R')
 source('scripts/measlesFunctions.R')
 source('scripts/analyses_supply_chain.R')
 
-# R0 <- 20 
-# vaccine_efficacy <- 0.9
-#mtime = 60
 
-#parameters
-# steps = 1:60
-# beta <- orv_model_params$R0/orv_model_params$IP
-# time_to_immunity <- 7 # seven days before people are immune
+######################################################
+#Plot parameters
+######################################################
+#Control parameters
+display_epi_plots <- TRUE
+save_epi_plots <- TRUE
+
 
 
 ###############################################################################
@@ -45,7 +41,8 @@ for (i in 1:length(strategy_names_subset)) {
         , vax_eff = orv_model_params$vaccine_efficacy
         , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
         , time_to_immunity = orv_model_params$immune_response_timing
-        , browse = F) 
+        , browse = F
+        ) 
 }
 
 ################################################################################
