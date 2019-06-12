@@ -1,3 +1,5 @@
+
+#packages
 library('ggplot2')
 library('dplyr')
 library('reshape2')
@@ -5,10 +7,22 @@ library('purrr')
 library('gridExtra')
 library('tidyr')
 
+#scripts
 source('./scripts/analyses_parameters.R')
 source('./scripts/parameters.R')
 source('./scripts/supply_chain_functions.R')
 source('./scripts/wrappers_supply_chain.R')
+
+######################################################
+#Plot parameters
+######################################################
+#Control parameters
+display_sc_plots <- TRUE
+save_sc_plots <- TRUE
+
+
+
+
 
 ##########################################################
 #Strategies to analyse
@@ -164,15 +178,18 @@ x_axis_labels <- c('10 dose FCC (parallel)', 'Monodose FCC (parallel)', 'Mixed F
 
 #Plot 1: Delay before a campaign can commence
 campaign_delay_plot <- ggplot(data = strategy_campaign_prep_delays,
-                              aes(x = strategy, y = campaign_start)
-) +
-    geom_bar(stat = "identity", fill = "steelblue") +
+                              aes(x = strategy, y = mt_freezing_time)) +
+    geom_bar(aes(fill = 'tomato3'), stat = "identity", width = 0.25) +
     labs(#title = 'Freezing time required per strategy',
-        x = 'Strategy'
-        , y = "Campaign delay (days)"
+        x = '',
+         y = "Campaign delay (days)"
     ) + 
-    scale_x_discrete(labels = x_axis_labels) + 
-    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+   scale_fill_manual(name = "Team type",
+                     values = c("tomato3")
+                     , labels = c('Mobile teams')) +
+     scale_x_discrete(labels = c('','','','')) + 
+    theme(legend.position = 'none', axis.ticks.x = element_blank()) + 
+   # theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     shiny_plot_theme
 
 if(save_plots){
@@ -187,10 +204,8 @@ team_days_plot <- ggplot(data = strategy_team_days_long,
                              fill = team_type
                          )
 ) +
-    geom_bar(stat = 'identity',
-             position = 'dodge'
-    ) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    geom_bar(stat = 'identity', position = 'dodge', width = 0.25) +
+   # theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     labs(#title = 'Number of days per team type and strategy',
         x = 'Strategy'
         ,  y = "Team days"
@@ -198,7 +213,8 @@ team_days_plot <- ggplot(data = strategy_team_days_long,
     scale_x_discrete(labels = x_axis_labels) +
     scale_fill_manual(values = c("royalblue4", "tomato3"),
                       name = "Team type",
-                      labels = c('fixed team', 'mobile team')) +
+                      labels = c('Fixed team', 'Mobile team')) +
+    theme(legend.position = 'bottom') + 
     shiny_plot_theme
 
 if(save_plots){
@@ -217,14 +233,17 @@ logistical_needs <- ggplot(data = strategy_logistical_needs_long,
     geom_bar(stat = 'identity',
              position = 'dodge'
     ) + 
-    facet_wrap('team_type') +
+    facet_wrap('team_type', labeller = as_labeller(c('fixed_team' = 'Fixed team', 'mobile_team' = 'Mobile team'))) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     labs(#title = 'Number of days per team type and strategy',
         x = 'Strategy'
-        ,  y = "Equipment quantity"
+        ,  y = "Quantity"
     ) +
     scale_x_discrete(labels = x_axis_labels) +
-    scale_fill_manual(values = c("royalblue4", "tomato3"),
+    scale_y_continuous(breaks = seq(min(strategy_logistical_needs_long$equip_quantity), max(strategy_logistical_needs_long$equip_quantity), 10),
+                       labels = every_nth(seq(min(strategy_logistical_needs_long$equip_quantity), max(strategy_logistical_needs_long$equip_quantity), 10), 2)
+                       ) +
+    scale_fill_manual(values = c("forestgreen", "grey27"),
                       name = "Equipment",
                       labels = c('RCW 25', 'Vaccine carrier')) +
     shiny_plot_theme
@@ -236,6 +255,7 @@ if(save_plots){
 
 #Combine all into one plot
 if(display_sc_plots){
+    plot(logistical_needs)
     sc_results_barplot <- grid.arrange(campaign_delay_plot,
                                        # iceVol_plot,
                                        team_days_plot,
