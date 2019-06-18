@@ -153,7 +153,7 @@ View(sc_analysis_output)
 
 #Supply chain plot control parameters
 display_sc_plots <- TRUE
-save_sc_plots <- TRUE
+save_sc_plots <- F
 
 #Data wrangling for plots: convert the wide table to long
 strategy_team_days_long <- strategy_team_days %>%
@@ -556,9 +556,9 @@ save_epi_plots <- TRUE
 ###############################################################################
 
 strategy_names_subset <- names(strategy_analysis_list)[c(2, 4, 6, 7)]
-orv_strategy_results <- list()
+orv_far_strategy_results <- list()
 for (i in 1:length(strategy_names_subset)) {
-    orv_strategy_results[[strategy_names_subset[i]]] <- runSimulations(
+    orv_far_strategy_results[[strategy_names_subset[i]]] <- runSimulations(
         R0 = orv_model_params$R0 # transmission coeficient
         , run_time = orv_model_params$model_time # 1 yr!
         , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.25, I0 = 1)
@@ -572,6 +572,21 @@ for (i in 1:length(strategy_names_subset)) {
     ) 
 }
 
+orv_near_strategy_results <- list()
+for (i in 1:length(strategy_names_subset)) {
+    orv_near_strategy_results[[strategy_names_subset[i]]] <- runSimulations(
+        R0 = orv_model_params$R0 # transmission coeficient
+        , run_time = orv_model_params$model_time # 1 yr!
+        , pop = initializePop(N = site_data$near_pop, initPropImmune = 0.25, I0 = 1)
+        , strategy_name = strategy_names_subset[i]
+        , vaxDay = as.numeric(subset(strategy_campaign_prep_delays, strategy == strategy_names_subset[i])['ft_freezing_time'])
+        , orv_duration = as.numeric(subset(strategy_team_days_long, strategy_name == strategy_names_subset[i] & team_type == 'fixed_team')[ ,'team_days']) #for now we're only looking at the far campaigns 
+        , vax_eff = orv_model_params$vaccine_efficacy
+        , team_performance = ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["fixed_team_with_dose10"]], as.numeric(sc_model_params$vax_rate['fixed_team']), ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["fixed_team_with_ice"]], 77, 170))
+        , time_to_immunity = orv_model_params$immune_response_timing
+        , browse = F
+    ) 
+}
 
 ################################################################################
 #Plotting the SC decision's consequence on the epidemic
@@ -579,74 +594,94 @@ for (i in 1:length(strategy_names_subset)) {
 ################################################################################
 
 #pre-processing the orv model output
+#1: far campaign
 #1A. Extract the detailed dynamics and bind them into one df
-orv_results_detailed <- orv_strategy_results %>% 
+far_orv_results_detailed <- orv_far_strategy_results %>% 
     purrr::map('Detailed')
 #data for plotting
-epi_dyn_detailed <- do.call("rbind", args = c(orv_results_detailed, make.row.names = F)) %>% 
+far_orv_epi_dyn_detailed <- do.call("rbind", args = c(far_orv_results_detailed, make.row.names = F)) %>% 
     mutate(strategy = factor(strategy))
 
 #1B. Extract the sub-summed results and bind them into one df
-orv_results_collapsed <- orv_strategy_results %>% 
+far_orv_results_collapsed <- orv_far_strategy_results %>% 
     purrr::map('Collapsed')
 #data for plotting
-epi_dyn_summed <- do.call("rbind", args = c(orv_results_collapsed, make.row.names = F)) %>% 
+far_orv_epi_dyn_summed <- do.call("rbind", args = c(far_orv_results_collapsed, make.row.names = F)) %>% 
     mutate(strategy = factor(strategy))
 
 
+#2: near campaign
+#2A. Extract the detailed dynamics and bind them into one df
+near_orv_results_detailed <- orv_near_strategy_results %>% 
+    purrr::map('Detailed')
+#data for plotting
+near_orv_epi_dyn_detailed <- do.call("rbind", args = c(near_orv_results_detailed, make.row.names = F)) %>% 
+    mutate(strategy = factor(strategy))
 
+#2B. Extract the sub-summed results and bind them into one df
+near_orv_results_collapsed <- orv_near_strategy_results %>% 
+    purrr::map('Collapsed')
+#data for plotting
+near_orv_epi_dyn_summed <- do.call("rbind", args = c(near_orv_results_collapsed, make.row.names = F)) %>% 
+    mutate(strategy = factor(strategy))
 
 ################################################################################
 #Plots
 ################################################################################
 
-#1. Final epidemic size taken to be class I5 of I1 to I6: Just an assumption
-cases_plot <- ggplot(data = epi_dyn_summed %>% filter(time <= 150)) + 
+#1. far orv: total cases
+far_orv_data <- far_orv_epi_dyn_summed %>% filter(totalInf >  0.1)
+far_orv_total_cases_plot <- ggplot(data = far_orv_data) + 
     geom_point(aes(x = time, y = totalInf, color = strategy), size = 2) + 
     geom_line(aes(x = time, y = totalInf, color = strategy), size = 1) +
-    labs(x = 'Time (days)', y = 'Cases') + 
+    labs(title = paste0('Far population (size = ', site_data$far_pop, ')'), x = 'Time (days)', y = 'Total cases') + 
     guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
     theme(legend.position = 'bottom') +
     scale_color_manual(name = "Strategy"
                        , values = c('forestgreen', 'blue', 'black', 'red', 'orange')
                        , labels = x_axis_labels
                        , breaks = strategy_names_subset
-                       ) + scale_x_continuous(breaks = seq(0, 150, 5)
-                                              , labels = every_nth(seq(0, 150, 5), 2, inverse = T)
+                       ) + scale_x_continuous(breaks = seq(min(far_orv_data$time), max(far_orv_data$time), 5)
+                                              , labels = every_nth(seq(min(far_orv_data$time), max(far_orv_data$time), 5), 2, inverse = T)
                                               )
 
 if (display_epi_plots) {
-    plot(cases_plot)  
+    plot(far_orv_total_cases_plot)  
 }
 
 if(save_epi_plots){
-    ggsave(file = 'figures/cases_plot.pdf', plot = cases_plot)
+    ggsave(file = 'figures/far_orv_total_cases_plot.pdf', plot = far_orv_total_cases_plot)
 }
 
-#recovered
-ggplot(data = epi_dyn_detailed %>% filter(time <= 200)) + 
-    geom_point(aes(x = time, y = Rec, color = strategy), size = 2) + 
-    geom_line(aes(x = time, y = Rec, color = strategy), size = 1) +
-    labs(x = 'Time (days)', y = 'Recovered') + 
+#1. Near orv: total cases
+near_orv_data <- near_orv_epi_dyn_summed %>% filter(totalInf >  0.1)
+near_orv_total_cases_plot <- ggplot(data = near_orv_data) + 
+    geom_point(aes(x = time, y = totalInf, color = strategy), size = 2) + 
+    geom_line(aes(x = time, y = totalInf, color = strategy), size = 1) +
+    labs(title = paste0('Near population (size = ', site_data$near_pop, ')'), x = '', y = 'Total cases') + 
     guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
-    theme(legend.position = 'bottom') +
+    theme(legend.position = 'none') +
     scale_color_manual(name = "Strategy"
                        , values = c('forestgreen', 'blue', 'black', 'red', 'orange')
                        , labels = x_axis_labels
                        , breaks = strategy_names_subset
+    ) + scale_x_continuous(breaks = seq(min(near_orv_data$time), max(near_orv_data$time), 5)
+                           , labels = every_nth(seq(min(near_orv_data$time), max(near_orv_data$time), 5), 2, inverse = T)
     )
-#Susceptibles
-ggplot(data = epi_dyn_detailed %>% filter(time <= 200)) + 
-    geom_point(aes(x = time, y = Sus1, color = strategy), size = 2) + 
-    geom_line(aes(x = time, y = Sus1, color = strategy), size = 1) +
-    labs(x = 'Time (days)', y = 'Susceptibles') + 
-    guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
-    theme(legend.position = 'bottom') +
-    scale_color_manual(name = "Strategy"
-                       , values = c('forestgreen', 'blue', 'black', 'red', 'orange')
-                       , labels = x_axis_labels
-                       , breaks = strategy_names_subset
-    )
+
+if (display_epi_plots) {
+    plot(near_orv_total_cases_plot)  
+}
+
+if(save_epi_plots){
+    ggsave(file = 'figures/near_orv_total_cases_plot.pdf', plot = near_orv_total_cases_plot)
+}
+
+
+if(save_epi_plots){
+    ggsave(file = 'figures/orv_complete_campaign_total_cases_plot.pdf', plot = grid.arrange(near_orv_total_cases_plot, far_orv_total_cases_plot, nrow = 2))
+}
+
 #View(head(orv_plot_dat %>% filter(strategy == 'monodose_fcc'), n = 20))
 
 #ggplot(epi_dyn_detailed, aes(x = time, y = epi_dyn_detailed$Inf5)) + stat_density() 
