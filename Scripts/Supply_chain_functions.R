@@ -129,7 +129,7 @@ print_site_team_dur <- function(site_team_quant, td_fixed, td_mobile){ #td_fixed
 
 calc_monodose_team_days <- function(target_pop, 
                                     carrier_vol_capacity, 
-                                    team_performance = tp_mobile #how many you are expected to vaccinate on average per day
+                                    team_performance  #how many you are expected to vaccinate on average per day
                                     ) 
    {
    if ((carrier_vol_capacity >= target_pop) & (target_pop <= team_performance)) {
@@ -153,7 +153,7 @@ calc_monodose_team_days <- function(target_pop,
 calc_dose10_team_days <- function(target_pop, 
                                   dose10_wastage,
                                   vaxCarr_capacity,
-                                  team_performance = tp_mobile)  #how many you are expected to vaccinate on average per day 
+                                  team_performance)  #how many you are expected to vaccinate on average per day 
 {
    effective_doses <- ceiling(vaxCarr_capacity * (1 - dose10_wastage/100)) #effectively, how many vaccinations is a mobile team actually undertaking?
    if ((effective_doses >= target_pop) & (target_pop <= team_performance)) {
