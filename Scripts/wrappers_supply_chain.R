@@ -221,10 +221,12 @@ analyse_team_days <- function(strategy_name
     team_days_mobile_team <- if(mobile_team_with_dose10){
         calc_dose10_team_days(target_pop = site_details$far_pop
                               , dose10_wastage = sc_model_params$dose10_ovw_mobile_team
+                              , team_performance = tp_mobile
                               , vaxCarr_capacity = mobile_team_vol_capacity
         )
     }else{
         calc_monodose_team_days(target_pop = site_details$far_pop
+                                , team_performance = min(mobile_team_vol_capacity, tp_mobile)
                                 , carrier_vol_capacity = mobile_team_vol_capacity
         )
     }
