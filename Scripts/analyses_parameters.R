@@ -36,3 +36,13 @@ site_data <- tibble(near_pop = 10000
                            , far_pop = 2500
                            , site_team_alloc = 1 #number of teams allocated to site
 )
+
+###########################################################################
+#Plot control parameters
+###########################################################################
+#Supply chain plot control parameters
+display_sc_plots <- TRUE
+save_sc_plots <- F
+#epidemiological
+display_epi_plots <- TRUE
+save_epi_plots <- F
