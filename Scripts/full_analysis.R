@@ -544,10 +544,7 @@ if(save_sc_plots){
 #EPIDEMIOLOGICAL ANALYSIS
 ###########################################################
 
-#Plot control parameters
 
-display_epi_plots <- TRUE
-save_epi_plots <- TRUE
 
 
 
