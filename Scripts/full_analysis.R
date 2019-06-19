@@ -640,16 +640,27 @@ far_orv_total_cases <- dplyr::filter(far_orv_dynamics, time == max(time)) %>% se
 far_orv_total_cases_table <- knitr::kable(select(far_orv_total_cases, 'epidemic duration' = 'time', 'strategy', 'total cases' = 'cases_cumulative'), caption = 'Total cases and epidemic duration per strategy')
 far_orv_total_cases_table
 
-
-
+#I create a dataframe here which I use to draw line segments to indicate the campaign period
+far_campaign_period_df <- data.frame(campaign_indicators_df, cases_peak = max(far_orv_dynamics$Inf4))
+far_campaign_period_df <- mutate(far_campaign_period_df, cases_peak = cases_peak - c(0, 2, 4, 6))
+    
 far_orv_total_cases_plot <- ggplot(data = far_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
     geom_point(aes(x = time, y = Inf4, color = strategy), size = 2) + 
     geom_line(aes(x = time, y = Inf4, color = strategy), size = 1) 
 
 
 far_orv_total_cases_plot <- far_orv_total_cases_plot + 
-    geom_line(data = far_orv_dynamics %>% filter(time <= 10), 
-              aes(x = mt_freezing_time, y = Inf4, color = strategy), size = 1) 
+    geom_segment(data = far_campaign_period_df, 
+              aes(x = mt_freezing_time
+                  , xend = mt_team_days
+                  , y = cases_peak
+                  , yend = cases_peak
+                  , color = strategy) 
+              ,lineend = 'butt'
+              , size = 1
+             , arrow = arrow(length = unit(0.01, "npc"), ends = 'both'
+                             )
+              )
 
 far_orv_total_cases_plot <- far_orv_total_cases_plot +
     labs(title = paste0('Far population (size = ', site_data$far_pop, ')'), x = 'Time (days)', y = 'Total cases') + 
@@ -665,7 +676,7 @@ far_orv_total_cases_plot <- far_orv_total_cases_plot +
 
 far_orv_total_cases_plot <- far_orv_total_cases_plot + annotation_custom(tableGrob(select(far_orv_total_cases, 'strategy', 'total cases' = 'cases_cumulative'), rows = NULL), xmin = 100, xmax = 130, ymin = 20, ymax = 30)
 
-
+far_orv_total_cases_plot
 
 #1. Near orv: total cases
 near_orv_dynamics <- near_orv_epi_dyn_detailed %>% 
@@ -681,16 +692,30 @@ near_orv_total_cases <- dplyr::filter(near_orv_dynamics, time == max(time)) %>% 
 near_orv_total_cases_table <- knitr::kable(select(near_orv_total_cases, 'epidemic duration' = 'time', 'strategy', 'total cases' = 'cases_cumulative'), caption = 'Total cases and epidemic duration per strategy')
 near_orv_total_cases_table
 
+#I create a dataframe here which I use to draw line segments to indicate the campaign period
+near_campaign_period_df <- data.frame(campaign_indicators_df, cases_peak = max(near_orv_dynamics$Inf4))
+near_campaign_period_df <- mutate(near_campaign_period_df, cases_peak = cases_peak - c(0, 10, 20, 30))
+
 
 near_orv_total_cases_plot <- ggplot(data = near_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
     geom_point(aes(x = time, y = Inf4, color = strategy), size = 2) + 
     geom_line(aes(x = time, y = Inf4, color = strategy), size = 1) 
 
-near_orv_total_cases_plot <- near_orv_total_cases_plot + geom_line(data = near_orv_dynamics %>% filter(Inf4 <= 100), 
-                                                                   aes(x = ft_freezing_time, y = Inf4, color = strategy)
-                                                                   ) 
+near_orv_total_cases_plot <- near_orv_total_cases_plot + 
+    geom_segment(data = near_campaign_period_df, 
+                 aes(x = mt_freezing_time
+                     , xend = mt_team_days
+                     , y = cases_peak
+                     , yend = cases_peak
+                     , color = strategy) 
+                 ,lineend = 'butt'
+                 , size = 1
+                 , arrow = arrow(length = unit(0.01, "npc"), ends = 'both'
+                 )
+    )
 
-near_orv_total_cases_plot <- near_orv_total_cases_plot + labs(title = paste0('Near population (size = ', site_data$near_pop, ')'), x = 'Time', y = 'Total cases') + 
+near_orv_total_cases_plot <- near_orv_total_cases_plot + 
+    labs(title = paste0('Near population (size = ', site_data$near_pop, ')'), x = 'Time', y = 'Total cases') + 
     guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
     theme(legend.position = 'bottom') +
     scale_color_manual(name = "Strategy"
