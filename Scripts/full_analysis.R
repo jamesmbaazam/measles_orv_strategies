@@ -652,7 +652,7 @@ far_orv_total_cases_plot <- ggplot(data = far_orv_dynamics %>% filter(Inf4 >= 0.
 far_orv_total_cases_plot <- far_orv_total_cases_plot + 
     geom_segment(data = far_campaign_period_df, 
               aes(x = mt_freezing_time
-                  , xend = mt_team_days
+                  , xend = mt_team_days + mt_freezing_time
                   , y = cases_peak
                   , yend = cases_peak
                   , color = strategy) 
@@ -703,8 +703,8 @@ near_orv_total_cases_plot <- ggplot(data = near_orv_dynamics %>% filter(Inf4 >= 
 
 near_orv_total_cases_plot <- near_orv_total_cases_plot + 
     geom_segment(data = near_campaign_period_df, 
-                 aes(x = mt_freezing_time
-                     , xend = mt_team_days
+                 aes(x = ft_freezing_time
+                     , xend = ft_team_days + ft_freezing_time
                      , y = cases_peak
                      , yend = cases_peak
                      , color = strategy) 
@@ -727,7 +727,7 @@ near_orv_total_cases_plot <- near_orv_total_cases_plot +
     )
 
 near_orv_total_cases_plot <- near_orv_total_cases_plot + annotation_custom(tableGrob(select(near_orv_total_cases, 'strategy', 'total cases' = 'cases_cumulative'), rows = NULL), xmin = 100, xmax = 130, ymin = 200, ymax = 350)
-
+near_orv_total_cases_plot
 
 ###############
 #complete orv dynamics
