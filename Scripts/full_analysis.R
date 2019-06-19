@@ -625,31 +625,31 @@ near_orv_epi_dyn_summed <- do.call("rbind", args = c(near_orv_results_collapsed,
 campaign_indicators_df <- select(sc_analysis_output, strategy, ft_freezing_time, mt_freezing_time, ft_team_days, mt_team_days)%>% 
     group_by(strategy)
 #1. far orv: total cases
-far_orv_dynamics <- far_orv_epi_dyn_summed %>% 
+far_orv_dynamics <- far_orv_epi_dyn_detailed %>% 
     group_by(strategy) %>% 
-    mutate(cases_cumulative = cumsum(totalInf)) %>% 
-    left_join(. , campaign_indicators_df, by = 'strategy') %>% 
-    filter(totalInf >  0.1) 
+    mutate(cases_cumulative = cumsum(Inf4)) %>% 
+    left_join(. , campaign_indicators_df, by = 'strategy') 
+# %>% 
+#     filter(Inf >  0.1) 
 
 #find the total cases at the end of the epidemic
 
 #far campaign
-far_orv_total_cases <-  far_orv_dynamics %>% group_by(strategy) %>% 
-    mutate(cases_cumulative = cumsum(totalInf)) %>% 
-    dplyr::filter(time == max(time)) 
+far_orv_total_cases <- dplyr::filter(far_orv_dynamics, time == max(time)) %>% select(time, strategy, cases_cumulative)
 #print a table of total cases
 far_orv_total_cases_table <- knitr::kable(select(far_orv_total_cases, 'epidemic duration' = 'time', 'strategy', 'total cases' = 'cases_cumulative'), caption = 'Total cases and epidemic duration per strategy')
 far_orv_total_cases_table
 
 
 
-far_orv_total_cases_plot <- ggplot(data = far_orv_dynamics) + 
-    geom_point(aes(x = time, y = totalInf, color = strategy), size = 2) + 
-    geom_line(aes(x = time, y = totalInf, color = strategy), size = 1) 
+far_orv_total_cases_plot <- ggplot(data = far_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
+    geom_point(aes(x = time, y = Inf4, color = strategy), size = 2) + 
+    geom_line(aes(x = time, y = Inf4, color = strategy), size = 1) 
 
 
-far_orv_total_cases_plot <- far_orv_total_cases_plot + geom_line(data = far_orv_dynamics %>% filter(totalInf <= 50), 
-              aes(x = mt_freezing_time, y = totalInf, color = strategy), size = 1) 
+far_orv_total_cases_plot <- far_orv_total_cases_plot + 
+    geom_line(data = far_orv_dynamics %>% filter(time <= 10), 
+              aes(x = mt_freezing_time, y = Inf4, color = strategy), size = 1) 
 
 far_orv_total_cases_plot <- far_orv_total_cases_plot +
     labs(title = paste0('Far population (size = ', site_data$far_pop, ')'), x = 'Time (days)', y = 'Total cases') + 
@@ -663,32 +663,31 @@ far_orv_total_cases_plot <- far_orv_total_cases_plot +
                                               , labels = every_nth(seq(min(far_orv_dynamics$time), max(far_orv_dynamics$time), 5), 2, inverse = T)
                                               ) 
 
-far_orv_total_cases_plot <- far_orv_total_cases_plot + annotation_custom(tableGrob(select(far_orv_total_cases, 'strategy', 'total cases' = 'cases_cumulative'), rows = NULL), xmin = 80, xmax = 140, ymin = 100, ymax = 200)
+far_orv_total_cases_plot <- far_orv_total_cases_plot + annotation_custom(tableGrob(select(far_orv_total_cases, 'strategy', 'total cases' = 'cases_cumulative'), rows = NULL), xmin = 100, xmax = 130, ymin = 20, ymax = 30)
 
 
 
 #1. Near orv: total cases
-near_orv_dynamics <- near_orv_epi_dyn_summed %>% 
+near_orv_dynamics <- near_orv_epi_dyn_detailed %>% 
     group_by(strategy) %>%
-    mutate(cases_cumulative = cumsum(totalInf)) %>% 
-    left_join(. , campaign_indicators_df, by = 'strategy')  %>% 
-    filter(totalInf >  0.1) 
+    mutate(cases_cumulative = cumsum(Inf4)) %>% 
+    left_join(. , campaign_indicators_df, by = 'strategy')  
+# %>% 
+#     filter(totalInf >  0.1) 
 
 ##find the total cases at the end of the epidemic
-near_orv_total_cases <-  near_orv_dynamics %>% group_by(strategy) %>% 
-    mutate(cases_cumulative = cumsum(totalInf)) %>% 
-    dplyr::filter(time == max(time)) 
+near_orv_total_cases <- dplyr::filter(near_orv_dynamics, time == max(time)) %>% select(time, strategy, cases_cumulative) 
 #print a table of total cases
 near_orv_total_cases_table <- knitr::kable(select(near_orv_total_cases, 'epidemic duration' = 'time', 'strategy', 'total cases' = 'cases_cumulative'), caption = 'Total cases and epidemic duration per strategy')
 near_orv_total_cases_table
 
 
-near_orv_total_cases_plot <- ggplot(data = near_orv_dynamics) + 
-    geom_point(aes(x = time, y = totalInf, color = strategy), size = 2) + 
-    geom_line(aes(x = time, y = totalInf, color = strategy), size = 1) 
+near_orv_total_cases_plot <- ggplot(data = near_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
+    geom_point(aes(x = time, y = Inf4, color = strategy), size = 2) + 
+    geom_line(aes(x = time, y = Inf4, color = strategy), size = 1) 
 
-near_orv_total_cases_plot <- near_orv_total_cases_plot + geom_line(data = near_orv_dynamics %>% filter(totalInf <= 500), 
-                                                                   aes(x = ft_freezing_time, y = totalInf, color = strategy)
+near_orv_total_cases_plot <- near_orv_total_cases_plot + geom_line(data = near_orv_dynamics %>% filter(Inf4 <= 100), 
+                                                                   aes(x = ft_freezing_time, y = Inf4, color = strategy)
                                                                    ) 
 
 near_orv_total_cases_plot <- near_orv_total_cases_plot + labs(title = paste0('Near population (size = ', site_data$near_pop, ')'), x = 'Time', y = 'Total cases') + 
@@ -702,7 +701,7 @@ near_orv_total_cases_plot <- near_orv_total_cases_plot + labs(title = paste0('Ne
                            , labels = every_nth(seq(min(near_orv_dynamics$time), max(near_orv_dynamics$time), 5), 2, inverse = T)
     )
 
-near_orv_total_cases_plot <- near_orv_total_cases_plot + annotation_custom(tableGrob(select(near_orv_total_cases, 'strategy', 'total cases' = 'cases_cumulative'), rows = NULL), xmin = 100, xmax = 150, ymin = 1500, ymax = 2000)
+near_orv_total_cases_plot <- near_orv_total_cases_plot + annotation_custom(tableGrob(select(near_orv_total_cases, 'strategy', 'total cases' = 'cases_cumulative'), rows = NULL), xmin = 100, xmax = 130, ymin = 200, ymax = 350)
 
 
 ###############
