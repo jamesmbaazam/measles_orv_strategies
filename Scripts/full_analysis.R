@@ -1,6 +1,7 @@
 
 #packages
 library('ggplot2')
+library('ggpubr')
 library('dplyr')
 library('reshape2')
 library('purrr')
@@ -655,16 +656,16 @@ far_orv_total_cases_plot <- ggplot(data = far_orv_dynamics %>% filter(Inf4 >= 0.
 
 far_orv_total_cases_plot <- far_orv_total_cases_plot + 
     geom_segment(data = far_campaign_period_df, 
-              aes(x = mt_freezing_time
-                  , xend = mt_team_days + mt_freezing_time
-                  , y = cases_peak
-                  , yend = cases_peak
-                  , color = strategy) 
-              ,lineend = 'butt'
-              , size = 1
-             , arrow = arrow(length = unit(0.01, "npc"), ends = 'both'
-                             )
-              )
+                 aes(x = mt_freezing_time
+                     , xend = mt_team_days + mt_freezing_time
+                     , y = cases_peak
+                     , yend = cases_peak
+                     , color = strategy
+                     )
+               #  , lineend = 'round'
+                 , size = 1
+                 , arrow = arrow(length = unit(0.01, "npc"), ends = 'both', type = 'closed')
+                 )
 
 far_orv_total_cases_plot <- far_orv_total_cases_plot +
     labs(title = paste0('Far population (size = ', site_data$far_pop, ')'), x = 'Time (days)', y = 'Total cases') + 
@@ -677,8 +678,15 @@ far_orv_total_cases_plot <- far_orv_total_cases_plot +
                        ) + scale_x_continuous(breaks = seq(min(far_orv_dynamics$time), max(far_orv_dynamics$time), 5)
                                               , labels = every_nth(seq(min(far_orv_dynamics$time), max(far_orv_dynamics$time), 5), 2, inverse = T)
                                               ) 
-
-far_orv_total_cases_plot <- far_orv_total_cases_plot + annotation_custom(tableGrob(select(far_orv_total_cases, 'strategy', 'total cases' = 'cases_cumulative'), rows = NULL), xmin = 100, xmax = 130, ymin = 20, ymax = 30)
+far_orv_total_cases_plot <- far_orv_total_cases_plot + theme_pubr(legend = 'bottom')
+    
+far_orv_total_cases_plot <- far_orv_total_cases_plot + 
+    annotation_custom(grob = tableGrob(far_orv_total_cases_table_grob, rows = NULL, theme = ttheme(base_style = "lBlackWhite", tbody.style = tbody_style(hjust = 0)))
+                      , xmin = 90
+                      , xmax = 120
+                      , ymin = 20
+                      , ymax = 30
+                      )
 
 far_orv_total_cases_plot
 
@@ -716,10 +724,9 @@ near_orv_total_cases_plot <- near_orv_total_cases_plot +
                      , y = cases_peak
                      , yend = cases_peak
                      , color = strategy) 
-                 ,lineend = 'butt'
+                 ,lineend = 'round'
                  , size = 1
-                 , arrow = arrow(length = unit(0.01, "npc"), ends = 'both'
-                 )
+                 , arrow = arrow(length = unit(0.01, "npc"), ends = 'both', type = 'closed')
     )
 
 near_orv_total_cases_plot <- near_orv_total_cases_plot + 
@@ -733,8 +740,19 @@ near_orv_total_cases_plot <- near_orv_total_cases_plot +
     ) + scale_x_continuous(breaks = seq(min(near_orv_dynamics$time), max(near_orv_dynamics$time), 5)
                            , labels = every_nth(seq(min(near_orv_dynamics$time), max(near_orv_dynamics$time), 5), 2, inverse = T)
     )
+near_orv_total_cases_plot <- near_orv_total_cases_plot + theme_pubr(legend = 'bottom')
 
-near_orv_total_cases_plot <- near_orv_total_cases_plot + annotation_custom(tableGrob(select(near_orv_total_cases, 'strategy', 'total cases' = 'cases_cumulative'), rows = NULL), xmin = 100, xmax = 130, ymin = 200, ymax = 350)
+near_orv_total_cases_plot <- near_orv_total_cases_plot + 
+    annotation_custom(tableGrob(near_orv_total_cases_table_grob, 
+                                rows = NULL
+                                , theme = ttheme(base_style = "lBlackWhite", tbody.style = tbody_style(hjust = 0))
+                                )
+                      , xmin = 100
+                      , xmax = 130
+                      , ymin = 200
+                      , ymax = 350
+                      )
+
 near_orv_total_cases_plot
 
 ###############
@@ -769,9 +787,9 @@ if (display_epi_plots) {
     plot(orv_complete)  
 }
 #save complete dynamics
-if(save_epi_plots){
-    ggsave(file = 'figures/orv_complete_campaign_total_cases_plot.pdf', orv_complete)
-}
+# if(save_epi_plots){
+#     ggsave(file = 'figures/orv_complete_campaign_total_cases_plot.pdf', orv_complete)
+# }
 
 
 
