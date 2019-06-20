@@ -175,7 +175,7 @@ strategy_logistical_needs_long <- sc_analysis_output %>%
 
 
 
-x_axis_labels <- c('10 dose FCC (parallel)', 'Monodose FCC (parallel)', 'Mixed FCC (parallel)', 'Part OCC (asap)')
+x_axis_labels <- c('10-dose FCC', 'Monodose FCC', 'Mixed FCC', 'Part OCC')
 
 #Plot 1: Delay before a campaign can commence
 campaign_delay_plot <- ggplot(data = strategy_campaign_prep_delays,
