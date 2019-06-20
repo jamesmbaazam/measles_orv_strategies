@@ -637,8 +637,12 @@ far_orv_dynamics <- far_orv_epi_dyn_detailed %>%
 #far campaign
 far_orv_total_cases <- dplyr::filter(far_orv_dynamics, time == max(time)) %>% select(time, strategy, cases_cumulative)
 #print a table of total cases
-far_orv_total_cases_table <- knitr::kable(select(far_orv_total_cases, 'epidemic duration' = 'time', 'strategy', 'total cases' = 'cases_cumulative'), caption = 'Total cases and epidemic duration per strategy')
-far_orv_total_cases_table
+far_orv_total_cases_table_console <- knitr::kable(select(far_orv_total_cases, 'epidemic duration' = 'time', 'strategy', 'total cases' = 'cases_cumulative'), caption = 'Total cases and epidemic duration per strategy')
+far_orv_total_cases_table_console
+
+far_orv_total_cases_table_grob <- select(far_orv_total_cases, 'strategy', 'total cases' = 'cases_cumulative')
+far_orv_total_cases_table_grob$strategy <- c('10-dose FCC', 'monodose FCC', 'mixed FCC', 'part OCC')
+far_orv_total_cases_table_grob
 
 #I create a dataframe here which I use to draw line segments to indicate the campaign period
 far_campaign_period_df <- data.frame(campaign_indicators_df, cases_peak = max(far_orv_dynamics$Inf4))
@@ -689,8 +693,12 @@ near_orv_dynamics <- near_orv_epi_dyn_detailed %>%
 ##find the total cases at the end of the epidemic
 near_orv_total_cases <- dplyr::filter(near_orv_dynamics, time == max(time)) %>% select(time, strategy, cases_cumulative) 
 #print a table of total cases
-near_orv_total_cases_table <- knitr::kable(select(near_orv_total_cases, 'epidemic duration' = 'time', 'strategy', 'total cases' = 'cases_cumulative'), caption = 'Total cases and epidemic duration per strategy')
-near_orv_total_cases_table
+near_orv_total_cases_table_console <- knitr::kable(select(near_orv_total_cases, 'epidemic duration' = 'time', 'strategy', 'total cases' = 'cases_cumulative'), caption = 'Total cases and epidemic duration per strategy')
+near_orv_total_cases_table_console
+
+near_orv_total_cases_table_grob <- select(near_orv_total_cases, 'strategy', 'total cases' = 'cases_cumulative')
+near_orv_total_cases_table_grob$strategy <- c('10-dose FCC', 'monodose FCC', 'mixed FCC', 'part OCC')
+near_orv_total_cases_table_grob
 
 #I create a dataframe here which I use to draw line segments to indicate the campaign period
 near_campaign_period_df <- data.frame(campaign_indicators_df, cases_peak = max(near_orv_dynamics$Inf4))
