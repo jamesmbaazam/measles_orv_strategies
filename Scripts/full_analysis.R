@@ -648,13 +648,15 @@ far_orv_total_cases_table_grob
 #I create a dataframe here which I use to draw line segments to indicate the campaign period
 far_campaign_period_df <- data.frame(campaign_indicators_df, cases_peak = max(far_orv_dynamics$Inf4))
 far_campaign_period_df <- mutate(far_campaign_period_df, cases_peak = cases_peak - c(0, 2, 4, 6))
-    
-far_orv_total_cases_plot <- ggplot(data = far_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
+
+
+#incidence (in this model, we assume infectious people are only diagnosed on their 4th day of infectiousness, i.e, Inf4)    
+far_orv_incidence_plot <- ggplot(data = far_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
     geom_point(aes(x = time, y = Inf4, color = strategy), size = 2) + 
     geom_line(aes(x = time, y = Inf4, color = strategy), size = 1) 
 
 
-far_orv_total_cases_plot <- far_orv_total_cases_plot + 
+far_orv_incidence_plot <- far_orv_incidence_plot + 
     geom_segment(data = far_campaign_period_df, 
                  aes(x = mt_freezing_time
                      , xend = mt_team_days + mt_freezing_time
@@ -667,8 +669,8 @@ far_orv_total_cases_plot <- far_orv_total_cases_plot +
                  , arrow = arrow(length = unit(0.01, "npc"), ends = 'both', type = 'closed')
                  )
 
-far_orv_total_cases_plot <- far_orv_total_cases_plot +
-    labs(title = paste0('Far population (size = ', site_data$far_pop, ')'), x = 'Time (days)', y = 'Total cases') + 
+far_orv_incidence_plot <- far_orv_incidence_plot +
+    labs(title = paste0('Far population (size = ', site_data$far_pop, ')'), x = 'Time (days)', y = 'Incidence') + 
     guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
     theme(legend.position = 'bottom') +
     scale_color_manual(name = "Strategy"
@@ -678,9 +680,9 @@ far_orv_total_cases_plot <- far_orv_total_cases_plot +
                        ) + scale_x_continuous(breaks = seq(min(far_orv_dynamics$time), max(far_orv_dynamics$time), 5)
                                               , labels = every_nth(seq(min(far_orv_dynamics$time), max(far_orv_dynamics$time), 5), 2, inverse = T)
                                               ) 
-far_orv_total_cases_plot <- far_orv_total_cases_plot + theme_pubr(legend = 'bottom')
+far_orv_incidence_plot <- far_orv_incidence_plot + theme_pubr(legend = 'bottom')
     
-far_orv_total_cases_plot <- far_orv_total_cases_plot + 
+far_orv_incidence_plot <- far_orv_incidence_plot + 
     annotation_custom(grob = tableGrob(far_orv_total_cases_table_grob, rows = NULL, theme = ttheme(base_style = "lBlackWhite", tbody.style = tbody_style(hjust = 0)))
                       , xmin = 90
                       , xmax = 120
@@ -688,7 +690,7 @@ far_orv_total_cases_plot <- far_orv_total_cases_plot +
                       , ymax = 30
                       )
 
-far_orv_total_cases_plot
+far_orv_incidence_plot
 
 #1. Near orv: total cases
 near_orv_dynamics <- near_orv_epi_dyn_detailed %>% 
@@ -713,11 +715,11 @@ near_campaign_period_df <- data.frame(campaign_indicators_df, cases_peak = max(n
 near_campaign_period_df <- mutate(near_campaign_period_df, cases_peak = cases_peak - c(0, 10, 20, 30))
 
 
-near_orv_total_cases_plot <- ggplot(data = near_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
+near_orv_incidence_plot <- ggplot(data = near_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
     geom_point(aes(x = time, y = Inf4, color = strategy), size = 2) + 
     geom_line(aes(x = time, y = Inf4, color = strategy), size = 1) 
 
-near_orv_total_cases_plot <- near_orv_total_cases_plot + 
+near_orv_incidence_plot <- near_orv_incidence_plot + 
     geom_segment(data = near_campaign_period_df, 
                  aes(x = ft_freezing_time
                      , xend = ft_team_days + ft_freezing_time
@@ -729,8 +731,8 @@ near_orv_total_cases_plot <- near_orv_total_cases_plot +
                  , arrow = arrow(length = unit(0.01, "npc"), ends = 'both', type = 'closed')
     )
 
-near_orv_total_cases_plot <- near_orv_total_cases_plot + 
-    labs(title = paste0('Near population (size = ', site_data$near_pop, ')'), x = 'Time', y = 'Total cases') + 
+near_orv_incidence_plot <- near_orv_incidence_plot + 
+    labs(title = paste0('Near population (size = ', site_data$near_pop, ')'), x = 'Time', y = 'Incidence') + 
     guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
     theme(legend.position = 'bottom') +
     scale_color_manual(name = "Strategy"
@@ -740,9 +742,9 @@ near_orv_total_cases_plot <- near_orv_total_cases_plot +
     ) + scale_x_continuous(breaks = seq(min(near_orv_dynamics$time), max(near_orv_dynamics$time), 5)
                            , labels = every_nth(seq(min(near_orv_dynamics$time), max(near_orv_dynamics$time), 5), 2, inverse = T)
     )
-near_orv_total_cases_plot <- near_orv_total_cases_plot + theme_pubr(legend = 'bottom')
+near_orv_incidence_plot <- near_orv_incidence_plot + theme_pubr(legend = 'bottom')
 
-near_orv_total_cases_plot <- near_orv_total_cases_plot + 
+near_orv_incidence_plot <- near_orv_incidence_plot + 
     annotation_custom(tableGrob(near_orv_total_cases_table_grob, 
                                 rows = NULL
                                 , theme = ttheme(base_style = "lBlackWhite", tbody.style = tbody_style(hjust = 0))
@@ -753,39 +755,174 @@ near_orv_total_cases_plot <- near_orv_total_cases_plot +
                       , ymax = 350
                       )
 
-near_orv_total_cases_plot
+near_orv_incidence_plot
 
+######
+#cumulative incidence
+#######
+#I create a dataframe here which I use to draw line segments to indicate the campaign period
+far_campaign_period_cum_cases <- data.frame(campaign_indicators_df, cases_peak = max(far_orv_dynamics$cases_cumulative))
+far_campaign_period_cum_cases <- mutate(far_campaign_period_cum_cases, cases_peak = cases_peak - c(0, 20, 40, 60))
+
+
+#far
+far_orv_cum_incidence_plot <- ggplot(data = far_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
+    geom_point(aes(x = time, y = cases_cumulative, color = strategy), size = 2) + 
+    geom_line(aes(x = time, y = cases_cumulative, color = strategy), size = 1) 
+
+
+far_orv_cum_incidence_plot <- far_orv_cum_incidence_plot + 
+    geom_segment(data = far_campaign_period_cum_cases, 
+                 aes(x = mt_freezing_time
+                     , xend = mt_team_days + mt_freezing_time
+                     , y = cases_peak
+                     , yend = cases_peak
+                     , color = strategy
+                 )
+                 #  , lineend = 'round'
+                 , size = 1
+                 , arrow = arrow(length = unit(0.01, "npc"), ends = 'both', type = 'closed')
+    )
+
+far_orv_cum_incidence_plot <- far_orv_cum_incidence_plot +
+    labs(title = paste0('Far population (size = ', site_data$far_pop, ')'), x = 'Time (days)', y = 'Cumulative incidence') + 
+    guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
+    theme(legend.position = 'bottom') +
+    scale_color_manual(name = "Strategy"
+                       , values = c('forestgreen', 'blue', 'black', 'red', 'orange')
+                       , labels = x_axis_labels
+                       , breaks = strategy_names_subset
+    ) + scale_x_continuous(breaks = seq(min(far_orv_dynamics$time), max(far_orv_dynamics$time), 5)
+                           , labels = every_nth(seq(min(far_orv_dynamics$time), max(far_orv_dynamics$time), 5), 2, inverse = T)
+    ) 
+
+far_orv_cum_incidence_plot <- far_orv_cum_incidence_plot + theme_pubr(legend = 'bottom')
+
+far_orv_cum_incidence_plot <- far_orv_cum_incidence_plot + 
+    annotation_custom(grob = tableGrob(far_orv_total_cases_table_grob, rows = NULL, theme = ttheme(base_style = "lBlackWhite", tbody.style = tbody_style(hjust = 0)))
+                      , xmin = 90
+                      , xmax = 125
+                      , ymin = 20
+                      , ymax = 200
+    )
+
+far_orv_cum_incidence_plot
+
+#Near orv
+#I create a dataframe here which I use to draw line segments to indicate the campaign period
+near_campaign_period_cum_cases <- data.frame(campaign_indicators_df, cases_peak = max(near_orv_dynamics$cases_cumulative))
+near_campaign_period_cum_cases <- mutate(near_campaign_period_cum_cases, cases_peak = cases_peak - c(0, 200, 400, 600))
+
+
+near_orv_cum_incidence_plot <- ggplot(data = near_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
+    geom_point(aes(x = time, y = cases_cumulative, color = strategy), size = 2) + 
+    geom_line(aes(x = time, y = cases_cumulative, color = strategy), size = 1) 
+
+near_orv_cum_incidence_plot <- near_orv_cum_incidence_plot + 
+    geom_segment(data = near_campaign_period_cum_cases, 
+                 aes(x = ft_freezing_time
+                     , xend = ft_team_days + ft_freezing_time
+                     , y = cases_peak
+                     , yend = cases_peak
+                     , color = strategy) 
+                 ,lineend = 'round'
+                 , size = 1
+                 , arrow = arrow(length = unit(0.01, "npc"), ends = 'both', type = 'closed')
+    )
+
+near_orv_cum_incidence_plot <- near_orv_cum_incidence_plot + 
+    labs(title = paste0('Near population (size = ', site_data$near_pop, ')'), x = 'Time', y = 'Cumulative incidence') + 
+    guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
+    theme(legend.position = 'bottom') +
+    scale_color_manual(name = "Strategy"
+                       , values = c('forestgreen', 'blue', 'black', 'red', 'orange')
+                       , labels = x_axis_labels
+                       , breaks = strategy_names_subset
+    ) + scale_x_continuous(breaks = seq(min(near_orv_dynamics$time), max(near_orv_dynamics$time), 5)
+                           , labels = every_nth(seq(min(near_orv_dynamics$time), max(near_orv_dynamics$time), 5), 2, inverse = T)
+    )
+
+near_orv_cum_incidence_plot <- near_orv_cum_incidence_plot + theme_pubr(legend = 'bottom')
+
+near_orv_cum_incidence_plot <- near_orv_cum_incidence_plot + 
+    annotation_custom(tableGrob(near_orv_total_cases_table_grob, 
+                                rows = NULL
+                                , theme = ttheme(base_style = "lBlackWhite", tbody.style = tbody_style(hjust = 0))
+                                )
+                      , xmin = 100
+                      , xmax = 140
+                      , ymin = 4000
+                      , ymax = 6000
+                      )
+
+near_orv_cum_incidence_plot
 ###############
 #complete orv dynamics
 ###############
 
-orv_complete <- grid.arrange(near_orv_total_cases_plot, far_orv_total_cases_plot, nrow = 2)
+#incidence
+orv_complete_incidence_plot <- grid.arrange(near_orv_incidence_plot, far_orv_incidence_plot, nrow = 2)
+
+#cumulative incidence
+orv_complete_cum_incidence_plot <- grid.arrange(near_orv_cum_incidence_plot, far_orv_cum_incidence_plot, nrow = 2)
+
 
 
 #display and save if indicated
-#display near dynamics
+
+#near orv dynamics
+
+#display near orv incidence
 if (display_epi_plots) {
-    plot(near_orv_total_cases_plot)  
-}
-#save near dynamics
-if(save_epi_plots){
-    ggsave(file = 'figures/near_orv_total_cases_plot.pdf', plot = near_orv_total_cases_plot)
+    plot(near_orv_incidence_plot)  
 }
 
-#display far dynamics
-if (display_epi_plots) {
-    plot(far_orv_total_cases_plot)  
-}
-#save far dynamics
+#save near orv incidence plot
 if(save_epi_plots){
-    ggsave(file = 'figures/far_orv_total_cases_plot.pdf', plot = far_orv_total_cases_plot)
+    ggsave(file = 'figures/near_orv_incidence_plot.pdf', plot = near_orv_incidence_plot)
+}
+
+#display near orv cumulative incidence
+if (display_epi_plots) {
+    plot(near_orv_cum_incidence_plot)  
+}
+
+#save near orv cumulative incidence
+if(save_epi_plots){
+    ggsave(file = 'figures/near_orv_cum_incidence_plot.pdf', plot = near_orv_cum_incidence_plot)
+}
+
+#far orv dynamics
+
+#display incidence plot
+if (display_epi_plots) {
+    plot(far_orv_incidence_plot)  
+}
+##save incidence plot
+if(save_epi_plots){
+    ggsave(file = 'figures/far_orv_incidence_plot.pdf', plot = far_orv_incidence_plot)
+}
+
+#display cumulative incidence plot
+if (display_epi_plots) {
+    plot(far_orv_cum_incidence_plot)  
+}
+
+#display cumulative incidence plot
+if(save_epi_plots){
+    ggsave(file = 'figures/far_orv_cum_incidence_plot.pdf', plot = far_orv_cum_incidence_plot)
 }
 
 
 #display complete dynamics
 if (display_epi_plots) {
-    plot(orv_complete)  
+    plot(orv_complete_cum_incidence_plot)  
 }
+
+if (display_epi_plots) {
+    plot(orv_complete_incidence_plot)  
+}
+
 #save complete dynamics
 # if(save_epi_plots){
 #     ggsave(file = 'figures/orv_complete_campaign_total_cases_plot.pdf', orv_complete)
