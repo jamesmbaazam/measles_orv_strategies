@@ -962,6 +962,27 @@ if(save_sc_plots){
 
 
 
+#the region where the two team days intersect are:
+# isocline_with_monodose_td <- ggplot(data = team_days_monodose_occ_dose10_fcc %>% filter(team_days_monodose_occ > min(team_days_monodose_occ))) +
+#     geom_point(aes(x = storage_capacity_ratio,
+#                    y = team_days_monodose_occ),
+#                color = 'black'
+#     ) +
+#     geom_line(aes(x = storage_capacity_ratio,
+#                   y = team_days_monodose_occ),
+#               color = 'black'
+#     )
+# 
+# isocline_with_dose10_td <- ggplot(data = team_days_monodose_occ_dose10_fcc %>% filter(team_days_dose10_fcc > min(team_days_dose10_fcc, na.rm = T))) +
+#     geom_point(aes(x = dose10_ovw,
+#                    y = team_days_dose10_fcc),
+#                color = 'black'
+#     ) +
+#     geom_line(aes(x = dose10_ovw,
+#                   y = team_days_dose10_fcc),
+#               color = 'black'
+#     )
+
 #################################################################################
 #Sensitivity on number of freezers
 #################################################################################
