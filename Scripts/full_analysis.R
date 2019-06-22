@@ -802,11 +802,6 @@ if(save_sc_plots){
 
 
 
-#################################################################################
-#Sensitivity on number of freezers
-#################################################################################
-
-#mf314_quant <- 1:10 #we currently run the sc model on only one freezer. What if the base has more than 1?
 
 
 #' #Other Plots
@@ -905,71 +900,70 @@ if(save_sc_plots){
 #' }
 #' 
 #' 
-#' #Reshaping the results and assigning zero wastage to the monodose strategy
-#' 
-#' team_days_output_melted <- team_days_output %>% 
-#'     select(-vaxCarr_dose10_capacity, -vaxCarr_monodose_capacity) %>% 
-#'     gather(key = 'strategy'
-#'            , value = 'team_days'
-#'            , c('team_days_dose10_far_FCC', 'team_days_monodose_far_OCC')
-#'            , factor_key = T
-#'            )
-#' 
-#' team_days_output_melted_mod <- dplyr::mutate(team_days_output_melted
-#'                                              , dose10_wastage = if_else(strategy == 'team_days_dose10_far_FCC'
-#'                                                                         , team_days_output_melted$dose10_wastage
-#'                                                                         , 0
-#'                                                                         )
-#'                                              )
+#Reshaping the results and assigning zero wastage to the monodose strategy
+
+team_days_monodose_occ_dose10_fcc_long <- team_days_monodose_occ_dose10_fcc %>%
+    select(-dose10_capacity, -monodose_capacity) %>%
+    gather(key = 'strategy'
+           , value = 'team_days'
+           , c('team_days_dose10_fcc', 'team_days_monodose_occ')
+           , factor_key = T
+           ) %>%  
+    dplyr::mutate(dose10_ovw = if_else(strategy == 'team_days_dose10_fcc', dose10_ovw, 0))
+
 #' #I do some further reshaping of the results for 10-dose so I can plot the team days wrt constant wastage rates across the monodose plot
-#' team_days_output_melted_dose10 <- dplyr::filter(team_days_output_melted_mod
-#'                                                 , strategy == 'team_days_dose10_far_FCC') %>% 
-#'     dplyr::mutate(vaxCarr_capacity_ratio = paste(vaxCarr_capacity_ratio, collapse = ',')) %>% 
-#'     separate_rows(vaxCarr_capacity_ratio, convert = T)
-#' 
-#' 
-#' 
-#' 
-#' #' plot to illustrate how the 10-dose and monodose team days intersect at some 
-#' #' points and how that leads to an isocline for decision-making
-#' #' 
-#' 
-#' team_days_intersection_plot <- ggplot(data = team_days_output) + 
-#'     geom_point(aes(x = vaxCarr_capacity_ratio, 
-#'                    y = team_days_monodose_far_OCC), 
-#'                color = 'black'
-#'                ) +
-#'     geom_line(aes(x = vaxCarr_capacity_ratio, 
-#'                    y = team_days_monodose_far_OCC), 
-#'                color = 'black'
-#'     ) +
-#'     geom_point(data = team_days_output_melted_dose10 %>% 
-#'                    dplyr::filter(between(team_days, min(team_days_output$team_days_monodose_far_OCC) + 0.4, max(team_days_output$team_days_monodose_far_OCC))
-#'                                  ), 
-#'                aes(x = vaxCarr_capacity_ratio, 
-#'                    y = team_days, 
-#'                    color = factor(dose10_wastage)
-#'                    )
-#'                ) +
-#'     scale_x_continuous(breaks = seq(0.2, 1, 0.05),
-#'                        labels  = every_nth(seq(0.2, 1, 0.05), 2, inverse = T)
-#'                        ) +
-#'     labs(x = 'Vaccine carrier capacity ratio (monodose vs 10-dose)',
-#'          y = 'Mobile team days',
-#'          color = 'Wastage (10-dose)') 
-#' 
-#' if(display_sc_plots){
-#'    plot(team_days_intersection_plot) 
-#' }
-#' 
-#' 
-#' if(save_sc_plots){
-#'  ggsave(filename = 'team_days_intersection_plot.png'
-#'         #, plot = team_days_intersection_plot + presentation_plot_theme #uncomment this line to save a powerpoint version
-#'         , team_days_intersection_plot
-#'         , path = './figures/'
-#'         , width = 9
-#'         , height = 5)
-#' }
-#' 
-#' 
+team_days_output_dose10_long <- dplyr::filter(team_days_monodose_occ_dose10_fcc_long
+                                                , strategy == 'team_days_dose10_fcc') %>%
+    dplyr::mutate(storage_capacity_ratio = paste(storage_capacity_ratio, collapse = ',')) %>%
+    separate_rows(storage_capacity_ratio, convert = T)
+
+
+
+
+#' plot to illustrate how the 10-dose and monodose team days intersect at some
+#' points and how that leads to an isocline for decision-making
+#'
+
+team_days_intersection_plot <- ggplot(data = team_days_monodose_occ_dose10_fcc) +
+    geom_point(aes(x = storage_capacity_ratio,
+                   y = team_days_monodose_occ),
+               color = 'black'
+               ) +
+    geom_line(aes(x = storage_capacity_ratio,
+                   y = team_days_monodose_occ),
+               color = 'black'
+    ) +
+    geom_point(data = team_days_output_dose10_long %>%
+                   dplyr::filter(between(team_days
+                                         , min(team_days_monodose_occ_dose10_fcc$team_days_monodose_occ) + 0.4
+                                         , max(team_days_monodose_occ_dose10_fcc$team_days_monodose_occ)
+                                         )
+                                 ),
+               aes(x = storage_capacity_ratio,
+                   y = team_days,
+                   color = factor(round(dose10_ovw, 2))
+                   )
+               ) +
+    scale_x_continuous(breaks = seq(0.2, 1, 0.05),
+                       labels  = every_nth(seq(0.2, 1, 0.05), 2, inverse = T)
+                       ) +
+    labs(x = 'Storage capacity ratio (monodose vs 10-dose)',
+         y = 'Mobile team days',
+         color = 'Open vial wastage (10-dose)')
+
+if(display_sc_plots){
+   plot(team_days_intersection_plot)
+}
+
+
+if(save_sc_plots){
+ ggsave(filename = 'figures/team_days_intersection_plot.pdf')
+}
+
+
+
+#################################################################################
+#Sensitivity on number of freezers
+#################################################################################
+
+#mf314_quant <- 1:10 #we currently run the sc model on only one freezer. What if the base has more than 1?
