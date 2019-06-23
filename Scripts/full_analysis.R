@@ -761,49 +761,88 @@ team_days_monodose_occ_dose10_fcc <- tibble(
 #'strategies where there is no difference in team days. The areas above and below the line
 #'correspond to a switch in decision.
 
-isocline_plot_data <- team_days_monodose_occ_dose10_fcc %>% 
-    mutate(wastage_diag = 1 - (site_data$far_pop/(dose10_capacity * team_days_monodose_occ)))
 
-#View(isocline_df)
+#'I've labelled this as sketchy because it depended on the monodose team days but the plot that
+#'follows is irrespective of team days and only depends on the parameters of choice, i.e wastage (dose10)
+#'and storage. I think that is a much desirable result
+# isocline_plot_sketchy_data <- team_days_monodose_occ_dose10_fcc %>% 
+#     mutate(wastage_diag = 1 - (site_data$far_pop/(dose10_capacity * team_days_monodose_occ)))
+# 
+# #View(isocline_df)
+# 
+# isocline_plot_sketchy <- ggplot(isocline_plot_data %>% filter(wastage_diag > 1 - sc_model_params$dose10_ovw_mobile_team/100)) +
+#     geom_point(aes(x = storage_capacity_ratio,
+#                    y = wastage_diag)
+#                , size = 2
+#                ) +
+#     geom_line(aes(x = storage_capacity_ratio,
+#                    y = wastage_diag)
+#               , size = 1
+#     ) 
+# 
+# isocline_plot_sketchy <- isocline_plot_sketchy + 
+#     annotate('text', label = '10-dose', x = 0.25, y = 0.7, size = 4) +
+#     annotate('text', label = 'Monodose', x = 0.3, y = 0.75, size = 4)
+# 
+# isocline_plot_sketchy <- isocline_plot_sketchy + 
+#     labs(x = 'Storage capacity ratio (monodose vs 10-dose)',
+#          y = 'Open vial wastage (10-dose)'
+#          )
+# isocline_plot_sketchy <- isocline_plot_sketchy + theme_pubr()
+#     
+# if(display_sc_plots){
+# plot(isocline_plot_sketchy)
+# }
+# 
+# 
+# if(save_sc_plots){
+#     ggsave(filename = 'mobile_team_days_isocline.png'
+#           # , plot = isocline_plot + presentation_plot_theme #uncomment this line to save a powerpoint version
+#           , plot = isocline_plot_sketchy
+#           , path = './figures/'
+#            , width = 9
+#            , height = 5)
+# }
 
-isocline_plot <- ggplot(isocline_plot_data %>% filter(wastage_diag > 1 - sc_model_params$dose10_ovw_mobile_team/100)) +
-    geom_point(aes(x = storage_capacity_ratio,
-                   y = wastage_diag)
-               , size = 2
-               ) +
-    geom_line(aes(x = storage_capacity_ratio,
-                   y = wastage_diag)
-              , size = 1
-    ) 
 
-isocline_plot <- isocline_plot + 
-    annotate('text', label = '10-dose', x = 0.25, y = 0.7, size = 4) +
+#'I believe this is the result I've been seeking: The plot eliminates anything relating to the population size
+#'and indicates the wastage (10-dose) and storage (monodose) pairs that give the same team days
+#'
+
+#' Monodose is worse when the volume capacity < 250
+#' 10 dose is worse when the effective doses < 250
+#' The relationship that links these two ideas leads to a single equation in
+#' two variables - wastage and storage, that is, wastage (10-dose) = 1 - storage 
+#' (monodose) / storage (10 dose). 
+#' Solving the above in the regions where storage (monodose) < mobile team 
+#' performance will yield the following
+#' 
+isocline_data <- team_days_monodose_occ_dose10_fcc %>%
+    filter(monodose_capacity < tp_mobile) %>% 
+    mutate(dose10_ovw = 1 - storage_capacity_ratio
+           , dose10_effec_dose = 750 * (1 - dose10_ovw / 100)
+           )
+    
+
+isocline_plot <- ggplot(data = isocline_data) + 
+    geom_point(aes(x = storage_capacity_ratio, y = dose10_ovw)) + 
+    geom_line(aes(x = storage_capacity_ratio, y = dose10_ovw)) + 
+    scale_y_continuous(breaks = round(isocline_data$dose10_ovw, 2), labels = round(isocline_data$dose10_ovw, 2)) 
+
+isocline_plot <- isocline_plot +
+    labs(x = 'Storage capacity ratio (monodose over 10-dose)', y = 'Open vial wastage (10-dose)') + 
+    annotate('text', label = '10-dose', x = 0.25, y = 0.70, size = 4) +
     annotate('text', label = 'Monodose', x = 0.3, y = 0.75, size = 4)
 
-isocline_plot <- isocline_plot + 
-    labs(x = 'Storage capacity ratio (monodose vs 10-dose)',
-         y = 'Open vial wastage (10-dose)'
-         )
 isocline_plot <- isocline_plot + theme_pubr()
-    
-if(display_sc_plots){
-plot(isocline_plot)
-}
 
+if (display_sc_plots) {
+   plot(isocline_plot)  
+}   
 
 if(save_sc_plots){
-    ggsave(filename = 'mobile_team_days_isocline.png'
-          # , plot = isocline_plot + presentation_plot_theme #uncomment this line to save a powerpoint version
-          , plot = isocline_plot
-          , path = './figures/'
-           , width = 9
-           , height = 5)
+    ggsave(filename = 'figures/isocline_plot.pdf')
 }
-
-
-
-
-
 #' #Other Plots
 #' 
 #' 
