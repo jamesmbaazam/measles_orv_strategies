@@ -82,7 +82,12 @@ analyse_prep_delay <- function(strategy_name
     ######################################
     #Here, I am assuming that mobile teams only need a vaccine carrier. 
     #' vaccine carriers are transported with ice and vaccines to the site.
-    RCW25_required_mobile_team <- 0
+    RCW25_required_mobile_team <- calc_transport_equipment_needs(equip_type = 'rcw25'
+                                                                 , vial_type = ifelse(mobile_team_with_dose10, 'dose10', "monodose")
+                                                                 , vax_vol = ifelse(mobile_team_with_dose10, dose10_vial_volume, monodose_vial_volume)
+                                                                 , with_ice = mobile_team_with_ice
+                                                                 , doses_to_transport = doses_mobile_team
+    )
     
     vaxCarr_required_mobile_team <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
                                                                    , vial_type = ifelse(mobile_team_with_dose10, 'dose10', "monodose")
