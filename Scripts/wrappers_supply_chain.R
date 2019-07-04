@@ -40,8 +40,7 @@ analyse_prep_delay <- function(strategy_name
                                              , pop_type = 'near'
                                              , ovwastage = ifelse(fixed_team_with_dose10, sc_model_params$dose10_ovw_fixed_team, sc_model_params$monodose_ovw_fixed_team)
                                              , buffer_size = sc_model_params$buffer_stock
-                                             
-    )
+                                             )
     
     doses_mobile_team <-  calc_doses_required(df = site_details
                                               , site_rows_selected = site_row
@@ -49,7 +48,7 @@ analyse_prep_delay <- function(strategy_name
                                               , pop_type = 'far'
                                               , ovwastage = ifelse(mobile_team_with_dose10, sc_model_params$dose10_ovw_mobile_team, sc_model_params$monodose_ovw_mobile_team)
                                               , buffer_size = sc_model_params$buffer_stock
-    )
+                                              )
     
     #determine passive cold chain needs
     ######################################
@@ -64,14 +63,14 @@ analyse_prep_delay <- function(strategy_name
                                                                 , vax_vol = ifelse(fixed_team_with_dose10, dose10_vial_volume, monodose_vial_volume)
                                                                 , with_ice = fixed_team_with_ice
                                                                 , doses_to_transport = doses_fixed_team
-    )
+                                                                )
     
     vaxCarr_required_fixed_team <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
                                                                   , vial_type = ifelse(fixed_team_with_dose10, 'dose10', "monodose")
                                                                   , vax_vol = ifelse(fixed_team_with_dose10, dose10_vial_volume, monodose_vial_volume)
                                                                   , with_ice = fixed_team_with_ice
                                                                   , doses_to_transport = doses_fixed_team
-    )
+                                                                  )
     
     
     #################
