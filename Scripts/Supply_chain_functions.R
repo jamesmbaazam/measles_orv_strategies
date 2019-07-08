@@ -327,6 +327,44 @@ calc_freezing_time <- function(mf314_available, large_icepacks_quantity, small_i
 
 }
 
+# calc_teams_and_campaign_days() ----
+#' This function takes in the team days and provides the possible number of teams
+#' and campaign days it would take, assuming teams are either routed in parallel
+#' or sequence. If in sequence, it'll take the same number of team days no matter
+#' the number of teams
+calc_teams_and_campaign_days <- function(team_days){
+   team_quantity <- seq(1, team_days, by =1 )
+   campaign_days <- team_days/ team_quantity
+   out <- data.frame(teams = team_quantity, campaign_duration = campaign_days)
+   return(out)
+}
+
+
+
+# calc_logistical_needs() ----
+#' This function takes in the possible number of teams, the equipment type
+#' the team will use, and how many per team. It returns the number of 
+#' the logisticals needs in terms of RCW25 and vaccine carriers using the rule
+#' that 1 fixed team needs an RCW25 and a vaccine carrier and a mobile team either
+#' can use 1 RCW25 or 1 vaccine carrier, hence, two scenarios. 
+#' NOTE: If we want to use the MSF policy where two teams on a site share one RCW25s
+#' but one vaccine carrier per team, then the number of RCW25 per team input will
+#' be 0.5 and vaxCarr will be 1.
+
+calc_logistical_needs <- function(num_of_teams, team_equip_type, rcw25_per_team = NA, vaxCarr_per_team = NA){ #'team_equip_type = 'rcw25', 'vaxCarr', 'both'
+  if (team_equip_type == 'rcw25' & !is.na(rcw25_per_team)) {
+     out <- data.frame(rcw25 = num_of_teams * rcw25_per_team)
+     return(out)
+  } else if (team_equip_type == 'vaxCarr' & !is.na(vaxCarr_per_team)) {
+     out <- data.frame(vaxCarr = num_of_teams * vaxCarr_per_team)
+     return(out)
+  } else if ((team_equip_type == 'both' & vaxCarr_per_team) & (team_equip_type == 'both' & !is.na(vaxCarr_per_team))) {
+     out <- data.frame(rcw25 = num_of_teams * rcw25_per_team, vaxCarr = num_of_teams * vaxCarr_per_team)
+     return(out)
+  } else{
+     stop('check team_equip_type input')
+  }
+}
 
 
 #calc_campaign_start(): ----
