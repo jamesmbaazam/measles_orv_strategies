@@ -1,12 +1,14 @@
-################################################################################
-#'compute_rcw25_icepacks() & compute_varCarr_icepacks(): Calculate ice pack needs 
-#' for each vax carrier and RCW25s, based on ambient temperature
-################################################################################
+
+# compute_rcw25_icepacks() & compute_varCarr_icepacks(): ---- 
+#' Calculate ice pack needs for each vax carrier and RCW25s, based on ambient 
+#' temperature
+
 compute_rcw25_icepacks <- function(amb_temp){
    switch (amb_temp,
            "below 40" = 12,
            "above 40" = 24
-   ) #I use the upper and lower limits of ice required. Lowest to use is 12 and highest is 24. 
+   ) #I use the upper and lower limits of ice required. Lowest to use is 12 and 
+   highest is 24. 
 }
 
 
@@ -20,30 +22,34 @@ compute_vaxCarr_icepacks <- function(amb_temp){
 
 
 
-################################################################################
-#'extract_near_pop() & extract_far_pop(): Extract population sizes for near and far
+
+# extract_near_pop() & extract_far_pop(): ----
+#' Extract population sizes for near and far
 #' kids for further calculations
-################################################################################
+
 extract_near_pop <- function(df, site_rows_selected){
    df %>%
-      dplyr::slice(site_rows_selected) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+      dplyr::slice(site_rows_selected) %>% # for now, we are only going to concentrate 
+      on one site. User indicates which site to analyse
       .$near_pop
 }
 
 
 extract_far_pop <- function(df, site_rows_selected){
    df %>%
-      dplyr::slice(site_rows_selected) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
+      dplyr::slice(site_rows_selected) %>% # for now, we are only going to concentrate 
+      on one site. User indicates which site to analyse
       .$far_pop
 }
 
 
-################################################################################
-#' extract_site_team_size(): Extract size of allocated teams for a site from the 
-#' sites table
-################################################################################
 
-extract_site_team_size <- function(df, site_rows_selected) { # for now, we are only going to concentrate on one site. User indicates which site to analyse
+# extract_site_team_size(): ---- 
+#' #Extract size of allocated teams for a site from the sites table
+
+
+extract_site_team_size <- function(df, site_rows_selected) { # for now, we are only 
+   going to concentrate on one site. User indicates which site to analyse
   teams <- df %>%
     dplyr::slice(site_rows_selected) %>%
     .$site_team_alloc # number of teams allocated to site
@@ -52,19 +58,18 @@ extract_site_team_size <- function(df, site_rows_selected) { # for now, we are o
 
 
 
-##########
-#calc_effective_doses(): adjusts for wastage and determines the actual number of doses we may be transporting
-##########
+
+# calc_effective_doses(): ----
+#' adjusts for wastage and determines the actual number of doses we may be transporting
+
 calc_effective_doses <- function(dose_quantity, ovwastage){
    eff_doses <- dose_quantity*(1 - ovwastage/100)
    return(eff_doses)
 }
 
 
-################################################################################
-#' print_site_team_dur(): Calculates and outputs to the UI how long the allocated 
-#' teams will spend on a site
-################################################################################
+# print_site_team_dur(): ---- 
+#' Calculates and outputs to the UI how long the allocated teams will spend on a site
 
 print_site_team_dur <- function(site_team_quant, td_fixed, td_mobile){ #td_fixed = team days for fixed site team, #td_mobile = team days for mobile team
  if (site_team_quant == 0) {
@@ -123,9 +128,10 @@ print_site_team_dur <- function(site_team_quant, td_fixed, td_mobile){ #td_fixed
  }
 }
 
-################################################################################
-#' team days calculations
-################################################################################
+
+# team days calculations ----
+#' Functions to calculate the team days for strategies using either monodose or
+#' 10-dose vials
 
 calc_monodose_team_days <- function(target_pop, 
                                     carrier_vol_capacity, 
@@ -171,9 +177,8 @@ calc_dose10_team_days <- function(target_pop,
       return(round(target_pop / effective_doses, 3)) # we can't carry enough doses to even vaccinate the expected number of kids per day, so the volume capacity becomes a constrainst 
    }
 }
-################################################################################
-#' passive cold chain dose capacity
-################################################################################
+
+# calculate passive cold chain dose capacity ----
 
 calc_dose_capacity <- function(vial_type, vax_vol, equip_type, with_ice = T) #vial_type = monodose/dose10 and vax_vol depends on monodose_vialVol/dose10_vialVol #equip_type = c('rcw25','vaxCarr')
    { 
@@ -225,14 +230,20 @@ calc_transport_equipment_needs <- function(equip_type, vial_type, vax_vol, with_
       } 
 }
 
-################################################################################
-#' Full Cold Chain (FCC) calculations
-################################################################################
-#'It is worth noting that the number of doses for a target population is the same for both 10-dose and monodose.
-#'However, the number of vials or vaccines for the same number of doses changes, i.e, 10 doses per vaccine vial for
+
+# Full Cold Chain (FCC) calculations ----
+
+#'It is worth noting that the number of doses for a target population is the same 
+#'for both 10-dose and monodose.
+#'However, the number of vials or vaccines for the same number of doses changes, 
+#'i.e, 10 doses per vaccine vial for
 #'10-dose and 1 vaccine vial per monodose
 
-#calc_doses_required(): calculates number of doses needed based on the target population size; indicate if you need doses for the near or far people; the type of vial you need calcalations for; and the row numbers of the sites you want to analyse
+# calc_doses_required(): ====
+#' calculates number of doses needed based on the target population size; indicate 
+#' if you need doses for the near or far people; the type of vial you need calcalations 
+#' for; and the row numbers of the sites you want to analyse
+
 calc_doses_required <- function(df
                                 , site_rows_selected = 1
                                 , pop_type
@@ -280,29 +291,19 @@ calc_doses_required <- function(df
       }
    }
 
-# ###########################################################
-# #buffer_doses(): account for factors that'll require us to transport
-# #more doses than needed
-# ###########################################################
-# 
-# apply_buffer <- function(buffer_size, doses){
-#    req_doses <- doses * (1 + buffer_size / 100)
-#    return(req_doses)
-# }
 
 
-##############################################
-#Ice pack quantity needed
-###############################################
+# Ice pack quantity needed ----
+
 calc_icepack_tot_quant <- function(equipment_quantity # options: rcw25, vaxCarr
                                    , icepacks_per_equipment
 ){
    return(equipment_quantity * icepacks_per_equipment)
 }
    
-##############################################
-#Ice pack volume needed
-###############################################   
+
+# Ice pack volume needed ----
+  
 calc_icepack_tot_vol <- function(equipment_type #options: large = 0.6L, small = 0.4L
                                  , icepack_quantity
                                  ){
@@ -317,9 +318,7 @@ calc_icepack_tot_vol <- function(equipment_type #options: large = 0.6L, small = 
 }  
 
 
-##########
-#calc_freezing_time()
-##########
+# calc_freezing_time() ----
 
 calc_freezing_time <- function(mf314_available, large_icepacks_quantity, small_icepacks_quantity){
    ceiling(
@@ -329,9 +328,10 @@ calc_freezing_time <- function(mf314_available, large_icepacks_quantity, small_i
 }
 
 
-##########
-#calc_campaign_start(): Calculates the delay to the start of a campaign based on routing rules: sequential or parallel
-##########
+
+#calc_campaign_start(): ----
+#Calculates the delay to the start of a campaign based on routing rules: sequential or parallel
+
 calc_campaign_start <- function(fixedT_freeze_time
                                 , mobileT_freeze_time
                                 , team_routing # routing: "asap" or "parallel"
@@ -353,12 +353,14 @@ calc_campaign_start <- function(fixedT_freeze_time
 }
 
 
-################
-#plotting functions
-###################
 
-#every_nth() is a useful function I got from SO for adding blank labels inbetween
-#vectors for labelling graphs, if you want to have unlabelled ticks
+# plotting functions ----
+
+
+# every_nth() ====
+# is a useful function I got from Stack Overflow for adding blank labels inbetween
+# vectors for labelling graphs, if you want to have unlabelled ticks
+
 every_nth <- function(x, nth, empty = TRUE, inverse = FALSE) 
 {
    if (!inverse) {
