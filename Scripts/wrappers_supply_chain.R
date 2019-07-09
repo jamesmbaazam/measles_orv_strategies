@@ -34,7 +34,7 @@ analyse_prep_delay <- function(strategy_name
     ##Doses and equipment calculations ====
     
     ### Fixed post - number of doses ####
-    doses_fixed_team <-  calc_doses_required(df = site_details
+    n_doses_fixed_team <-  calc_doses_required(df = site_details
                                              , site_rows_selected = site_row
                                              , is_dose10 = fixed_team_with_dose10
                                              , pop_type = 'near'
@@ -53,19 +53,19 @@ analyse_prep_delay <- function(strategy_name
                                                                 , vial_type = ifelse(fixed_team_with_dose10, 'dose10', "monodose")
                                                                 , vax_vol = ifelse(fixed_team_with_dose10, dose10_vial_volume, monodose_vial_volume)
                                                                 , with_ice = fixed_team_with_ice
-                                                                , doses_to_transport = doses_fixed_team
+                                                                , doses_to_transport = n_doses_fixed_team
                                                                 )
     
     vaxCarr_required_fixed_team <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
                                                                   , vial_type = ifelse(fixed_team_with_dose10, 'dose10', "monodose")
                                                                   , vax_vol = ifelse(fixed_team_with_dose10, dose10_vial_volume, monodose_vial_volume)
                                                                   , with_ice = fixed_team_with_ice
-                                                                  , doses_to_transport = doses_fixed_team
+                                                                  , doses_to_transport = n_doses_fixed_team
                                                                   )
     
     
     ### Mobile teams - number of doses ####
-    doses_mobile_team <-  calc_doses_required(df = site_details
+    n_doses_mobile_team <-  calc_doses_required(df = site_details
                                               , site_rows_selected = site_row
                                               , is_dose10 = mobile_team_with_dose10
                                               , pop_type = 'far'
@@ -81,14 +81,14 @@ analyse_prep_delay <- function(strategy_name
                                                                  , vial_type = ifelse(mobile_team_with_dose10, 'dose10', "monodose")
                                                                  , vax_vol = ifelse(mobile_team_with_dose10, dose10_vial_volume, monodose_vial_volume)
                                                                  , with_ice = mobile_team_with_ice
-                                                                 , doses_to_transport = doses_mobile_team
+                                                                 , doses_to_transport = n_doses_mobile_team
     )
     
     vaxCarr_required_mobile_team <- calc_transport_equipment_needs(equip_type = 'vaxCarr'
                                                                    , vial_type = ifelse(mobile_team_with_dose10, 'dose10', "monodose")
                                                                    , vax_vol = ifelse(mobile_team_with_dose10, dose10_vial_volume, monodose_vial_volume)
                                                                    , with_ice = mobile_team_with_ice
-                                                                   , doses_to_transport = doses_mobile_team
+                                                                   , doses_to_transport = n_doses_mobile_team
     )
     
     
@@ -159,9 +159,9 @@ analyse_prep_delay <- function(strategy_name
     ## Results - Campaign delays ====
     out <- data.frame(strategy = strategy_name,
                       ft_vial_type = ifelse(fixed_team_with_dose10, 'dose10', 'monodose')
-                      , ft_doses_required = doses_fixed_team
+                      , ft_doses_required = n_doses_fixed_team
                       , mt_vial_type = ifelse(mobile_team_with_dose10, 'dose10', 'monodose')
-                      , mt_doses_required = doses_mobile_team
+                      , mt_doses_required = n_doses_mobile_team
                       , ft_RCW25 = RCW25_required_fixed_team
                       , mt_RCW25 = RCW25_required_mobile_team
                       , ft_vaxCarr = vaxCarr_required_fixed_team
