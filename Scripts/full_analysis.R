@@ -236,7 +236,8 @@ logistical_needs <- ggplot(data = strategy_logistical_needs_long,
              position = 'dodge'
     ) + 
     facet_wrap('team_type', labeller = as_labeller(c('fixed_team' = 'Fixed team', 'mobile_team' = 'Mobile team'))) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+   # theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = 'top') +
+    theme(legend.position = 'top') +
     labs(#title = 'Number of days per team type and strategy',
         x = 'Strategy'
         ,  y = "Quantity"
