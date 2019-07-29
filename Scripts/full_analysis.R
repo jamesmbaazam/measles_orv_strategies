@@ -251,9 +251,27 @@ logistical_needs <- ggplot(data = strategy_logistical_needs_long,
     shiny_plot_theme
 
 if(save_sc_plots){
-    ggsave(filename = 'figures/logistical_needs.pdf', plot = logistical_needs, device = 'pdf')
+    ggsave(filename = 'figures/logistical_needs_plot.pdf', plot = logistical_needs, device = 'pdf', width = 10, height = 4.3) #probably not a good scale to save it for a publication but for a presentation
 }
 
+#applying theme_economist() from the ggthemes package for trial
+library('ggthemes')
+#control whether or not to save the economist_theme plots
+save_economist_theme_plots <- TRUE
+
+logistical_needs_econ_theme_white <- logistical_needs + theme_economist_white() + scale_color_economist()
+logistical_needs_econ_theme_default <- logistical_needs + theme_economist()
+
+#display the economist_theme plots
+if(display_sc_plots){
+    plot(logistical_needs_econ_theme_white)
+    plot(logistical_needs_econ_theme_default)
+}
+
+if(save_economist_theme_plots){
+    ggsave(filename = 'figures/logistical_needs_econ_theme_white.pdf', plot = logistical_needs_econ_theme_white, device = 'pdf', width = 10, height = 4.3) 
+    ggsave(filename = 'figures/logistical_needs_econ_theme_default.pdf', plot = logistical_needs_econ_theme_default, device = 'pdf', width = 10, height = 4.3)
+}
 
 #Combine all into one plot
 if(display_sc_plots){
@@ -263,6 +281,7 @@ if(display_sc_plots){
                                        team_days_plot,
                                        nrow = 2)
 }
+
 
 if(save_sc_plots){
     ggsave(filename = 'figures/campaign_delay_and_duration.pdf', plot = campaign_delay_and_duration_plot, device = 'pdf')
