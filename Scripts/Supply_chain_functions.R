@@ -8,7 +8,7 @@ compute_rcw25_icepacks <- function(amb_temp){
            "below 40" = 12,
            "above 40" = 24
    ) #I use the upper and lower limits of ice required. Lowest to use is 12 and 
-   highest is 24. 
+ #  highest is 24. 
 }
 
 
@@ -29,16 +29,14 @@ compute_vaxCarr_icepacks <- function(amb_temp){
 
 extract_near_pop <- function(df, site_rows_selected){
    df %>%
-      dplyr::slice(site_rows_selected) %>% # for now, we are only going to concentrate 
-      on one site. User indicates which site to analyse
+      dplyr::slice(site_rows_selected) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
       .$near_pop
 }
 
 
 extract_far_pop <- function(df, site_rows_selected){
    df %>%
-      dplyr::slice(site_rows_selected) %>% # for now, we are only going to concentrate 
-      on one site. User indicates which site to analyse
+      dplyr::slice(site_rows_selected) %>% # for now, we are only going to concentrate on one site. User indicates which site to analyse
       .$far_pop
 }
 
@@ -48,8 +46,7 @@ extract_far_pop <- function(df, site_rows_selected){
 #' #Extract size of allocated teams for a site from the sites table
 
 
-extract_site_team_size <- function(df, site_rows_selected) { # for now, we are only 
-   going to concentrate on one site. User indicates which site to analyse
+extract_site_team_size <- function(df, site_rows_selected) { # for now, we are only going to concentrate on one site. User indicates which site to analyse
   teams <- df %>%
     dplyr::slice(site_rows_selected) %>%
     .$site_team_alloc # number of teams allocated to site
