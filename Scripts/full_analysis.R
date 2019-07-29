@@ -243,9 +243,8 @@ logistical_needs <- ggplot(data = strategy_logistical_needs_long,
         ,  y = "Quantity"
     ) +
     scale_x_discrete(labels = x_axis_labels) +
-    scale_y_continuous(breaks = seq(min(strategy_logistical_needs_long$equip_quantity), max(strategy_logistical_needs_long$equip_quantity), 10),
-                       labels = every_nth(seq(min(strategy_logistical_needs_long$equip_quantity), max(strategy_logistical_needs_long$equip_quantity), 10), 2)
-    ) +
+    scale_y_continuous(breaks = seq(0, (max(strategy_logistical_needs_long$equip_quantity) + 10), 10),
+                       labels = every_nth(seq(0, max(strategy_logistical_needs_long$equip_quantity) + 10, 10), 2)) +
     scale_fill_manual(values = c("forestgreen", "grey27"),
                       name = "Equipment",
                       labels = c('RCW 25', 'Vaccine carrier')) +
