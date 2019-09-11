@@ -178,6 +178,7 @@ strategy_logistical_needs_long <- sc_analysis_output %>%
 
 x_axis_labels <- c('10-dose FCC', 'Monodose FCC', 'Mixed FCC', 'Part OCC')
 
+
 #Plot 1: Delay before a campaign can commence
 campaign_delay_plot <- ggplot(data = strategy_campaign_prep_delays,
                               aes(x = strategy, y = mt_freezing_time)) +
@@ -193,6 +194,7 @@ campaign_delay_plot <- ggplot(data = strategy_campaign_prep_delays,
     theme(legend.position = 'none', axis.ticks.x = element_blank()) + 
     # theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     shiny_plot_theme
+
 
 # if(save_sc_plots){
 #     ggsave(filename = 'figures/campaign_commencement_delay.pdf', plot = campaign_delay_plot, device = 'pdf')
@@ -218,6 +220,16 @@ team_days_plot <- ggplot(data = strategy_team_days_long,
                       labels = c('Fixed team', 'Mobile team')) +
     theme(legend.position = 'bottom') + 
     shiny_plot_theme
+
+
+
+
+
+
+
+
+
+################################################################################
 
 # if(save_sc_plots){
 #     ggsave(filename = 'figures/team_days.pdf', plot = team_days_plot, device = 'pdf')
@@ -1019,6 +1031,172 @@ if(save_sc_plots){
 }
 
 
+#################################################################################
+# Research days talk plots ----
+x_axis_labels_rd_ppt <- c('Full Cold Chain', 'Outside Cold Chain')
+
+campaign_delay_df <- strategy_campaign_prep_delays %>% 
+    select(strategy, ft_freezing_time, mt_freezing_time) %>% 
+    melt(id = 'strategy', value.name = 'freezing_time')
+
+campaign_delay_df$variable <- ifelse(campaign_delay_df$variable == 'ft_freezing_time', 'fixed_team', 'mobile_team') 
+campaign_delay_df
+
+campaign_delay_plot_rd_ppt <- ggplot(data = campaign_delay_df[c(1,4,5,8), ],
+                                     aes(x = strategy, y = freezing_time)) +
+    geom_bar(aes(fill = variable), 
+             color = 'black', 
+             stat = "identity", 
+             width = 0.25, 
+             position = 'dodge') +
+    labs(#title = 'Freezing time required per strategy',
+        x = '',
+        y = "Campaign delay (days)"
+    ) + 
+    scale_fill_manual(name = "Team type",
+                      values = c("royalblue4", "tomato3"),
+                      #values = c("aquamarine4", "goldenrod4"),
+                      labels = c('Fixed team', 'Mobile team')
+                      ) +
+    scale_x_discrete(labels = c('','')) + 
+    theme_economist() + 
+    theme(legend.position = 'none', axis.ticks.x = element_blank()) + 
+    presentation_plot_theme
+
+team_days_plot_rd_ppt<- ggplot(data = strategy_team_days_long[c(1,4,5,8), ],
+                               aes(x = strategy_name,
+                                   y = team_days,
+                                   fill = team_type
+                               )
+) +
+    geom_bar(color = 'black', stat = 'identity', position = 'dodge', width = 0.25) +
+    # theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    labs(#title = 'Number of days per team type and strategy',
+        x = 'Strategy'
+        ,  y = "Campaign duration"
+    ) +
+    scale_x_discrete(labels = x_axis_labels_rd_ppt) +
+    scale_fill_manual(name = "Team type",
+                      #values = c("aquamarine4", "goldenrod4"),
+                      values = c("royalblue4", "tomato3"),
+                      labels = c('Fixed team', 'Mobile team')
+                      ) + theme_economist() + 
+    theme(legend.position = 'bottom') + 
+    presentation_plot_theme
+
+#arrange on a grid
+delays_plot_rd_ppt <- grid.arrange(campaign_delay_plot_rd_ppt,
+             # iceVol_plot,
+             team_days_plot_rd_ppt,
+             nrow = 2)
+
+plot(delays_plot_rd_ppt)
+
+
+#arrow plots
+#fixed team
+near_campaign_period_plot_rd_ppt <- ggplot() + 
+    geom_segment(data = near_campaign_period_df[c(1,4), ], 
+                 aes(x = ft_freezing_time
+                     , xend = ft_team_days + ft_freezing_time
+                     , y = 1
+                     , yend = 1
+                     , color = strategy
+                 )
+                 , size = 1
+                 , arrow = arrow(length = unit(0.06, "npc"), ends = 'both', type = 'closed')
+    ) + 
+    geom_segment(data = near_campaign_period_df[c(1,4), ], 
+                 aes(x = ft_freezing_time
+                     , xend = ft_team_days + ft_freezing_time
+                     , y = 1.01
+                     , yend = 1.01
+                     
+                 ), color = 'blue'
+                 , size = 1
+                 , arrow = arrow(length = unit(0.06, "npc"), ends = 'both', type = 'closed')
+    ) + scale_x_continuous(breaks = seq(0, 25, 5), labels = seq(0, 25, 5)) + 
+    scale_color_manual(name = "Strategy",
+                       # breaks = c('dose10_fcc_parallel', 'part_occ_asap'),
+                       values = c("royalblue4", "tomato3"),
+                       labels = x_axis_labels_rd_ppt
+    ) +
+    labs(x = 'Campaign period (Fixed team)', y = '') + 
+    theme_economist() +
+    theme(axis.title.y = element_blank(), 
+          axis.text.y = element_blank(), 
+          axis.ticks.y = element_blank()
+    ) +
+    presentation_plot_theme
+
+
+near_campaign_period_plot_rd_ppt
+
+#mobile team
+far_campaign_period_plot_rd_ppt <- ggplot() + 
+    geom_segment(data = far_campaign_period_df[c(1,4), ], 
+             aes(x = mt_freezing_time
+                 , xend = mt_team_days + mt_freezing_time
+                 , y = 1
+                 , yend = 1
+                 , color = strategy
+             )
+             , size = 1
+             , arrow = arrow(length = unit(0.06, "npc"), ends = 'both', type = 'closed')
+) + scale_x_continuous(breaks = seq(0, 15, 3), labels = seq(0, 15, 3)) + 
+    scale_color_manual(name = "Strategy",
+                     # breaks = c('dose10_fcc_parallel', 'part_occ_asap'),
+                      values = c("royalblue4", "tomato3"),
+                      labels = x_axis_labels_rd_ppt
+                      ) +
+    labs(x = 'Campaign period (days)', y = '') + 
+    theme_economist() +
+    theme(axis.title.y = element_blank(), 
+          axis.text.y = element_blank(), 
+          axis.ticks.y = element_blank()
+          ) +
+    presentation_plot_theme
+
+
+far_campaign_period_plot_rd_ppt
+
+
+
+
+
+
+
+
+
+#total cases bar plot
+near_orv_total_cases_mod <- near_orv_total_cases %>% 
+    mutate(cases_cumulative_near = cases_cumulative) %>% 
+    select(-cases_cumulative)
+
+far_orv_total_cases_mod <- far_orv_total_cases %>% 
+    mutate(cases_cumulative_far = cases_cumulative) %>% 
+    select(-cases_cumulative)
+
+
+total_cases_df <- left_join(near_orv_total_cases_mod, far_orv_total_cases_mod, by = 'strategy') %>% 
+    mutate(total_cases = sum(cases_cumulative_near, cases_cumulative_far))
+    
+total_cases_plot_rd_ppt <- ggplot(data = total_cases_df[c(1, 4), ], 
+                                  aes(x = strategy, y = total_cases,
+                                      fill = x_axis_labels_rd_ppt
+                                      )
+                                  ) +
+    geom_bar(color = 'black', stat = "identity", width = 0.25) +
+    scale_fill_manual(name = "Strategy",
+                       values = c("Full Cold Chain" = "royalblue4", "Outside Cold Chain" = "tomato3"),
+    ) +
+    scale_x_discrete(labels = x_axis_labels_rd_ppt) + 
+    labs(x = 'Strategy',  
+         y = "Total cases"
+    ) +
+    theme_economist() + presentation_plot_theme
+
+total_cases_plot_rd_ppt
 
 #the region where the two team days intersect are:
 # isocline_with_monodose_td <- ggplot(data = team_days_monodose_occ_dose10_fcc %>% filter(team_days_monodose_occ > min(team_days_monodose_occ))) +
