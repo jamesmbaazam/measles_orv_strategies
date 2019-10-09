@@ -1092,6 +1092,25 @@ delays_plot_rd_ppt <- grid.arrange(campaign_delay_plot_rd_ppt,
 
 plot(delays_plot_rd_ppt)
 
+logistical_needs_subset <- strategy_logistical_needs_long[c(1,4,5,8,9,16), ]
+
+#logistical needs between 10-dose FCC and monodose OCC
+logistical_needs_subset_plot <- ggplot(data = logistical_needs_subset, aes(x = strategy, y = equip_quantity, fill = equip_name)) +
+    geom_bar(stat = 'identity', position = 'dodge') + 
+    facet_wrap('team_type', labeller = as_labeller(c('fixed_team' = 'Fixed team', 'mobile_team' = 'Mobile team'))) +
+    scale_color_manual(name = "Strategy",
+                       # breaks = c('dose10_fcc_parallel', 'part_occ_asap'),
+                       values = c("royalblue4", "tomato3"),
+                       labels = x_axis_labels_rd_ppt
+    ) +
+    scale_x_discrete(labels = x_axis_labels_rd_ppt) +
+    scale_fill_manual(values = c("forestgreen", "grey27"),
+                      name = "Equipment",
+                      labels = c('RCW 25', 'Vaccine carrier')) + 
+    labs(x = 'Strategy', y = 'Equipment Quantity') +
+    theme(legend.position = 'bottom') + 
+    presentation_plot_theme 
+
 
 #arrow plots
 #fixed team
