@@ -32,8 +32,8 @@ orv_model_params <- list(R0 = 12
                          )
 
 
-site_data <- tibble(near_pop = 10000 
-                           , far_pop = 2500
+site_data <- tibble(near_pop = 2500 
+                           , far_pop = 100
                            , site_team_alloc = 1 #number of teams allocated to site
 )
 
