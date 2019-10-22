@@ -23,7 +23,8 @@ sc_model_params <- list(ambient_temp = c("below 40", "above 40")
                 )
 
 
-orv_model_params <- list(R0 = 12
+orv_model_params <- list(near_pop_R0 = 12
+                         , far_pop_R0 = 12
                          , vaccine_efficacy = 0.95
                          , model_time = 365 #run model for a year
                          , LP = 7 #LP = Latent period
@@ -32,8 +33,8 @@ orv_model_params <- list(R0 = 12
                          )
 
 
-site_data <- tibble(near_pop = 2500 
-                           , far_pop = 100
+site_data <- tibble(near_pop = 1000 
+                           , far_pop = 500
                            , site_team_alloc = 1 #number of teams allocated to site
 )
 
