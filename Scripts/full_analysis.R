@@ -325,11 +325,10 @@ if(save_sc_plots){
 #Running the simulations for each strategy
 ###############################################################################
 
-strategy_names_subset <- names(strategy_analysis_list)[c(2, 4, 6, 7)]
 orv_far_strategy_results <- list()
 for (i in 1:length(strategy_names_subset)) {
     orv_far_strategy_results[[strategy_names_subset[i]]] <- runSimulations(
-        R0 = orv_model_params$R0 # transmission coeficient
+        R0 = orv_model_params$far_pop_R0 # transmission coeficient
         , run_time = orv_model_params$model_time # 1 yr!
         , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.25, I0 = 1)
         , strategy_name = strategy_names_subset[i]
@@ -346,7 +345,7 @@ for (i in 1:length(strategy_names_subset)) {
 orv_near_strategy_results <- list()
 for (i in 1:length(strategy_names_subset)) {
     orv_near_strategy_results[[strategy_names_subset[i]]] <- runSimulations(
-        R0 = orv_model_params$R0 # transmission coeficient
+        R0 = orv_model_params$near_pop_R0 # transmission coeficient
         , run_time = orv_model_params$model_time # 1 yr!
         , pop = initializePop(N = site_data$near_pop, initPropImmune = 0.25, I0 = 1)
         , strategy_name = strategy_names_subset[i]
