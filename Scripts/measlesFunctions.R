@@ -114,7 +114,7 @@ vaccinate <- function(pop, tp, v, n_team_type = 1, browse = FALSE) {
   totalPop <- sum(pop)
   
   #calculate the vaccination "rate" from the team performance
-  vax_rate <-  ifelse(pop$Sus1 > n_team_type*tp, n_team_type*(tp/totalPop), pop$Sus1/totalPop)
+  vax_rate <-  ifelse(pop$Sus1 > n_team_type*tp, (n_team_type*tp)/totalPop, pop$Sus1/totalPop)
   # vax_rate <-  ifelse(pop$Sus1 > tp, tp, pop$Sus1)
   #calculate the proportions of individuals who'll be immunised and those who'll fail immunisation
   newly_immunised_batch <- v * vax_rate * pop$Sus1
