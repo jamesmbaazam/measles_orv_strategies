@@ -333,6 +333,7 @@ for (i in 1:length(strategy_names_subset)) {
         , strategy_name = strategy_names_subset[i]
         , vaxDay = as.numeric(subset(strategy_campaign_prep_delays, strategy == strategy_names_subset[i])['mt_freezing_time'])
         , orv_duration = as.numeric(subset(strategy_team_days_long, strategy_name == strategy_names_subset[i] & team_type == 'mobile_team')[ ,'team_days']) #for now we're only looking at the far campaigns 
+        , n_team_type = 2
         , vax_eff = orv_model_params$vaccine_efficacy
         , team_performance = ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["mobile_team_with_dose10"]], as.numeric(sc_model_params$vax_rate['mobile_team']), ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["mobile_team_with_ice"]], 77, 170))
         , time_to_immunity = orv_model_params$immune_response_timing
@@ -349,6 +350,7 @@ for (i in 1:length(strategy_names_subset)) {
         , strategy_name = strategy_names_subset[i]
         , vaxDay = as.numeric(subset(strategy_campaign_prep_delays, strategy == strategy_names_subset[i])['ft_freezing_time'])
         , orv_duration = as.numeric(subset(strategy_team_days_long, strategy_name == strategy_names_subset[i] & team_type == 'fixed_team')[ ,'team_days']) #for now we're only looking at the far campaigns 
+        , n_team_type = 1
         , vax_eff = orv_model_params$vaccine_efficacy
         , team_performance = ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["fixed_team_with_dose10"]], as.numeric(sc_model_params$vax_rate['fixed_team']), ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["fixed_team_with_ice"]], 77, 170))
         , time_to_immunity = orv_model_params$immune_response_timing
