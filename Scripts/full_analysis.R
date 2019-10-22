@@ -52,7 +52,6 @@ strategy_analysis_list <- list(
                                    , mobile_team_with_ice = T
                                    , team_dispatch = 'asap'
     ),
-    
     monodose_fcc_parallel = data.frame(strategy_name = 'monodose_fcc_parallel'
                                        , fixed_team_with_dose10 = F
                                        , fixed_team_with_ice = T
@@ -194,7 +193,7 @@ strategy_logistical_needs_long <- sc_analysis_output %>%
 
 
 
-x_axis_labels <- c('10-dose FCC', 'Monodose FCC', 'Mixed FCC', 'Part OCC')
+x_axis_labels <- c('10-dose FCC', 'Monodose FCC', 'Monodose OCC', 'Mixed FCC', 'Part OCC')
 
 
 #Plot 1: Delay before a campaign can commence
@@ -208,7 +207,7 @@ campaign_delay_plot <- ggplot(data = strategy_campaign_prep_delays,
     scale_fill_manual(name = "Team type",
                       values = c("tomato3")
                       , labels = c('Mobile teams')) +
-    scale_x_discrete(labels = c('','','','')) + 
+    scale_x_discrete(labels = rep('', times = length(x_axis_labels))) + 
     theme(legend.position = 'none', axis.ticks.x = element_blank()) + 
     # theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     shiny_plot_theme
@@ -418,7 +417,7 @@ far_orv_total_cases_table_console <- knitr::kable(select(far_orv_total_cases, 'e
 far_orv_total_cases_table_console
 
 far_orv_total_cases_table_grob <- select(far_orv_total_cases, 'strategy', 'total cases' = 'cases_cumulative')
-far_orv_total_cases_table_grob$strategy <- c('10-dose FCC', 'monodose FCC', 'mixed FCC', 'part OCC')
+far_orv_total_cases_table_grob$strategy <- x_axis_labels
 far_orv_total_cases_table_grob
 
 #I create a dataframe here which I use to draw line segments to indicate the campaign period
@@ -483,7 +482,7 @@ near_orv_total_cases_table_console <- knitr::kable(select(near_orv_total_cases, 
 near_orv_total_cases_table_console
 
 near_orv_total_cases_table_grob <- select(near_orv_total_cases, 'strategy', 'total cases' = 'cases_cumulative')
-near_orv_total_cases_table_grob$strategy <- c('10-dose FCC', 'monodose FCC', 'mixed FCC', 'part OCC')
+near_orv_total_cases_table_grob$strategy <- x_axis_labels
 near_orv_total_cases_table_grob
 
 #I create a dataframe here which I use to draw line segments to indicate the campaign period
@@ -955,7 +954,7 @@ if(save_sc_plots){
 
 #################################################################################
 # Research days talk plots ----
-x_axis_labels_rd_ppt <- c('Full Cold Chain', 'Outside Cold Chain')
+x_axis_labels_rd_ppt <- x_axis_labels
 
 campaign_delay_df <- strategy_campaign_prep_delays %>% 
     select(strategy, ft_freezing_time, mt_freezing_time) %>% 
@@ -980,7 +979,7 @@ campaign_delay_plot_rd_ppt <- ggplot(data = campaign_delay_df[c(1,4,5,8), ],
                       #values = c("aquamarine4", "goldenrod4"),
                       labels = c('Fixed team', 'Mobile team')
                       ) +
-    scale_x_discrete(labels = c('','')) + 
+    scale_x_discrete(labels = rep('', times = length(x_axis_labels))) + 
     theme_economist() + 
     theme(legend.position = 'none', axis.ticks.x = element_blank()) + 
     presentation_plot_theme
@@ -1108,8 +1107,10 @@ far_campaign_period_plot_rd_ppt
 
 
 
-
+###########################################################
 #total cases bar plot
+###########################################################
+
 near_orv_total_cases_mod <- near_orv_total_cases %>% 
     mutate(cases_cumulative_near = cases_cumulative) %>% 
     select(-cases_cumulative)
@@ -1122,22 +1123,127 @@ far_orv_total_cases_mod <- far_orv_total_cases %>%
 total_cases_df <- left_join(near_orv_total_cases_mod, far_orv_total_cases_mod, by = 'strategy') %>% 
     mutate(total_cases = sum(cases_cumulative_near, cases_cumulative_far))
     
-total_cases_plot_rd_ppt <- ggplot(data = total_cases_df[c(1, 4), ], 
+total_cases_plot_rd_ppt <- ggplot(data = total_cases_df, 
                                   aes(x = strategy, y = total_cases,
-                                      fill = x_axis_labels_rd_ppt
+                                      fill = x_axis_labels
                                       )
                                   ) +
     geom_bar(color = 'black', stat = "identity", width = 0.25) +
-    scale_fill_manual(name = "Strategy",
-                       values = c("Full Cold Chain" = "royalblue4", "Outside Cold Chain" = "tomato3"),
-    ) +
-    scale_x_discrete(labels = x_axis_labels_rd_ppt) + 
+   #  scale_fill_manual(name = "Strategy",
+                  #      values = c("Full Cold Chain" = "royalblue4", "Outside Cold Chain" = "tomato3"),
+    #) +
+    scale_x_discrete(labels = x_axis_labels) + 
     labs(x = 'Strategy',  
-         y = "Total cases"
+         y = "Total cases",
+         fill = 'Strategy'
     ) +
-    theme_economist() + presentation_plot_theme
+    theme_economist() + 
+    coord_flip() + 
+    presentation_plot_theme 
 
 total_cases_plot_rd_ppt
+
+#' #Other Plots
+#' 
+#' 
+#' 
+#' 
+#' #range of points for formating axis labels
+#' wastage_vs_team_days_axis_lim <- range(as.numeric(c(team_days_output$team_days_dose10_far_FCC, team_days_output$team_days_monodose_far_OCC)), na.rm = T)
+#' 
+#' #formating monodose data for comparison
+#' monodose_wastage_comparison_dat <- dplyr::filter(team_days_output, dose10_wastage == 0) %>% 
+#'     select(dose10_wastage, team_days_monodose_far_OCC) %>% 
+#'     bind_rows(data.frame(dose10_wastage = max(team_days_output$dose10_wastage, na.rm = T), 
+#'                                                         team_days_monodose_far_OCC = .$team_days_monodose_far_OCC
+#'                                                         )
+#'                                              )
+#' 
+#' #plot of 10 dose mobile team days against increasing wastage
+#' wastage_vs_team_days <- ggplot(data = team_days_output) + 
+#'     geom_point(aes(x = dose10_wastage, y = team_days_dose10_far_FCC)) + 
+#'     geom_line(aes(x = dose10_wastage, y = team_days_dose10_far_FCC))  + 
+#'     geom_point(data = slice(monodose_wastage_comparison_dat, 1), 
+#'               aes(x = dose10_wastage, y = team_days_monodose_far_OCC), 
+#'               color = 'red', 
+#'               size = 2
+#'               ) + 
+#'     scale_y_continuous(breaks = round(seq(wastage_vs_team_days_axis_lim[1], 
+#'                                     wastage_vs_team_days_axis_lim[2], 
+#'                                     length.out = 10), 2
+#'                                     ), 
+#'                        labels = round(seq(wastage_vs_team_days_axis_lim[1], 
+#'                                     wastage_vs_team_days_axis_lim[2], 
+#'                                     length.out = 10), 2
+#'                                     )
+#'                        ) + 
+#'     labs(x = 'Open vial wastage' 
+#'          , y = 'Mobile team days' 
+#'          #, title = '10 dose for far campaigns in full cold chain (monodose value shown in red)'
+#'          )
+#' 
+#' 
+#' 
+#' #plot of monodose mobile team days against increasing dose storage capacity
+#' storage_vs_team_days_lim <- range(c(team_days_output$team_days_monodose_far_OCC, 
+#'                                     team_days_output$team_days_dose10_far_FCC[1]), 
+#'                                   na.rm = T
+#'                                   )
+#' 
+#' #formating 10-dose data for comparison
+#' dose10_storage_comparison_dat <- dplyr::filter(team_days_output, dose10_wastage == 0.155) %>% 
+#'     select(vaxCarr_dose10_capacity, vaxCarr_capacity_ratio, team_days_dose10_far_FCC) %>% 
+#'     bind_rows(data.frame(vaxCarr_dose10_capacity = min(team_days_output$vaxCarr_monodose_capacity, na.rm = T),
+#'                          vaxCarr_capacity_ratio = min(team_days_output$vaxCarr_capacity_ratio, na.rm = T),
+#'                                                         team_days_dose10_far_FCC = .$team_days_dose10_far_FCC
+#'                                              ))
+#' 
+#' 
+#' storage_vs_team_days <- ggplot(data = team_days_output) + 
+#'     geom_point(aes(x = vaxCarr_capacity_ratio, y = team_days_monodose_far_OCC)) + 
+#'     geom_line(aes(x = vaxCarr_capacity_ratio, y = team_days_monodose_far_OCC))  + 
+#'     geom_point(data = slice(dose10_storage_comparison_dat, 1), 
+#'                aes(x = vaxCarr_capacity_ratio, y = team_days_dose10_far_FCC), 
+#'                color = 'red', 
+#'                size = 2
+#'     ) + 
+#'     scale_x_continuous(breaks = round(seq(range(team_days_output$vaxCarr_capacity_ratio)[1], 
+#'             range(team_days_output$vaxCarr_capacity_ratio)[2], 
+#'             length.out = 8), 2),
+#'             labels = round(seq(range(team_days_output$vaxCarr_capacity_ratio)[1], 
+#'                          range(team_days_output$vaxCarr_capacity_ratio)[2], 
+#'                          length.out = 8), 2)
+#'                        ) + 
+#'     scale_y_continuous(breaks = round(
+#'         seq(storage_vs_team_days_lim[1], 
+#'             storage_vs_team_days_lim[2], 
+#'             length.out = 10
+#'         ),
+#'         2
+#'     ), 
+#'     labels = round(seq(storage_vs_team_days_lim[1], 
+#'                        storage_vs_team_days_lim[2], 
+#'                        length.out = 10
+#'     ), 2
+#'     )
+#'     ) + 
+#'     labs(x = 'Dose storage capacity ratio (monodose vs 10-dose)'
+#'          , y = 'Mobile team days'
+#'          #, title = 'Monodose for far campaigns out of cold chain (10 dose value shown in red)'
+#'          )
+#' 
+#'  
+#' 
+#' if(display_sc_plots){
+#'     sc_results_wastage_storage <-  grid.arrange(wastage_vs_team_days, storage_vs_team_days, ncol = 1)
+#' }
+#' 
+#' 
+#Reshaping the results and assigning zero wastage to the monodose strategy
+
+
+
+
 
 #the region where the two team days intersect are:
 # isocline_with_monodose_td <- ggplot(data = team_days_monodose_occ_dose10_fcc %>% filter(team_days_monodose_occ > min(team_days_monodose_occ))) +
