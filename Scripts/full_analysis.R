@@ -116,7 +116,7 @@ strategy_analysis_list <- list(
 #'STRATEGY-SPECIFIC CAMPAIGN DELAY ANALYSIS 
 #'TODO: change the for loop to an lapply function for efficiency
 ##########################################################################
-strategy_names_subset <- c("dose10_fcc_parallel", "monodose_fcc_parallel", "monodose_occ_asap", "mixed_fcc_parallel", "part_occ_asap", "part_occ_parallel")
+strategy_names_subset <- c("dose10_fcc_parallel", "monodose_fcc_parallel", "monodose_occ_asap", "mixed_fcc_parallel", "part_occ_asap")
 
 
 campaign_delay_results <- list()
