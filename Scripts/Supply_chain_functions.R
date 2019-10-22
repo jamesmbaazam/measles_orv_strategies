@@ -374,7 +374,7 @@ calc_campaign_start <- function(fixedT_freeze_time
    team_prep_delays <- c(fixed_team = fixedT_freeze_time, mobile_team = mobileT_freeze_time)
    if (team_routing == 'asap') {
       asap_campaign_day = min(team_prep_delays)
-      faster_team =  names(which(team_prep_delays == asap_campaign_day))
+      faster_team =  ifelse(which(team_prep_delays == asap_campaign_day) == 1, names(which(team_prep_delays == asap_campaign_day)), 'both')
      return(list(start_day = asap_campaign_day
                  , which_team_first = faster_team
                  )
