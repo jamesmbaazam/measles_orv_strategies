@@ -573,7 +573,7 @@ far_orv_cum_incidence_plot <- far_orv_cum_incidence_plot +
                            , labels = every_nth(seq(min(far_orv_dynamics$time), max(far_orv_dynamics$time), 5), 2, inverse = T)
     ) 
 
-far_orv_cum_incidence_plot <- far_orv_cum_incidence_plot + theme_pubr(legend = 'bottom')
+far_orv_cum_incidence_plot <- far_orv_cum_incidence_plot + theme_economist(legend = 'bottom')
 
 far_orv_cum_incidence_plot <- far_orv_cum_incidence_plot + 
     annotation_custom(grob = tableGrob(far_orv_total_cases_table_grob, rows = NULL, theme = ttheme(base_style = "lBlackWhite", tbody.style = tbody_style(hjust = 0)))
@@ -619,7 +619,7 @@ near_orv_cum_incidence_plot <- near_orv_cum_incidence_plot +
                            , labels = every_nth(seq(min(near_orv_dynamics$time), max(near_orv_dynamics$time), 5), 2, inverse = T)
     )
 
-near_orv_cum_incidence_plot <- near_orv_cum_incidence_plot + theme_pubr(legend = 'bottom')
+near_orv_cum_incidence_plot <- near_orv_cum_incidence_plot + theme_economist()
 
 near_orv_cum_incidence_plot <- near_orv_cum_incidence_plot + 
     annotation_custom(tableGrob(near_orv_total_cases_table_grob, 
@@ -876,16 +876,16 @@ isocline_data <- team_days_monodose_occ_dose10_fcc %>%
     
 
 isocline_plot <- ggplot(data = isocline_data) + 
-    geom_point(aes(x = storage_capacity_ratio, y = dose10_ovw)) + 
-    geom_line(aes(x = storage_capacity_ratio, y = dose10_ovw)) + 
+    geom_point(aes(x = storage_capacity_ratio, y = dose10_ovw), size = 2) + 
+    geom_line(aes(x = storage_capacity_ratio, y = dose10_ovw), size = 1) + 
     scale_y_continuous(breaks = round(isocline_data$dose10_ovw, 2), labels = round(isocline_data$dose10_ovw, 2)) 
 
 isocline_plot <- isocline_plot +
     labs(x = 'Storage capacity ratio (monodose over 10-dose)', y = 'Open vial wastage (10-dose)') + 
-    annotate('text', label = '10-dose', x = 0.25, y = 0.70, size = 4) +
-    annotate('text', label = 'Monodose', x = 0.3, y = 0.75, size = 4)
+    annotate('text', label = '10-dose', x = 0.25, y = 0.70, size = 7) +
+    annotate('text', label = 'Monodose', x = 0.3, y = 0.75, size = 7)
 
-isocline_plot <- isocline_plot + theme_pubr()
+isocline_plot <- isocline_plot + theme_economist()
 
 if (display_sc_plots) {
    plot(isocline_plot)  
