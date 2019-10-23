@@ -177,7 +177,7 @@ calc_dose10_team_days <- function(target_pop,
 
 # calculate passive cold chain dose capacity ----
 
-calc_dose_capacity <- function(vial_type, vax_vol, equip_type, with_ice = T) #vial_type = monodose/dose10 and vax_vol depends on monodose_vialVol/dose10_vialVol #equip_type = c('rcw25','vaxCarr')
+calc_dose_capacity <- function(vial_type, vax_vol, equip_type, with_ice) #vial_type = monodose/dose10 and vax_vol depends on monodose_vialVol/dose10_vialVol #equip_type = c('rcw25','vaxCarr')
    { 
    if(vial_type == 'dose10' & vax_vol == 2.1 & equip_type == 'rcw25' & with_ice == T)
    {5000}
@@ -203,7 +203,7 @@ calc_dose_capacity <- function(vial_type, vax_vol, equip_type, with_ice = T) #vi
 
 
 
-calc_transport_equipment_needs <- function(equip_type, vial_type, vax_vol, with_ice = T, doses_to_transport)
+calc_transport_equipment_needs <- function(equip_type, vial_type, vax_vol, with_ice, doses_to_transport)
    { 
    #NB: numbers here are doses and are based on the packed volume per dose, i.e, how much volume is required to pack one dose. 
       if(vial_type == 'dose10' & vax_vol == 2.1 & equip_type == 'rcw25' & with_ice == T)
