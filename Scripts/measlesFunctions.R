@@ -173,9 +173,9 @@ runSimulations <- function(R0 # transmission coeficient
   #while (simResults[time, 'Sus1'] > 0) {
   while (time < run_time) {
     # for (time in 1: run_time) {
-    if (!is.na(vaxDay) & time < vaxDay + 1  | time > vaxDay + 1 + orv_duration) {
+    if (!is.na(vaxDay) & time < vaxDay + 1  | time > vaxDay + 1 + (orv_duration/n_team_type)) {
       simResults <- rbind(simResults, data.frame(time, step(pop = simResults[time, -1], R0 = R0)))
-    }else if (!is.na(vaxDay) & time >= vaxDay + 1  & time <= vaxDay + 1 + orv_duration){
+    }else if (!is.na(vaxDay) & time >= vaxDay + 1  & time <= vaxDay + 1 + (orv_duration/n_team_type)){
       simResults <- rbind(simResults, data.frame(time, step(pop = vaccinate(simResults[time, -1], v = vax_eff, n_team_type = n_team_type, tp = team_performance), R0 = R0)))
     }else if (is.na(vaxDay)){
       simResults <- rbind(simResults, data.frame(time, step(pop = simResults[time, -1], R0 = R0)))
