@@ -421,51 +421,51 @@ far_orv_total_cases_table_grob$strategy <- x_axis_labels
 far_orv_total_cases_table_grob
 
 #I create a dataframe here which I use to draw line segments to indicate the campaign period
-far_campaign_period_df <- data.frame(campaign_indicators_df, cases_peak = max(far_orv_dynamics$Inf4))
-far_campaign_period_df <- mutate(far_campaign_period_df, cases_peak = cases_peak - c(0, 2, 4, 6))
+# far_campaign_period_df <- data.frame(campaign_indicators_df, cases_peak = max(far_orv_dynamics$Inf4))
+# far_campaign_period_df <- mutate(far_campaign_period_df, cases_peak = cases_peak - c(0, 2, 4, 6))
 
 
 #incidence (in this model, we assume infectious people are only diagnosed on their 4th day of infectiousness, i.e, Inf4)    
-far_orv_incidence_plot <- ggplot(data = far_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
-    geom_point(aes(x = time, y = Inf4, color = strategy), size = 2) + 
-    geom_line(aes(x = time, y = Inf4, color = strategy), size = 1) 
-
-
-far_orv_incidence_plot <- far_orv_incidence_plot + 
-    geom_segment(data = far_campaign_period_df, 
-                 aes(x = mt_freezing_time
-                     , xend = mt_team_days + mt_freezing_time
-                     , y = cases_peak
-                     , yend = cases_peak
-                     , color = strategy
-                     )
-               #  , lineend = 'round'
-                 , size = 1
-                 , arrow = arrow(length = unit(0.01, "npc"), ends = 'both', type = 'closed')
-                 )
-
-far_orv_incidence_plot <- far_orv_incidence_plot +
-    labs(title = paste0('Far population (size = ', site_data$far_pop, ')'), x = 'Time (days)', y = 'Incidence') + 
-    guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
-    theme(legend.position = 'bottom') +
-    scale_color_manual(name = "Strategy"
-                       , values = c('forestgreen', 'blue', 'black', 'red', 'orange')
-                       , labels = x_axis_labels
-                       , breaks = strategy_names_subset
-                       ) + scale_x_continuous(breaks = seq(min(far_orv_dynamics$time), max(far_orv_dynamics$time), 5)
-                                              , labels = every_nth(seq(min(far_orv_dynamics$time), max(far_orv_dynamics$time), 5), 2, inverse = T)
-                                              ) 
-far_orv_incidence_plot <- far_orv_incidence_plot + theme_pubr(legend = 'bottom')
-    
-far_orv_incidence_plot <- far_orv_incidence_plot + 
-    annotation_custom(grob = tableGrob(far_orv_total_cases_table_grob, rows = NULL, theme = ttheme(base_style = "lBlackWhite", tbody.style = tbody_style(hjust = 0)))
-                      , xmin = 90
-                      , xmax = 120
-                      , ymin = 20
-                      , ymax = 30
-                      )
-
-far_orv_incidence_plot
+# far_orv_incidence_plot <- ggplot(data = far_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
+#     geom_point(aes(x = time, y = Inf4, color = strategy), size = 2) + 
+#     geom_line(aes(x = time, y = Inf4, color = strategy), size = 1) 
+# 
+# 
+# far_orv_incidence_plot <- far_orv_incidence_plot + 
+#     geom_segment(data = far_campaign_period_df, 
+#                  aes(x = mt_freezing_time
+#                      , xend = mt_team_days + mt_freezing_time
+#                      , y = cases_peak
+#                      , yend = cases_peak
+#                      , color = strategy
+#                      )
+#                #  , lineend = 'round'
+#                  , size = 1
+#                  , arrow = arrow(length = unit(0.01, "npc"), ends = 'both', type = 'closed')
+#                  )
+# 
+# far_orv_incidence_plot <- far_orv_incidence_plot +
+#     labs(title = paste0('Far population (size = ', site_data$far_pop, ')'), x = 'Time (days)', y = 'Incidence') + 
+#     guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
+#     theme(legend.position = 'bottom') +
+#     scale_color_manual(name = "Strategy"
+#                        , values = c('forestgreen', 'blue', 'black', 'red', 'orange')
+#                        , labels = x_axis_labels
+#                        , breaks = strategy_names_subset
+#                        ) + scale_x_continuous(breaks = seq(min(far_orv_dynamics$time), max(far_orv_dynamics$time), 5)
+#                                               , labels = every_nth(seq(min(far_orv_dynamics$time), max(far_orv_dynamics$time), 5), 2, inverse = T)
+#                                               ) 
+# far_orv_incidence_plot <- far_orv_incidence_plot + theme_pubr(legend = 'bottom')
+#     
+# far_orv_incidence_plot <- far_orv_incidence_plot + 
+#     annotation_custom(grob = tableGrob(far_orv_total_cases_table_grob, rows = NULL, theme = ttheme(base_style = "lBlackWhite", tbody.style = tbody_style(hjust = 0)))
+#                       , xmin = 90
+#                       , xmax = 120
+#                       , ymin = 20
+#                       , ymax = 30
+#                       )
+# 
+# far_orv_incidence_plot
 
 #1. Near orv: total cases
 near_orv_dynamics <- near_orv_epi_dyn_detailed %>% 
@@ -486,161 +486,161 @@ near_orv_total_cases_table_grob$strategy <- x_axis_labels
 near_orv_total_cases_table_grob
 
 #I create a dataframe here which I use to draw line segments to indicate the campaign period
-near_campaign_period_df <- data.frame(campaign_indicators_df, cases_peak = max(near_orv_dynamics$Inf4))
-near_campaign_period_df <- mutate(near_campaign_period_df, cases_peak = cases_peak - c(0, 10, 20, 30))
+# near_campaign_period_df <- data.frame(campaign_indicators_df, cases_peak = max(near_orv_dynamics$Inf4))
+# near_campaign_period_df <- mutate(near_campaign_period_df, cases_peak = cases_peak - c(0, 10, 20, 30))
 
 
-near_orv_incidence_plot <- ggplot(data = near_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
-    geom_point(aes(x = time, y = Inf4, color = strategy), size = 2) + 
-    geom_line(aes(x = time, y = Inf4, color = strategy), size = 1) 
-
-near_orv_incidence_plot <- near_orv_incidence_plot + 
-    geom_segment(data = near_campaign_period_df, 
-                 aes(x = ft_freezing_time
-                     , xend = ft_team_days + ft_freezing_time
-                     , y = cases_peak
-                     , yend = cases_peak
-                     , color = strategy) 
-                 ,lineend = 'round'
-                 , size = 1
-                 , arrow = arrow(length = unit(0.01, "npc"), ends = 'both', type = 'closed')
-    )
-
-near_orv_incidence_plot <- near_orv_incidence_plot + 
-    labs(title = paste0('Near population (size = ', site_data$near_pop, ')'), x = 'Time', y = 'Incidence') + 
-    guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
-    theme(legend.position = 'bottom') +
-    scale_color_manual(name = "Strategy"
-                       , values = c('forestgreen', 'blue', 'black', 'red', 'orange')
-                       , labels = x_axis_labels
-                       , breaks = strategy_names_subset
-    ) + scale_x_continuous(breaks = seq(min(near_orv_dynamics$time), max(near_orv_dynamics$time), 5)
-                           , labels = every_nth(seq(min(near_orv_dynamics$time), max(near_orv_dynamics$time), 5), 2, inverse = T)
-    )
-near_orv_incidence_plot <- near_orv_incidence_plot + theme_pubr(legend = 'bottom')
-
-near_orv_incidence_plot <- near_orv_incidence_plot + 
-    annotation_custom(tableGrob(near_orv_total_cases_table_grob, 
-                                rows = NULL
-                                , theme = ttheme(base_style = "lBlackWhite", tbody.style = tbody_style(hjust = 0))
-                                )
-                      , xmin = 100
-                      , xmax = 130
-                      , ymin = 200
-                      , ymax = 350
-                      )
-
-near_orv_incidence_plot
+# near_orv_incidence_plot <- ggplot(data = near_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
+#     geom_point(aes(x = time, y = Inf4, color = strategy), size = 2) + 
+#     geom_line(aes(x = time, y = Inf4, color = strategy), size = 1) 
+# 
+# near_orv_incidence_plot <- near_orv_incidence_plot + 
+#     geom_segment(data = near_campaign_period_df, 
+#                  aes(x = ft_freezing_time
+#                      , xend = ft_team_days + ft_freezing_time
+#                      , y = cases_peak
+#                      , yend = cases_peak
+#                      , color = strategy) 
+#                  ,lineend = 'round'
+#                  , size = 1
+#                  , arrow = arrow(length = unit(0.01, "npc"), ends = 'both', type = 'closed')
+#     )
+# 
+# near_orv_incidence_plot <- near_orv_incidence_plot + 
+#     labs(title = paste0('Near population (size = ', site_data$near_pop, ')'), x = 'Time', y = 'Incidence') + 
+#     guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
+#     theme(legend.position = 'bottom') +
+#     scale_color_manual(name = "Strategy"
+#                        , values = c('forestgreen', 'blue', 'black', 'red', 'orange')
+#                        , labels = x_axis_labels
+#                        , breaks = strategy_names_subset
+#     ) + scale_x_continuous(breaks = seq(min(near_orv_dynamics$time), max(near_orv_dynamics$time), 5)
+#                            , labels = every_nth(seq(min(near_orv_dynamics$time), max(near_orv_dynamics$time), 5), 2, inverse = T)
+#     )
+# near_orv_incidence_plot <- near_orv_incidence_plot + theme_pubr(legend = 'bottom')
+# 
+# near_orv_incidence_plot <- near_orv_incidence_plot + 
+#     annotation_custom(tableGrob(near_orv_total_cases_table_grob, 
+#                                 rows = NULL
+#                                 , theme = ttheme(base_style = "lBlackWhite", tbody.style = tbody_style(hjust = 0))
+#                                 )
+#                       , xmin = 100
+#                       , xmax = 130
+#                       , ymin = 200
+#                       , ymax = 350
+#                       )
+# 
+# near_orv_incidence_plot
 
 ######
 #cumulative incidence
 #######
 #I create a dataframe here which I use to draw line segments to indicate the campaign period
-far_campaign_period_cum_cases <- data.frame(campaign_indicators_df, cases_peak = max(far_orv_dynamics$cases_cumulative))
-far_campaign_period_cum_cases <- mutate(far_campaign_period_cum_cases, cases_peak = cases_peak - c(0, 20, 40, 60))
+# far_campaign_period_cum_cases <- data.frame(campaign_indicators_df, cases_peak = max(far_orv_dynamics$cases_cumulative))
+# far_campaign_period_cum_cases <- mutate(far_campaign_period_cum_cases, cases_peak = cases_peak - c(0, 20, 40, 60))
 
 
 #far
-far_orv_cum_incidence_plot <- ggplot(data = far_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
-    geom_point(aes(x = time, y = cases_cumulative, color = strategy), size = 2) + 
-    geom_line(aes(x = time, y = cases_cumulative, color = strategy), size = 1) 
-
-
-far_orv_cum_incidence_plot <- far_orv_cum_incidence_plot + 
-    geom_segment(data = far_campaign_period_cum_cases, 
-                 aes(x = mt_freezing_time
-                     , xend = mt_team_days + mt_freezing_time
-                     , y = cases_peak
-                     , yend = cases_peak
-                     , color = strategy
-                 )
-                 #  , lineend = 'round'
-                 , size = 1
-                 , arrow = arrow(length = unit(0.01, "npc"), ends = 'both', type = 'closed')
-    )
-
-far_orv_cum_incidence_plot <- far_orv_cum_incidence_plot +
-    labs(title = paste0('Far population (size = ', site_data$far_pop, ')'), x = 'Time (days)', y = 'Cumulative incidence') + 
-    guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
-    theme(legend.position = 'bottom') +
-    scale_color_manual(name = "Strategy"
-                       , values = c('forestgreen', 'blue', 'black', 'red', 'orange')
-                       , labels = x_axis_labels
-                       , breaks = strategy_names_subset
-    ) + scale_x_continuous(breaks = seq(min(far_orv_dynamics$time), max(far_orv_dynamics$time), 5)
-                           , labels = every_nth(seq(min(far_orv_dynamics$time), max(far_orv_dynamics$time), 5), 2, inverse = T)
-    ) 
-
-far_orv_cum_incidence_plot <- far_orv_cum_incidence_plot + theme_economist(legend = 'bottom')
-
-far_orv_cum_incidence_plot <- far_orv_cum_incidence_plot + 
-    annotation_custom(grob = tableGrob(far_orv_total_cases_table_grob, rows = NULL, theme = ttheme(base_style = "lBlackWhite", tbody.style = tbody_style(hjust = 0)))
-                      , xmin = 90
-                      , xmax = 125
-                      , ymin = 20
-                      , ymax = 200
-    )
-
-far_orv_cum_incidence_plot
+# far_orv_cum_incidence_plot <- ggplot(data = far_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
+#     geom_point(aes(x = time, y = cases_cumulative, color = strategy), size = 2) + 
+#     geom_line(aes(x = time, y = cases_cumulative, color = strategy), size = 1) 
+# 
+# 
+# far_orv_cum_incidence_plot <- far_orv_cum_incidence_plot + 
+#     geom_segment(data = far_campaign_period_cum_cases, 
+#                  aes(x = mt_freezing_time
+#                      , xend = mt_team_days + mt_freezing_time
+#                      , y = cases_peak
+#                      , yend = cases_peak
+#                      , color = strategy
+#                  )
+#                  #  , lineend = 'round'
+#                  , size = 1
+#                  , arrow = arrow(length = unit(0.01, "npc"), ends = 'both', type = 'closed')
+#     )
+# 
+# far_orv_cum_incidence_plot <- far_orv_cum_incidence_plot +
+#     labs(title = paste0('Far population (size = ', site_data$far_pop, ')'), x = 'Time (days)', y = 'Cumulative incidence') + 
+#     guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
+#     theme(legend.position = 'bottom') +
+#     scale_color_manual(name = "Strategy"
+#                        , values = c('forestgreen', 'blue', 'black', 'red', 'orange')
+#                        , labels = x_axis_labels
+#                        , breaks = strategy_names_subset
+#     ) + scale_x_continuous(breaks = seq(min(far_orv_dynamics$time), max(far_orv_dynamics$time), 5)
+#                            , labels = every_nth(seq(min(far_orv_dynamics$time), max(far_orv_dynamics$time), 5), 2, inverse = T)
+#     ) 
+# 
+# far_orv_cum_incidence_plot <- far_orv_cum_incidence_plot + theme_economist(legend = 'bottom')
+# 
+# far_orv_cum_incidence_plot <- far_orv_cum_incidence_plot + 
+#     annotation_custom(grob = tableGrob(far_orv_total_cases_table_grob, rows = NULL, theme = ttheme(base_style = "lBlackWhite", tbody.style = tbody_style(hjust = 0)))
+#                       , xmin = 90
+#                       , xmax = 125
+#                       , ymin = 20
+#                       , ymax = 200
+#     )
+# 
+# far_orv_cum_incidence_plot
 
 #Near orv
 #I create a dataframe here which I use to draw line segments to indicate the campaign period
-near_campaign_period_cum_cases <- data.frame(campaign_indicators_df, cases_peak = max(near_orv_dynamics$cases_cumulative))
-near_campaign_period_cum_cases <- mutate(near_campaign_period_cum_cases, cases_peak = cases_peak - c(0, 200, 400, 600))
+# near_campaign_period_cum_cases <- data.frame(campaign_indicators_df, cases_peak = max(near_orv_dynamics$cases_cumulative))
+# near_campaign_period_cum_cases <- mutate(near_campaign_period_cum_cases, cases_peak = cases_peak - c(0, 200, 400, 600))
 
 
-near_orv_cum_incidence_plot <- ggplot(data = near_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
-    geom_point(aes(x = time, y = cases_cumulative, color = strategy), size = 2) + 
-    geom_line(aes(x = time, y = cases_cumulative, color = strategy), size = 1) 
-
-near_orv_cum_incidence_plot <- near_orv_cum_incidence_plot + 
-    geom_segment(data = near_campaign_period_cum_cases, 
-                 aes(x = ft_freezing_time
-                     , xend = ft_team_days + ft_freezing_time
-                     , y = cases_peak
-                     , yend = cases_peak
-                     , color = strategy) 
-                 ,lineend = 'round'
-                 , size = 1
-                 , arrow = arrow(length = unit(0.01, "npc"), ends = 'both', type = 'closed')
-    )
-
-near_orv_cum_incidence_plot <- near_orv_cum_incidence_plot + 
-    labs(title = paste0('Near population (size = ', site_data$near_pop, ')'), x = 'Time', y = 'Cumulative incidence') + 
-    guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
-    theme(legend.position = 'bottom') +
-    scale_color_manual(name = "Strategy"
-                       , values = c('forestgreen', 'blue', 'black', 'red', 'orange')
-                       , labels = x_axis_labels
-                       , breaks = strategy_names_subset
-    ) + scale_x_continuous(breaks = seq(min(near_orv_dynamics$time), max(near_orv_dynamics$time), 5)
-                           , labels = every_nth(seq(min(near_orv_dynamics$time), max(near_orv_dynamics$time), 5), 2, inverse = T)
-    )
-
-near_orv_cum_incidence_plot <- near_orv_cum_incidence_plot + theme_economist()
-
-near_orv_cum_incidence_plot <- near_orv_cum_incidence_plot + 
-    annotation_custom(tableGrob(near_orv_total_cases_table_grob, 
-                                rows = NULL
-                                , theme = ttheme(base_style = "lBlackWhite", tbody.style = tbody_style(hjust = 0))
-                                )
-                      , xmin = 100
-                      , xmax = 140
-                      , ymin = 4000
-                      , ymax = 6000
-                      )
-
-near_orv_cum_incidence_plot
+# near_orv_cum_incidence_plot <- ggplot(data = near_orv_dynamics %>% filter(Inf4 >= 0.1)) + 
+#     geom_point(aes(x = time, y = cases_cumulative, color = strategy), size = 2) + 
+#     geom_line(aes(x = time, y = cases_cumulative, color = strategy), size = 1) 
+# 
+# near_orv_cum_incidence_plot <- near_orv_cum_incidence_plot + 
+#     geom_segment(data = near_campaign_period_cum_cases, 
+#                  aes(x = ft_freezing_time
+#                      , xend = ft_team_days + ft_freezing_time
+#                      , y = cases_peak
+#                      , yend = cases_peak
+#                      , color = strategy) 
+#                  ,lineend = 'round'
+#                  , size = 1
+#                  , arrow = arrow(length = unit(0.01, "npc"), ends = 'both', type = 'closed')
+#     )
+# 
+# near_orv_cum_incidence_plot <- near_orv_cum_incidence_plot + 
+#     labs(title = paste0('Near population (size = ', site_data$near_pop, ')'), x = 'Time', y = 'Cumulative incidence') + 
+#     guides(color = guide_legend(ncol = 2, nrow = 2, byrow = TRUE)) + 
+#     theme(legend.position = 'bottom') +
+#     scale_color_manual(name = "Strategy"
+#                        , values = c('forestgreen', 'blue', 'black', 'red', 'orange')
+#                        , labels = x_axis_labels
+#                        , breaks = strategy_names_subset
+#     ) + scale_x_continuous(breaks = seq(min(near_orv_dynamics$time), max(near_orv_dynamics$time), 5)
+#                            , labels = every_nth(seq(min(near_orv_dynamics$time), max(near_orv_dynamics$time), 5), 2, inverse = T)
+#     )
+# 
+# near_orv_cum_incidence_plot <- near_orv_cum_incidence_plot + theme_economist()
+# 
+# near_orv_cum_incidence_plot <- near_orv_cum_incidence_plot + 
+#     annotation_custom(tableGrob(near_orv_total_cases_table_grob, 
+#                                 rows = NULL
+#                                 , theme = ttheme(base_style = "lBlackWhite", tbody.style = tbody_style(hjust = 0))
+#                                 )
+#                       , xmin = 100
+#                       , xmax = 140
+#                       , ymin = 4000
+#                       , ymax = 6000
+#                       )
+# 
+# near_orv_cum_incidence_plot
 ###############
 #complete orv dynamics
 ###############
 
 #incidence
-orv_complete_incidence_plot <- grid.arrange(near_orv_incidence_plot, far_orv_incidence_plot, nrow = 2)
-
-#cumulative incidence
-orv_complete_cum_incidence_plot <- grid.arrange(near_orv_cum_incidence_plot, far_orv_cum_incidence_plot, nrow = 2)
-
+# orv_complete_incidence_plot <- grid.arrange(near_orv_incidence_plot, far_orv_incidence_plot, nrow = 2)
+# 
+# #cumulative incidence
+# orv_complete_cum_incidence_plot <- grid.arrange(near_orv_cum_incidence_plot, far_orv_cum_incidence_plot, nrow = 2)
+# 
 
 
 #display and save if indicated
@@ -648,55 +648,55 @@ orv_complete_cum_incidence_plot <- grid.arrange(near_orv_cum_incidence_plot, far
 #near orv dynamics
 
 #display near orv incidence
-if (display_epi_plots) {
-    plot(near_orv_incidence_plot)  
-}
-
-#save near orv incidence plot
-if(save_epi_plots){
-    ggsave(file = 'figures/near_orv_incidence_plot.pdf', plot = near_orv_incidence_plot)
-}
-
-#display near orv cumulative incidence
-if (display_epi_plots) {
-    plot(near_orv_cum_incidence_plot)  
-}
-
-#save near orv cumulative incidence
-if(save_epi_plots){
-    ggsave(file = 'figures/near_orv_cum_incidence_plot.pdf', plot = near_orv_cum_incidence_plot)
-}
-
-#far orv dynamics
-
-#display incidence plot
-if (display_epi_plots) {
-    plot(far_orv_incidence_plot)  
-}
-##save incidence plot
-if(save_epi_plots){
-    ggsave(file = 'figures/far_orv_incidence_plot.pdf', plot = far_orv_incidence_plot)
-}
-
-#display cumulative incidence plot
-if (display_epi_plots) {
-    plot(far_orv_cum_incidence_plot)  
-}
-
-#display cumulative incidence plot
-if(save_epi_plots){
-    ggsave(file = 'figures/far_orv_cum_incidence_plot.pdf', plot = far_orv_cum_incidence_plot)
-}
-
-
-#display complete dynamics
-if (display_epi_plots) {
-    plot(orv_complete_cum_incidence_plot)  
-}
-
-if (display_epi_plots) {
-    plot(orv_complete_incidence_plot)  
-}
+# if (display_epi_plots) {
+#     plot(near_orv_incidence_plot)  
+# }
+# 
+# #save near orv incidence plot
+# if(save_epi_plots){
+#     ggsave(file = 'figures/near_orv_incidence_plot.pdf', plot = near_orv_incidence_plot)
+# }
+# 
+# #display near orv cumulative incidence
+# if (display_epi_plots) {
+#     plot(near_orv_cum_incidence_plot)  
+# }
+# 
+# #save near orv cumulative incidence
+# if(save_epi_plots){
+#     ggsave(file = 'figures/near_orv_cum_incidence_plot.pdf', plot = near_orv_cum_incidence_plot)
+# }
+# 
+# #far orv dynamics
+# 
+# #display incidence plot
+# if (display_epi_plots) {
+#     plot(far_orv_incidence_plot)  
+# }
+# ##save incidence plot
+# if(save_epi_plots){
+#     ggsave(file = 'figures/far_orv_incidence_plot.pdf', plot = far_orv_incidence_plot)
+# }
+# 
+# #display cumulative incidence plot
+# if (display_epi_plots) {
+#     plot(far_orv_cum_incidence_plot)  
+# }
+# 
+# #display cumulative incidence plot
+# if(save_epi_plots){
+#     ggsave(file = 'figures/far_orv_cum_incidence_plot.pdf', plot = far_orv_cum_incidence_plot)
+# }
+# 
+# 
+# #display complete dynamics
+# if (display_epi_plots) {
+#     plot(orv_complete_cum_incidence_plot)  
+# }
+# 
+# if (display_epi_plots) {
+#     plot(orv_complete_incidence_plot)  
+# }
 
 #save complete dynamics
 # if(save_epi_plots){
@@ -761,10 +761,10 @@ team_days_mobile_monodose_occ <- for (storage_capacity_index in 1:length(monodos
                                                                                              , carrier_vol_capacity = monodose_occ_capacity_larger[storage_capacity_index]
                                                                                              )
     }
-
-###############################
-#10 dose FCC 
-###############################
+# 
+# ###############################
+# #10 dose FCC 
+# ###############################
 
 #Considering wastage ranging from 0% to 100%, with 0% meaning no wastage and 100%, wastage of whole vial. MSF considers an average of 15% wastage rate in field operations.
 
@@ -963,7 +963,7 @@ campaign_delay_df <- strategy_campaign_prep_delays %>%
 campaign_delay_df$variable <- ifelse(campaign_delay_df$variable == 'ft_freezing_time', 'fixed_team', 'mobile_team') 
 campaign_delay_df
 
-campaign_delay_plot_rd_ppt <- ggplot(data = campaign_delay_df[c(1,4,5,8), ],
+campaign_delay_plot_rd_ppt <- ggplot(data = campaign_delay_df,
                                      aes(x = strategy, y = freezing_time)) +
     geom_bar(aes(fill = variable), 
              color = 'black', 
@@ -984,7 +984,7 @@ campaign_delay_plot_rd_ppt <- ggplot(data = campaign_delay_df[c(1,4,5,8), ],
     theme(legend.position = 'none', axis.ticks.x = element_blank()) + 
     presentation_plot_theme
 
-team_days_plot_rd_ppt<- ggplot(data = strategy_team_days_long[c(1,4,5,8), ],
+team_days_plot_rd_ppt <- ggplot(data = strategy_team_days_long,
                                aes(x = strategy_name,
                                    y = team_days,
                                    fill = team_type
@@ -1013,7 +1013,7 @@ delays_plot_rd_ppt <- grid.arrange(campaign_delay_plot_rd_ppt,
 
 plot(delays_plot_rd_ppt)
 
-logistical_needs_subset <- strategy_logistical_needs_long[c(1,4,5,8,9,16), ]
+logistical_needs_subset <- strategy_logistical_needs_long
 
 #logistical needs between 10-dose FCC and monodose OCC
 logistical_needs_subset_plot <- ggplot(data = logistical_needs_subset, aes(x = strategy, y = equip_quantity, fill = equip_name)) +
@@ -1030,79 +1030,80 @@ logistical_needs_subset_plot <- ggplot(data = logistical_needs_subset, aes(x = s
                       labels = c('RCW 25', 'Vaccine carrier')) + 
     labs(x = 'Strategy', y = 'Equipment Quantity') +
     theme(legend.position = 'bottom') + 
+    coord_flip() +
     presentation_plot_theme 
 
 
 #arrow plots
 #fixed team
-near_campaign_period_plot_rd_ppt <- ggplot() + 
-    geom_segment(data = near_campaign_period_df[c(1,4), ], 
-                 aes(x = ft_freezing_time
-                     , xend = ft_team_days + ft_freezing_time
-                     , y = 1
-                     , yend = 1
-                     , color = strategy
-                 )
-                 , size = 1
-                 , arrow = arrow(length = unit(0.06, "npc"), ends = 'both', type = 'closed')
-    ) + 
-    geom_segment(data = near_campaign_period_df[c(1,4), ], 
-                 aes(x = ft_freezing_time
-                     , xend = ft_team_days + ft_freezing_time
-                     , y = 1.01
-                     , yend = 1.01
-                     
-                 ), color = 'blue'
-                 , size = 1
-                 , arrow = arrow(length = unit(0.06, "npc"), ends = 'both', type = 'closed')
-    ) + scale_x_continuous(breaks = seq(0, 25, 5), labels = seq(0, 25, 5)) + 
-    scale_color_manual(name = "Strategy",
-                       # breaks = c('dose10_fcc_parallel', 'part_occ_asap'),
-                       values = c("royalblue4", "tomato3"),
-                       labels = x_axis_labels_rd_ppt
-    ) +
-    labs(x = 'Campaign period (Fixed team)', y = '') + 
-    theme_economist() +
-    theme(axis.title.y = element_blank(), 
-          axis.text.y = element_blank(), 
-          axis.ticks.y = element_blank()
-    ) +
-    presentation_plot_theme
-
-
-near_campaign_period_plot_rd_ppt
-
-#mobile team
-far_campaign_period_plot_rd_ppt <- ggplot() + 
-    geom_segment(data = far_campaign_period_df[c(1,4), ], 
-             aes(x = mt_freezing_time
-                 , xend = mt_team_days + mt_freezing_time
-                 , y = 1
-                 , yend = 1
-                 , color = strategy
-             )
-             , size = 1
-             , arrow = arrow(length = unit(0.06, "npc"), ends = 'both', type = 'closed')
-) + scale_x_continuous(breaks = seq(0, 15, 3), labels = seq(0, 15, 3)) + 
-    scale_color_manual(name = "Strategy",
-                     # breaks = c('dose10_fcc_parallel', 'part_occ_asap'),
-                      values = c("royalblue4", "tomato3"),
-                      labels = x_axis_labels_rd_ppt
-                      ) +
-    labs(x = 'Campaign period (days)', y = '') + 
-    theme_economist() +
-    theme(axis.title.y = element_blank(), 
-          axis.text.y = element_blank(), 
-          axis.ticks.y = element_blank()
-          ) +
-    presentation_plot_theme
-
-
-far_campaign_period_plot_rd_ppt
-
-
-
-
+# near_campaign_period_plot_rd_ppt <- ggplot() + 
+#     geom_segment(data = near_campaign_period_df[c(1,4), ], 
+#                  aes(x = ft_freezing_time
+#                      , xend = ft_team_days + ft_freezing_time
+#                      , y = 1
+#                      , yend = 1
+#                      , color = strategy
+#                  )
+#                  , size = 1
+#                  , arrow = arrow(length = unit(0.06, "npc"), ends = 'both', type = 'closed')
+#     ) + 
+#     geom_segment(data = near_campaign_period_df[c(1,4), ], 
+#                  aes(x = ft_freezing_time
+#                      , xend = ft_team_days + ft_freezing_time
+#                      , y = 1.01
+#                      , yend = 1.01
+#                      
+#                  ), color = 'blue'
+#                  , size = 1
+#                  , arrow = arrow(length = unit(0.06, "npc"), ends = 'both', type = 'closed')
+#     ) + scale_x_continuous(breaks = seq(0, 25, 5), labels = seq(0, 25, 5)) + 
+#     scale_color_manual(name = "Strategy",
+#                        # breaks = c('dose10_fcc_parallel', 'part_occ_asap'),
+#                        values = c("royalblue4", "tomato3"),
+#                        labels = x_axis_labels_rd_ppt
+#     ) +
+#     labs(x = 'Campaign period (Fixed team)', y = '') + 
+#     theme_economist() +
+#     theme(axis.title.y = element_blank(), 
+#           axis.text.y = element_blank(), 
+#           axis.ticks.y = element_blank()
+#     ) +
+#     presentation_plot_theme
+# 
+# 
+# near_campaign_period_plot_rd_ppt
+# 
+# #mobile team
+# far_campaign_period_plot_rd_ppt <- ggplot() + 
+#     geom_segment(data = far_campaign_period_df[c(1,4), ], 
+#              aes(x = mt_freezing_time
+#                  , xend = mt_team_days + mt_freezing_time
+#                  , y = 1
+#                  , yend = 1
+#                  , color = strategy
+#              )
+#              , size = 1
+#              , arrow = arrow(length = unit(0.06, "npc"), ends = 'both', type = 'closed')
+# ) + scale_x_continuous(breaks = seq(0, 15, 3), labels = seq(0, 15, 3)) + 
+#     scale_color_manual(name = "Strategy",
+#                      # breaks = c('dose10_fcc_parallel', 'part_occ_asap'),
+#                       values = c("royalblue4", "tomato3"),
+#                       labels = x_axis_labels_rd_ppt
+#                       ) +
+#     labs(x = 'Campaign period (days)', y = '') + 
+#     theme_economist() +
+#     theme(axis.title.y = element_blank(), 
+#           axis.text.y = element_blank(), 
+#           axis.ticks.y = element_blank()
+#           ) +
+#     presentation_plot_theme
+# 
+# 
+# far_campaign_period_plot_rd_ppt
+# 
+# 
+# 
+# 
 
 
 
@@ -1141,7 +1142,7 @@ total_cases_plot_rd_ppt <- ggplot(data = total_cases_df,
     coord_flip() + 
     presentation_plot_theme 
 
-total_cases_plot_rd_ppt
+plot(total_cases_plot_rd_ppt)
 
 #' #Other Plots
 #' 
