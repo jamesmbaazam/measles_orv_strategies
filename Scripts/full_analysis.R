@@ -42,22 +42,30 @@ strategy_names_subset <- c("dose10_fcc_asap", "monodose_fcc_asap", "monodose_occ
 #save to file
 # saveRDS(campaign_delay_results_assump1, file = 'model_output/campaign_delay_results_assump1.rds')
 
+far_pop_sizes <- seq(50, 250, length.out = 5)
+near_pop_sizes <- rep(1000, times = length(far_pop_sizes))
+site_pops_df <- make_site_data(near_pop_sizes, far_pop_sizes)
+    
 
 campaign_delay_results_assump2 <- list()
-for (i in seq_along(strategy_names_subset)) {
-    campaign_delay_results_assump2[[strategy_names_subset[i]]] <- analyse_prep_delay_assump2(
-        strategy_name = strategy_names_subset[i]
-        , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[i]]]$fixed_team_with_dose10
-        , fixed_team_with_ice = strategy_analysis_list[[strategy_names_subset[i]]]$fixed_team_with_ice
-        , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[i]]]$mobile_team_with_dose10
-        , mobile_team_with_ice = strategy_analysis_list[[strategy_names_subset[i]]]$mobile_team_with_ice
-        , team_dispatch = strategy_analysis_list[[strategy_names_subset[i]]]$team_dispatch
+
+for (pop_index in 1:nrow(site_pops_df)){
+for (strategy in seq_along(strategy_names_subset)) {
+    campaign_delay_results_assump2[[strategy_names_subset[strategy]]] <- analyse_prep_delay_assump2(
+        strategy_name = strategy_names_subset[strategy]
+        , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[strategy]]]$fixed_team_with_dose10
+        , fixed_team_with_ice = strategy_analysis_list[[strategy_names_subset[strategy]]]$fixed_team_with_ice
+        , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[strategy]]]$mobile_team_with_dose10
+        , mobile_team_with_ice = strategy_analysis_list[[strategy_names_subset[strategy]]]$mobile_team_with_ice
+        , team_dispatch = strategy_analysis_list[[strategy_names_subset[strategy]]]$team_dispatch
+        , site_details = site_pops_df[pop_index, ]
+        , site_row = pop_index
         , fixed_team_equip_type = 'both'
         , mobile_team_equip_type = 'vaxCarr'
         , n_teams_fixed = 1
         , n_teams_mobile = 1
     )
-}
+}}
 
 #save to file
 saveRDS(campaign_delay_results_assump2, file = 'model_output/campaign_delay_results_assump2.rds')
@@ -162,6 +170,31 @@ saveRDS(strategy_assump2_logistical_needs_long, file = 'model_output/strategy_as
 ###############################################################################
 
 #far/remote location
+
+
+
+#running it for different far population sizes
+orv_far_strategy_multiple_pops_results <- list()
+simulation_pop <- list()
+for (pop_size in 1: length(far_pop_sizes)) {
+    simulation_pop[[pop_size]] <- far_pop_sizes[pop_size] 
+    for (i in 1:length(strategy_names_subset)) {
+        orv_far_strategy_multiple_pops_results[[strategy_names_subset[i]]][[far_pop = far_pop]] <- runSimulations(
+            R0 = orv_model_params$far_pop_R0 # transmission coeficient
+            , run_time = orv_model_params$model_time # 1 yr!
+            , pop = initializePop(N = far_pop_sizes[pop_size], initPropImmune = 0.25, I0 = 1)
+            , strategy_name = strategy_names_subset[i]
+            , vaxDay = as.numeric(subset(strategy_campaign_prep_delays, strategy == strategy_names_subset[i])['mt_freezing_time'])
+            , orv_duration = as.numeric(subset(strategy_team_days_long, strategy_name == strategy_names_subset[i] & team_type == 'mobile_team')[ ,'team_days']) #for now we're only looking at the far campaigns 
+            , n_team_type = 2
+            , vax_eff = orv_model_params$vaccine_efficacy
+            , team_performance = ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["mobile_team_with_dose10"]], as.numeric(sc_model_params$vax_rate['mobile_team']), ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["mobile_team_with_ice"]], 77, 170))
+            , time_to_immunity = orv_model_params$immune_response_timing
+            , browse = F
+        ) 
+    }
+    }
+
 orv_far_strategy_results <- list()
 for (i in 1:length(strategy_names_subset)) {
     orv_far_strategy_results[[strategy_names_subset[i]]] <- runSimulations(
