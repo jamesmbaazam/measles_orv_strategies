@@ -10,10 +10,15 @@ source('./scripts/supply_chain_functions.R')
 # and subsubsections following a comment with 4 or more hashes (####)
 
 
-# analyse_prep_delay() ---- 
+# analyse_prep_delay_assump1() ---- 
 #' wrapper to combine all the supply chain functions and analyse 
-#'the logistical needs and time to commence a campaign for each strategy
-analyse_prep_delay <- function(strategy_name
+#'the logistical needs and time to commence a campaign for each strategy, based on
+#' the first transportation assumption. (Refer to dissertation writeup but basically,
+#' we assume that you transport the vaccines to the field base in cold boxes with ice
+#' and when you arrive, you freeze to replace what's in the cold boxes. The essential
+#' point here is that, throughout the campaign, you don't take out the vaccines 
+#' in the cold boxes. This assumption requires a lot more ice)
+analyse_prep_delay_assump1 <- function(strategy_name
                                , fixed_team_with_dose10 # options = if "T", 10 dose, else monodose
                                , fixed_team_with_ice # options = if "T", ice is used, else, no ice
                                , mobile_team_with_dose10 # options = if "T", 10 dose, else monodose
