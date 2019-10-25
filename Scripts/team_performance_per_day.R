@@ -55,18 +55,22 @@ for(ii in 1:nrow(pargrid)){
   out <- rbind(out, tmp)
 }
 
-ggplot(out, aes(x = doses, y = doses_wasted, color = doses)) +
+wastage_plot <- ggplot(out, aes(x = doses, y = doses_wasted, color = doses)) +
   geom_boxplot() +
   facet_grid(kk ~ mkpd)
+plot(wastage_plot)
 
-ggplot(out, aes(x = doses, y = kids_vaxed, color = doses)) +
+vaccinations_plot <- ggplot(out, aes(x = doses, y = kids_vaxed, color = doses)) +
   geom_boxplot() +
   facet_grid(kk ~ mkpd)
+plot(vaccinations_plot)
 
-ggplot(out, aes(x = doses, y = doses_used, color = doses)) +
+dose_usage_plot <- ggplot(out, aes(x = doses, y = doses_used, color = doses)) +
   geom_boxplot() +
-  facet_grid(kk ~ mkpd)
+  facet_grid(kk ~ mkpd) 
+plot(dose_usage_plot)
 
-ggplot(out, aes(x = doses, y = vials_used, color = doses)) +
+vial_usage <- ggplot(out, aes(x = doses, y = vials_used, color = doses)) +
   geom_boxplot() +
   facet_grid(kk ~ mkpd)
+plot(vial_usage)
