@@ -33,10 +33,9 @@ orv_model_params <- list(near_pop_R0 = 12
                          )
 
 
-site_data <- tibble(near_pop = 1000 
-                           , far_pop = 169
-                           , site_team_alloc = 1 #number of teams allocated to site
-)
+site_data <- tibble(near_pop = 1000
+                    , far_pop = 169)
+                           
 
 ###########################################################################
 #Plot control parameters
