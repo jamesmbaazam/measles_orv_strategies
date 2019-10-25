@@ -19,7 +19,13 @@ compute_vaxCarr_icepacks <- function(amb_temp) {
   )
 }
 
+#function to convert specified near and far populations into a data frame
 
+make_site_data <- function(near_pop_size, far_pop_size){
+   data <- data.frame(near_pop = near_pop_size
+                      , far_pop = far_pop_size)
+   return(data)
+}
 
 
 
