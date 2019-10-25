@@ -26,28 +26,50 @@ source('scripts/strategy_list_complete.R')
 strategy_names_subset <- c("dose10_fcc_asap", "monodose_fcc_asap", "monodose_occ_asap", "mixed_fcc_asap", "part_occ_asap")
 
 
-campaign_delay_results <- list()
+#campaign delay - assumption 1
+# campaign_delay_results_assump1 <- list()
+# for (i in seq_along(strategy_names_subset)) {
+#     campaign_delay_results_assump1[[strategy_names_subset[i]]] <- analyse_prep_delay_assump1(
+#         strategy_name = strategy_names_subset[i]
+#         , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[i]]]$fixed_team_with_dose10
+#         , fixed_team_with_ice = strategy_analysis_list[[strategy_names_subset[i]]]$fixed_team_with_ice
+#         , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[i]]]$mobile_team_with_dose10
+#         , mobile_team_with_ice = strategy_analysis_list[[strategy_names_subset[i]]]$mobile_team_with_ice
+#         , team_dispatch = strategy_analysis_list[[strategy_names_subset[i]]]$team_dispatch
+#     )
+# }
+
+#save to file
+# saveRDS(campaign_delay_results_assump1, file = 'model_output/campaign_delay_results_assump1.rds')
+
+
+campaign_delay_results_assump2 <- list()
 for (i in seq_along(strategy_names_subset)) {
-    campaign_delay_results[[strategy_names_subset[i]]] <- analyse_prep_delay(
+    campaign_delay_results_assump2[[strategy_names_subset[i]]] <- analyse_prep_delay_assump2(
         strategy_name = strategy_names_subset[i]
         , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[i]]]$fixed_team_with_dose10
         , fixed_team_with_ice = strategy_analysis_list[[strategy_names_subset[i]]]$fixed_team_with_ice
         , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[i]]]$mobile_team_with_dose10
         , mobile_team_with_ice = strategy_analysis_list[[strategy_names_subset[i]]]$mobile_team_with_ice
         , team_dispatch = strategy_analysis_list[[strategy_names_subset[i]]]$team_dispatch
+        , fixed_team_equip_type = 'both'
+        , mobile_team_equip_type = 'vaxCarr'
+        , n_teams_fixed = 1
+        , n_teams_mobile = 1
     )
 }
 
 #save to file
-saveRDS(campaign_delay_results, file = 'model_output/campaign_delay_results.rds')
+saveRDS(campaign_delay_results_assump2, file = 'model_output/campaign_delay_results_assump2.rds')
 
 
 #Convert the list of dataframes output into a single data frame
-strategy_campaign_prep_delays <- do.call(rbind, args = c(campaign_delay_results, make.row.names = F))
+# strategy_campaign_prep_delays_assump1 <- do.call(rbind, args = c(campaign_delay_results_assump1, make.row.names = F))
+strategy_campaign_prep_delays_assump2 <- do.call(rbind, args = c(campaign_delay_results_assump2, make.row.names = F))
 
 #save to file
-saveRDS(strategy_campaign_prep_delays, file = 'model_output/strategy_campaign_prep_delays.rds')
-
+# saveRDS(strategy_campaign_prep_delays_assump1, file = 'model_output/strategy_campaign_prep_delays_assump1.rds')
+saveRDS(strategy_campaign_prep_delays_assump2, file = 'model_output/strategy_campaign_prep_delays_assump2.rds')
 
 
 ##########################################################################
@@ -78,11 +100,12 @@ saveRDS(strategy_team_days, file = 'model_output/strategy_team_days.rds')
 
 
 #all supply chain results combined
-sc_analysis_output <- left_join(strategy_campaign_prep_delays, strategy_team_days, by = 'strategy')
+# sc_assump1_analysis_output <- left_join(strategy_campaign_prep_delays_assump1, strategy_team_days, by = 'strategy')
+sc_assump2_analysis_output <- left_join(strategy_campaign_prep_delays_assump2, strategy_team_days, by = 'strategy')
 
 #save to file
-saveRDS(sc_analysis_output, file = 'model_output/sc_analysis_output.rds')
-
+# saveRDS(sc_assump1_analysis_output, file = 'model_output/sc_assump1_analysis_output.rds')
+saveRDS(sc_assump2_analysis_output, file = 'model_output/sc_assump2_analysis_output.rds')
 
 ################################################################################
 #Data wrangling for epi analyses and plots: convert the wide table to long
@@ -102,14 +125,22 @@ saveRDS(strategy_team_days_long, file = 'model_output/strategy_team_days_long.rd
 
 
 #logistical needs
-strategy_logistical_needs_long <- sc_analysis_output %>% 
+# strategy_assump1_logistical_needs_long <- sc_assump1_analysis_output %>% 
+#     select(strategy, ft_RCW25, ft_vaxCarr, mt_RCW25, mt_vaxCarr) %>%
+#     gather('equip_name', 'equip_quantity', 2:5) %>% 
+#     separate(col = 'equip_name', into = c('team_type', 'equip_name'), sep = '_') %>% 
+#     mutate(team_type = factor(if_else(team_type == 'ft', 'fixed_team', 'mobile_team')))
+
+strategy_assump2_logistical_needs_long <- sc_assump2_analysis_output %>% 
     select(strategy, ft_RCW25, ft_vaxCarr, mt_RCW25, mt_vaxCarr) %>%
     gather('equip_name', 'equip_quantity', 2:5) %>% 
     separate(col = 'equip_name', into = c('team_type', 'equip_name'), sep = '_') %>% 
     mutate(team_type = factor(if_else(team_type == 'ft', 'fixed_team', 'mobile_team')))
 
+
 #save to file
-saveRDS(strategy_logistical_needs_long, file = 'model_output/strategy_logistical_needs_long.rds')
+# saveRDS(strategy_assump1_logistical_needs_long, file = 'model_output/strategy_assump1_logistical_needs_long.rds')
+saveRDS(strategy_assump2_logistical_needs_long, file = 'model_output/strategy_assump2_logistical_needs_long.rds')
 
 
 #' #' Question: If we need more than 1 vaccine carrier for the doses, how do we translate that? Does that translate into
