@@ -205,7 +205,7 @@ analyse_prep_delay_assump2 <- function(strategy_name
                                        
                                        #defaults follow: can do sensitivity analyses on them as well
                                        
-                                       , site_details = site_data
+                                       , site_details 
                                        , site_row = 1 #which site to analyse
                                        , fixed_team_equip_type = 'both' #fixed teams can use one of options = c('rcw25', 'vaxCarr', 'both') for now, we assume fixed teams use both
                                        , mobile_team_equip_type = 'vaxCarr' # options = c('rcw25', 'vaxCarr', 'both') for now, we assume mobile teams use vaxCarr
