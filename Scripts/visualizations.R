@@ -9,7 +9,7 @@ library('gridExtra')
 
 
 #load saved model output
-strategy_campaign_prep_delays <- readRDS('model_output/strategy_campaign_prep_delays.rds')
+strategy_campaign_prep_delays_assump1 <- readRDS('model_output/strategy_campaign_prep_delays_assump1.rds')
 strategy_team_days_long <- readRDS('model_output/strategy_team_days_long.rds')
 strategy_logistical_needs_long <- readRDS('model_output/strategy_logistical_needs_long.rds')
 
@@ -24,7 +24,7 @@ x_axis_labels <- c('10-dose FCC', 'Monodose FCC', 'Monodose OCC', 'Mixed FCC', '
 
 
 #Plot 1: Delay before a campaign can commence
-campaign_delay_plot <- ggplot(data = strategy_campaign_prep_delays,
+campaign_delay_plot <- ggplot(data = strategy_campaign_prep_delays_assump1,
                               aes(x = strategy, y = mt_freezing_time)) +
     geom_bar(aes(fill = 'tomato3'), stat = "identity", width = 0.25) +
     labs(#title = 'Freezing time required per strategy',
@@ -487,7 +487,7 @@ team_days_output_dose10_long <- dplyr::filter(team_days_monodose_occ_dose10_fcc_
 # Research days talk plots ----
 x_axis_labels_rd_ppt <- x_axis_labels
 
-campaign_delay_df <- strategy_campaign_prep_delays %>% 
+campaign_delay_df <- strategy_campaign_prep_delays_assump1 %>% 
     select(strategy, ft_freezing_time, mt_freezing_time) %>% 
     melt(id = 'strategy', value.name = 'freezing_time')
 
