@@ -48,35 +48,42 @@ site_pops_df <- make_site_data(near_pop_sizes, far_pop_sizes)
     
 
 campaign_delay_results_assump2 <- list()
-delay_results <- list(pop_size = NULL, delay_results = NULL)
+delay_results <- vector('list', length = nrow(site_pops_df))
+
 
 for (pop_index in 1:nrow(site_pops_df)){
-for (strategy in seq_along(strategy_names_subset)) {
-    campaign_delay_results_assump2[[strategy_names_subset[strategy]]] <- analyse_prep_delay_assump2(
-        strategy_name = strategy_names_subset[strategy]
-        , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[strategy]]]$fixed_team_with_dose10
-        , fixed_team_with_ice = strategy_analysis_list[[strategy_names_subset[strategy]]]$fixed_team_with_ice
-        , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[strategy]]]$mobile_team_with_dose10
-        , mobile_team_with_ice = strategy_analysis_list[[strategy_names_subset[strategy]]]$mobile_team_with_ice
-        , team_dispatch = strategy_analysis_list[[strategy_names_subset[strategy]]]$team_dispatch
-        , site_details = site_pops_df[pop_index, ]
-        , site_row = pop_index
-        , fixed_team_equip_type = 'both'
-        , mobile_team_equip_type = 'vaxCarr'
-        , n_teams_fixed = 1
-        , n_teams_mobile = 1
-    )
-}
-    delay_results$pop_size[[pop_index]] = site_pops_df[pop_index, ] 
-    delay_results$delay_results[[pop_index]] = campaign_delay_results_assump2
+    for (strategy in seq_along(strategy_names_subset)) {
+        campaign_delay_results_assump2[[strategy_names_subset[strategy]]] <- analyse_prep_delay_assump2(
+            strategy_name = strategy_names_subset[strategy]
+            , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[strategy]]]$fixed_team_with_dose10
+            , fixed_team_with_ice = strategy_analysis_list[[strategy_names_subset[strategy]]]$fixed_team_with_ice
+            , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[strategy]]]$mobile_team_with_dose10
+            , mobile_team_with_ice = strategy_analysis_list[[strategy_names_subset[strategy]]]$mobile_team_with_ice
+            , team_dispatch = strategy_analysis_list[[strategy_names_subset[strategy]]]$team_dispatch
+            , site_details = site_pops_df[pop_index, ]
+            , site_row = pop_index
+            , fixed_team_equip_type = 'both'
+            , mobile_team_equip_type = 'vaxCarr'
+            , n_teams_fixed = 1
+            , n_teams_mobile = 1
+        )
     }
+    
+    delay_results[[pop_index]] = campaign_delay_results_assump2
+}
 
 #save to file
 saveRDS(campaign_delay_results_assump2, file = 'model_output/campaign_delay_results_assump2.rds')
 
 
 #Convert the list of dataframes output into a single data frame
-# strategy_campaign_prep_delays_assump1 <- do.call(rbind, args = c(campaign_delay_results_assump1, make.row.names = F))
+strategy_campaign_prep_delays_1 <- do.call(rbind, args = c(delay_results[[1]], make.row.names = F))
+strategy_campaign_prep_delays_2 <- do.call(rbind, args = c(delay_results[[2]], make.row.names = F))
+strategy_campaign_prep_delays_3 <- do.call(rbind, args = c(delay_results[[3]], make.row.names = F))
+
+
+
+
 strategy_campaign_prep_delays_assump2 <- do.call(rbind, args = c(campaign_delay_results_assump2, make.row.names = F))
 
 #save to file
