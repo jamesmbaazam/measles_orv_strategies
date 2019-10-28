@@ -48,6 +48,7 @@ site_pops_df <- make_site_data(near_pop_sizes, far_pop_sizes)
     
 
 campaign_delay_results_assump2 <- list()
+delay_results <- list(pop_size = NULL, delay_results = NULL)
 
 for (pop_index in 1:nrow(site_pops_df)){
 for (strategy in seq_along(strategy_names_subset)) {
@@ -65,7 +66,10 @@ for (strategy in seq_along(strategy_names_subset)) {
         , n_teams_fixed = 1
         , n_teams_mobile = 1
     )
-}}
+}
+    delay_results$pop_size[[pop_index]] = site_pops_df[pop_index, ] 
+    delay_results$delay_results[[pop_index]] = campaign_delay_results_assump2
+    }
 
 #save to file
 saveRDS(campaign_delay_results_assump2, file = 'model_output/campaign_delay_results_assump2.rds')
