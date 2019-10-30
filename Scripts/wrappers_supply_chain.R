@@ -105,7 +105,7 @@ analyse_prep_delay_assump1 <- function(strategy_name
    
     ### RCW25 and vaccince carrier needs ####
     #ice packs needed for each equipment type, based on the ambient temperature
-    RCW25_icepack_needs <-  compute_rcw25_icepacks(sc_model_params$ambient_temp[1])
+    RCW25_icepack_needs <-  compute_rcw25_icepacks(sc_model_params$ambient_temp[1], replacement_days = rcw25_ice_replacement_days)
     
     vaxCarr_icepack_needs <- compute_vaxCarr_icepacks(sc_model_params$ambient_temp[1])
     
@@ -292,7 +292,7 @@ else{stop('unknown mobile team equipment scenario')}
   
   ### RCW25 and vaccince carrier needs ####
   #ice packs needed for each equipment type, based on the ambient temperature
-  RCW25_icepack_needs <-  compute_rcw25_icepacks(sc_model_params$ambient_temp[1])
+  RCW25_icepack_needs <-  compute_rcw25_icepacks(sc_model_params$ambient_temp[1], replacement_days = rcw25_ice_replacement_days)
   
   vaxCarr_icepack_needs <- compute_vaxCarr_icepacks(sc_model_params$ambient_temp[1])
   
