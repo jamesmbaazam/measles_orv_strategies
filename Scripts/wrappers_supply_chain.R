@@ -30,6 +30,7 @@ analyse_prep_delay_assump1 <- function(strategy_name
                                , site_details = site_data
                                , site_row #which site to analyse
                                , mf314 = sc_model_params$mf314_quant
+                               , rcw25_ice_replacement_days
                                , ambient_temperature = sc_model_params$ambient_temp[1]
                                , dose10_vial_volume = sc_model_params$dose10_vial_vol[1]
                                , monodose_vial_volume = sc_model_params$monodose_vial_vol
