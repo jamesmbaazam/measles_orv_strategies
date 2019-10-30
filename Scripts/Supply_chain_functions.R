@@ -1,22 +1,34 @@
 
 # compute_rcw25_icepacks() & compute_varCarr_icepacks(): ----
 #' Calculate ice pack needs for each vax carrier and RCW25s, based on ambient
-#' temperature
+#' temperature and number of days to replace ice, which is daily for the 
+#' vaccine carrier ice packs and 1, 2, or 3 days for the RCW25s
 
-compute_rcw25_icepacks <- function(amb_temp) {
-  switch(amb_temp,
-    "below 40" = 12,
-    "above 40" = 24
-  ) # I use the upper and lower limits of ice required. Lowest to use is 12 and
-  #  highest is 24.
+compute_rcw25_icepacks <- function(amb_temp, replacement_days) { # replacement_days = c(1, 2, 3)
+  if (amb_temp == "below 40" & (replacement_days == 1 | replacement_days == 2)) {
+    12
+  } else if (amb_temp == "below 40" & replacement_days == 3) {
+    14
+  } else if (amb_temp == "above 40" & replacement_days == 1) {
+    12
+  } else if (amb_temp == "above 40" & replacement_days == 2) {
+    18
+  } else if (amb_temp == "above 40" & replacement_days == 3) {
+    24
+  } else {
+    stop("wrong inputs provided")
+  }
 }
 
 
-compute_vaxCarr_icepacks <- function(amb_temp) {
-  switch(amb_temp,
-    "below 40" = 6,
-    "above 40" = 8
-  )
+compute_vaxCarr_icepacks <- function(amb_temp, replacement_days = 1) {
+  if (amb_temp == "below 40" & replacement_days == 1) {
+    6
+  } else if (amb_temp == "above 40" & replacement_days == 1) {
+    8
+  } else {
+    stop("wrong inputs provided")
+  }
 }
 
 #function to convert specified near and far populations into a data frame
