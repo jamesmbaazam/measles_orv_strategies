@@ -28,7 +28,7 @@ analyse_prep_delay_assump1 <- function(strategy_name
                                #defaults follow: can do sensitivity analyses on them as well
                                
                                , site_details = site_data
-                               , site_row = 1 #which site to analyse
+                               , site_row #which site to analyse
                                , mf314 = sc_model_params$mf314_quant
                                , ambient_temperature = sc_model_params$ambient_temp[1]
                                , dose10_vial_volume = sc_model_params$dose10_vial_vol[1]
