@@ -61,7 +61,7 @@ for (pop_index in 1:nrow(site_pops_df)){
             , mobile_team_with_ice = strategy_analysis_list[[strategy_names_subset[strategy]]]$mobile_team_with_ice
             , team_dispatch = strategy_analysis_list[[strategy_names_subset[strategy]]]$team_dispatch
             , site_details = site_pops_df[pop_index, ]
-            , site_row = pop_index
+          #  , site_row = pop_index
             , fixed_team_equip_type = 'both'
             , mobile_team_equip_type = 'vaxCarr'
             , rcw25_ice_replacement_days = 2

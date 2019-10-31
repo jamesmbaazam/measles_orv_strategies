@@ -289,14 +289,14 @@ calc_transport_equipment_needs <- function(equip_type,
 #' for; and the row numbers of the sites you want to analyse
 
 calc_doses_required <- function(df,
-                                site_rows_selected = 1,
+                                # site_rows_selected = 1,
                                 pop_type,
                                 ovwastage,
                                 buffer_size,
-                                is_dose10) { # df is the dataframe of added sites; site_row = row numbers to analyse; is.dose10, if false, means monodose; #pop_type = c(near, far), ovwastage = open vial wastage, buffer = safety stock to cushion uncertainty
-  selected_sites <- df %>%
-    dplyr::slice(site_rows_selected)
-
+                                 is_dose10) { # df is the dataframe of added sites; site_row = row numbers to analyse; is.dose10, if false, means monodose; #pop_type = c(near, far), ovwastage = open vial wastage, buffer = safety stock to cushion uncertainty
+  # selected_sites <- df %>%
+  #   dplyr::slice(site_rows_selected)
+  selected_sites <- df 
   if (pop_type == "near" & is_dose10 == T) {
     dose_quant <- selected_sites %>%
       dplyr::summarise(sum(.$near_pop))

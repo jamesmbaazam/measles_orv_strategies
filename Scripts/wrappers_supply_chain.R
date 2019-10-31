@@ -41,7 +41,7 @@ analyse_prep_delay_assump1 <- function(strategy_name
     
     ### Fixed post - number of doses ####
     n_doses_fixed_team <-  calc_doses_required(df = site_details
-                                             , site_rows_selected = site_row
+                                            # , site_rows_selected = site_row
                                              , is_dose10 = fixed_team_with_dose10
                                              , pop_type = 'near'
                                              , ovwastage = ifelse(fixed_team_with_dose10, sc_model_params$dose10_ovw_fixed_team, sc_model_params$monodose_ovw_fixed_team)
@@ -72,7 +72,7 @@ analyse_prep_delay_assump1 <- function(strategy_name
     
     ### Mobile teams - number of doses ####
     n_doses_mobile_team <-  calc_doses_required(df = site_details
-                                              , site_rows_selected = site_row
+                                             # , site_rows_selected = site_row
                                               , is_dose10 = mobile_team_with_dose10
                                               , pop_type = 'far'
                                               , ovwastage = ifelse(mobile_team_with_dose10, sc_model_params$dose10_ovw_mobile_team, sc_model_params$monodose_ovw_mobile_team)
@@ -207,7 +207,7 @@ analyse_prep_delay_assump2 <- function(strategy_name
                                        #defaults follow: can do sensitivity analyses on them as well
                                        
                                        , site_details 
-                                       , site_row #which site to analyse
+                                     #  , site_row #which site to analyse
                                        , fixed_team_equip_type = 'both' #fixed teams can use one of options = c('rcw25', 'vaxCarr', 'both') for now, we assume fixed teams use both
                                        , mobile_team_equip_type = 'vaxCarr' # options = c('rcw25', 'vaxCarr', 'both') for now, we assume mobile teams use vaxCarr
                                        , n_teams_fixed
@@ -249,7 +249,7 @@ else{stop('unknown mobile team equipment scenario')}
   
   ### Fixed post - number of doses ####
   n_doses_fixed_team <-  calc_doses_required(df = site_details
-                                             , site_rows_selected = site_row
+                                           #  , site_rows_selected = site_row
                                              , is_dose10 = fixed_team_with_dose10
                                              , pop_type = 'near'
                                              , ovwastage = ifelse(fixed_team_with_dose10, sc_model_params$dose10_ovw_fixed_team, sc_model_params$monodose_ovw_fixed_team)
@@ -270,7 +270,7 @@ else{stop('unknown mobile team equipment scenario')}
   
   ### Mobile teams - number of doses ####
   n_doses_mobile_team <-  calc_doses_required(df = site_details
-                                              , site_rows_selected = site_row
+                                            #  , site_rows_selected = site_row
                                               , is_dose10 = mobile_team_with_dose10
                                               , pop_type = 'far'
                                               , ovwastage = ifelse(mobile_team_with_dose10, sc_model_params$dose10_ovw_mobile_team, sc_model_params$monodose_ovw_mobile_team)
