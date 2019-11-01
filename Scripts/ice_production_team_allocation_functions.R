@@ -192,7 +192,7 @@ ice_and_team_allocation <- calc_icepack_production(
     campaign_duration = 10,
     fixed_teams_on_site = 2,
     mobile_teams_per_site = 0,
-    ambient_temperature = "above 40",
+    ambient_temperature = "below 40",
     rcw25_ice_replacement_days = 2,
     num_of_freezers = sc_model_params$mf314_quant,
     small_icepacks_fr = mf314_smallpack_fr,
