@@ -129,15 +129,18 @@ calc_team_equipment_needs <- function(campaign_duration,
 
 # calc_icepack_production() ----
 calc_icepack_production <- function(campaign_duration,
-                                     fixed_teams_on_site, # c(1, 2)
-                                     mobile_teams_per_site,
-                                     ambient_temperature,
-                                     rcw25_ice_replacement_days,
-                                     mobile_team_equip_type = 'vaxCarr', #options = c('vaxCarr', 'rcw25', 'both')
-                                     num_of_freezers,
-                                     small_icepacks_fr, #MF314 freezing rate for small icepacks
-                                     large_icepacks_fr #MF314 freezing rate for large icepacks
-) {
+                                    fixed_teams_on_site, # c(1, 2)
+                                    mobile_teams_per_site,
+                                    ambient_temperature,
+                                    rcw25_ice_replacement_days,
+                                    mobile_team_equip_type = 'vaxCarr', #options = c('vaxCarr', 'rcw25', 'both')
+                                    num_of_freezers,
+                                    small_icepacks_fr, #MF314 freezing rate for small icepacks
+                                    large_icepacks_fr, #MF314 freezing rate for large icepacks
+                                    icepack_fr_large,
+                                    icepack_fr_small,
+                                    num_of_teams
+                                    ) {
     if (fixed_teams_on_site > 2 | fixed_teams_on_site < 0) {
         stop("Fixed teams per site cannot be greater than 2 or negative")
     }
@@ -165,10 +168,12 @@ calc_icepack_production <- function(campaign_duration,
                                       vaxCarr_ready = floor(small_icepacks/vaxCarr_icepacks),
                                       large_icepacks = 0.5 * num_of_freezers * campaign_day * large_icepacks_fr,
                                       rcw25_ready = floor(large_icepacks/rcw25_icepacks),
-                                      ft_possible = rcw25_ready, #I use the number of rcw25's as a proxy to determine the number of fixed teams since they require rcw25s and vax carriers
-                                      mt_possible = vaxCarr_ready - rcw25_ready #I assume the remaining vaccine carriers will be used by the mobile teams
+                                      ft_possible = fixed_teams_on_site * rcw25_ready, #I use the number of rcw25's as a proxy to determine the number of fixed teams since they require rcw25s and vax carriers
+                                      mt_possible = (vaxCarr_ready * fixed_teams_on_site) - rcw25_ready, #I assume the remaining vaccine carriers will be used by the mobile teams
+                                    #  ice_surplus = 0.5*(mf314_largepack_capacity + mf314_smallpack_capacity) - cumsum(large_icepacks + small_icepacks)
     )
     
+    #ice demand and supply
     return(ice_production_capacity)
 }
 
