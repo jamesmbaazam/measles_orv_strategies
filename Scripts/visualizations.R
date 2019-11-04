@@ -279,211 +279,214 @@ near_orv_total_cases_table_grob$strategy <- x_axis_labels
 near_orv_total_cases_table_grob
 
 
-################################################################################
-#' #'TOWARDS THE ISOCLINE!! 
-#' 
-#' We have determined that the mixed FCC and monodose FCC
-#' are out of the question now. Also, we know that vaccine wastage is a function 
-#' of the demand during an outbreak hence, is non-linear. Additionally, we know 
-#' the vaccine carrier design is optimised for transporting ice but not so for
-#' transporting enough monodose vials as 10-dose.
-#' 
-#' Q: The question then arises: if the vaccine carriers could be optimised to carry
-#' more monodose, would that solve there be a point in the parameter space where
-#' the partial OCC strategy would match the 10-dose strategy or even surpass it? 
-#' We consider that the fixed post team requirements are the same for the two 
-#' strategies and the difference is in the mobile teams. Therefore, we will zoom 
-#' in on the mobile campaign. 
-#' 
-#' Here, we have the choice 
-#' between using 10-dose vials in full cold chain or the monodose out of the 
-#' cold chain. We want to investigate
-#' under what combinations of 10-dose wastage and higher storage capacity for 
-#' monodose vials will 
-#' the use of monodose outside of the cold chain be better than the 10-dose 
-#' vaccine?
-#' We will answer this using an isocline formulation.
 #' ################################################################################
+#' #' #'TOWARDS THE ISOCLINE!! 
+#' #' 
+#' #' We have determined that the mixed FCC and monodose FCC
+#' #' are out of the question now. Also, we know that vaccine wastage is a function 
+#' #' of the demand during an outbreak hence, is non-linear. Additionally, we know 
+#' #' the vaccine carrier design is optimised for transporting ice but not so for
+#' #' transporting enough monodose vials as 10-dose.
+#' #' 
+#' #' Q: The question then arises: if the vaccine carriers could be optimised to carry
+#' #' more monodose, would that solve there be a point in the parameter space where
+#' #' the partial OCC strategy would match the 10-dose strategy or even surpass it? 
+#' #' We consider that the fixed post team requirements are the same for the two 
+#' #' strategies and the difference is in the mobile teams. Therefore, we will zoom 
+#' #' in on the mobile campaign. 
+#' #' 
+#' #' Here, we have the choice 
+#' #' between using 10-dose vials in full cold chain or the monodose out of the 
+#' #' cold chain. We want to investigate
+#' #' under what combinations of 10-dose wastage and higher storage capacity for 
+#' #' monodose vials will 
+#' #' the use of monodose outside of the cold chain be better than the 10-dose 
+#' #' vaccine?
+#' #' We will answer this using an isocline formulation.
+#' #' ################################################################################
+#' #' 
+#' #' #####################
+#' #' #Far campaigns: monodose Outside of Cold Chain versus 10-dose in Full Cold Chain
+#' #' #########################
+#' #' 
+#' #' 
+#' #' ###############################
+#' #' 
+#' #how many doses of the 10-dose vials can we transport in a vaccine carrier?
 #' 
-#' #####################
-#' #Far campaigns: monodose Outside of Cold Chain versus 10-dose in Full Cold Chain
-#' #########################
+#' 
+#' #target_pop <- 100
+#' 
+#' monodose_occ_capacity <- calc_dose_capacity(vial_type = 'monodose'
+#'                                             , vax_vol = 21.09
+#'                                             , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
+#'                                             , with_ice = F)
+#' 
+#' #how many doses of the 10-dose vials can we transport in a vaccine carrier?
+#' dose10_fcc_capacity <- calc_dose_capacity(vial_type = 'dose10'
+#'                                           , vax_vol = dose10_vial_vol[1]
+#'                                           , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
+#'                                           , with_ice = T)
 #' 
 #' 
-#' ###############################
+#' monodose_occ_capacity_larger <- seq(monodose_occ_capacity, dose10_fcc_capacity, 5) #just a vector of possible increasing volume capacities to consider. The idea is to increase it to as high as the capacity for 10-dose carriage per trip.
 #' 
-#how many doses of the 10-dose vials can we transport in a vaccine carrier?
-
-monodose_occ_capacity <- calc_dose_capacity(vial_type = 'monodose'
-                                            , vax_vol = 21.09
-                                            , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
-                                            , with_ice = F)
-
-#how many doses of the 10-dose vials can we transport in a vaccine carrier?
-dose10_fcc_capacity <- calc_dose_capacity(vial_type = 'dose10'
-                                          , vax_vol = dose10_vial_vol[1]
-                                          , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
-                                          , with_ice = T)
-
-
-monodose_occ_capacity_larger <- seq(monodose_occ_capacity, dose10_fcc_capacity, 5) #just a vector of possible increasing volume capacities to consider. The idea is to increase it to as high as the capacity for 10-dose carriage per trip.
-
-
-#mobile team days for monodose OCC with increasing storage/transport volume
-monodose_occ_team_days_increasing_vol <- vector()
-team_days_mobile_monodose_occ <- for (storage_capacity_index in 1:length(monodose_occ_capacity_larger)){
-    monodose_occ_team_days_increasing_vol[storage_capacity_index] <- calc_monodose_team_days(target_pop = site_data$far_pop
-                                                                                             , team_performance = min(monodose_occ_capacity_larger[storage_capacity_index], tp_mobile)
-                                                                                             , carrier_vol_capacity = monodose_occ_capacity_larger[storage_capacity_index]
-    )
-}
-# 
-# ###############################
-# #10 dose FCC 
-# ###############################
-
-#Considering wastage ranging from 0% to 100%, with 0% meaning no wastage and 100%, wastage of whole vial. MSF considers an average of 15% wastage rate in field operations.
-
-dose10_fcc_ovw_increasing <- seq(0, 100, length.out = length(monodose_occ_team_days_increasing_vol)) #ovw = open vial wastage
-
-#dose10_FCC_far_trip_eff_doses_vect <- ceiling(dose10_vaxCarr_cap_ice * (1 - wastage_dose10_mt_vect)) #effectively, how many vaccinations is a mobile team actually undertaking?
-
-team_days_mobile_dose10_fcc <- vector()
-for(ovw_index in 1: length(dose10_fcc_ovw_increasing)){
-    team_days_mobile_dose10_fcc[ovw_index] <- calc_dose10_team_days(target_pop = site_data$far_pop
-                                                                    , dose10_wastage = dose10_fcc_ovw_increasing[ovw_index]
-                                                                    , vaxCarr_capacity = dose10_fcc_capacity
-                                                                    , team_performance = tp_mobile
-    )
-}
-
-#there's a division by zero here, returning an infinity, so we'll replace it with NA to allow for better manipulation
-
-
-team_days_mobile_dose10_fcc <- ifelse(!is.infinite(team_days_mobile_dose10_fcc), team_days_mobile_dose10_fcc, NA) #I do a correction here to avoid division by zero.
-
-#data.frame(wastage = wastage_dose10_mt_vect, team_days = team_days_mobile_dose10_Ice)
-
-#x-axis of plot: ratio of increasing vaccine carrier volume capacity for monodose vs fixed for 10-dose
-monodose_to_dose10_capacity_ratio <- round(monodose_occ_capacity_larger / dose10_fcc_capacity, 3)
-
-
-team_days_monodose_occ_dose10_fcc <- tibble(
-    dose10_ovw = dose10_fcc_ovw_increasing,
-    dose10_capacity = dose10_fcc_capacity,
-    monodose_capacity = monodose_occ_capacity_larger,
-    storage_capacity_ratio = monodose_to_dose10_capacity_ratio,
-    team_days_dose10_fcc = team_days_mobile_dose10_fcc,
-    team_days_monodose_occ = monodose_occ_team_days_increasing_vol
-)
-
-
-#' #####################################
-#' #Isocline plot
-#' #####################################
 #' 
-#'The isocline represents the point on the intersection between the monodose and 10-dose
-#'strategies where there is no difference in team days. The areas above and below the line
-#'correspond to a switch in decision.
-
-
-#'I've labelled this as sketchy because it depended on the monodose team days but the plot that
-#'follows is irrespective of team days and only depends on the parameters of choice, i.e wastage (dose10)
-#'and storage. I think that is a much desirable result
-# isocline_plot_sketchy_data <- team_days_monodose_occ_dose10_fcc %>% 
-#     mutate(wastage_diag = 1 - (site_data$far_pop/(dose10_capacity * team_days_monodose_occ)))
-# 
-# #View(isocline_df)
-# 
-# isocline_plot_sketchy <- ggplot(isocline_plot_data %>% filter(wastage_diag > 1 - sc_model_params$dose10_ovw_mobile_team/100)) +
-#     geom_point(aes(x = storage_capacity_ratio,
-#                    y = wastage_diag)
-#                , size = 2
-#                ) +
-#     geom_line(aes(x = storage_capacity_ratio,
-#                    y = wastage_diag)
-#               , size = 1
-#     ) 
-# 
-# isocline_plot_sketchy <- isocline_plot_sketchy + 
-#     annotate('text', label = '10-dose', x = 0.25, y = 0.7, size = 4) +
-#     annotate('text', label = 'Monodose', x = 0.3, y = 0.75, size = 4)
-# 
-# isocline_plot_sketchy <- isocline_plot_sketchy + 
-#     labs(x = 'Storage capacity ratio (monodose vs 10-dose)',
-#          y = 'Open vial wastage (10-dose)'
-#          )
-# isocline_plot_sketchy <- isocline_plot_sketchy + theme_pubr()
-#     
-# if(display_sc_plots){
-# plot(isocline_plot_sketchy)
-# }
-# 
-# 
-# if(save_sc_plots){
-#     ggsave(filename = 'mobile_team_days_isocline.png'
-#           # , plot = isocline_plot + presentation_plot_theme #uncomment this line to save a powerpoint version
-#           , plot = isocline_plot_sketchy
-#           , path = './figures/'
-#            , width = 9
-#            , height = 5)
-# }
-
-
-#'I believe this is the result I've been seeking: The plot eliminates anything relating to the population size
-#'and indicates the wastage (10-dose) and storage (monodose) pairs that give the same team days
-#'
-
-#' Monodose is worse when the volume capacity < 250
-#' 10 dose is worse when the effective doses < 250
-#' The relationship that links these two ideas leads to a single equation in
-#' two variables - wastage and storage, that is, wastage (10-dose) = 1 - storage 
-#' (monodose) / storage (10 dose). 
-#' Solving the above in the regions where storage (monodose) < mobile team 
-#' performance will yield the following
+#' #mobile team days for monodose OCC with increasing storage/transport volume
+#' #monodose_occ_team_days_increasing_vol <- vector()
+#' # team_days_mobile_monodose_occ <- for (storage_capacity_index in seq_along(monodose_occ_capacity_larger)){
+#' #     monodose_occ_team_days_increasing_vol[storage_capacity_index] <- calc_monodose_team_days(target_pop = target_pop
+#' #                                                                                              , team_performance = min(monodose_occ_capacity_larger[storage_capacity_index], tp_mobile)
+#' #                                                                                              , carrier_vol_capacity = monodose_occ_capacity_larger[storage_capacity_index]
+#' #     )
+#' # }
+#' # 
+#' # ###############################
+#' # #10 dose FCC 
+#' # ###############################
 #' 
-isocline_data <- team_days_monodose_occ_dose10_fcc %>%
-    filter(monodose_capacity < tp_mobile) %>% 
-    mutate(dose10_ovw = 1 - storage_capacity_ratio
-           , dose10_effec_dose = 750 * (1 - dose10_ovw / 100)
-    )
+#' #Considering wastage ranging from 0% to 100%, with 0% meaning no wastage and 100%, wastage of whole vial. MSF considers an average of 15% wastage rate in field operations.
+#' 
+#' dose10_fcc_ovw_increasing <- seq(0, 100, length.out = length(monodose_occ_team_days_increasing_vol)) #ovw = open vial wastage
+#' 
+#' #dose10_FCC_far_trip_eff_doses_vect <- ceiling(dose10_vaxCarr_cap_ice * (1 - wastage_dose10_mt_vect)) #effectively, how many vaccinations is a mobile team actually undertaking?
+#' 
+#' # team_days_mobile_dose10_fcc <- vector()
+#' # for(ovw_index in 1: length(dose10_fcc_ovw_increasing)){
+#' #     team_days_mobile_dose10_fcc[ovw_index] <- calc_dose10_team_days(target_pop = target_pop
+#' #                                                                     , dose10_wastage = dose10_fcc_ovw_increasing[ovw_index]
+#' #                                                                     , vaxCarr_capacity = dose10_fcc_capacity
+#' #                                                                     , team_performance = tp_mobile
+#' #     )
+#' # }
+#' # 
+#' # #there's a division by zero here, returning an infinity, so we'll replace it with NA to allow for better manipulation
+#' # 
+#' # 
+#' # team_days_mobile_dose10_fcc <- ifelse(!is.infinite(team_days_mobile_dose10_fcc), team_days_mobile_dose10_fcc, NA) #I do a correction here to avoid division by zero.
+#' 
+#' #data.frame(wastage = wastage_dose10_mt_vect, team_days = team_days_mobile_dose10_Ice)
+#' 
+#' #x-axis of plot: ratio of increasing vaccine carrier volume capacity for monodose vs fixed for 10-dose
+#' monodose_to_dose10_capacity_ratio <- round(monodose_occ_capacity_larger / dose10_fcc_capacity, 3)
+#' 
+#' 
+#' team_days_monodose_occ_dose10_fcc <- tibble(
+#'     dose10_ovw = dose10_fcc_ovw_increasing,
+#'     dose10_capacity = dose10_fcc_capacity,
+#'     monodose_capacity = monodose_occ_capacity_larger,
+#'     storage_capacity_ratio = monodose_to_dose10_capacity_ratio,
+#'    # team_days_dose10_fcc = team_days_mobile_dose10_fcc,
+#'     team_days_monodose_occ = monodose_occ_team_days_increasing_vol
+#' )
+#' 
+#' 
+#' #' #####################################
+#' #' #Isocline plot
+#' #' #####################################
+#' #' 
+#' #'The isocline represents the point on the intersection between the monodose and 10-dose
+#' #'strategies where there is no difference in team days. The areas above and below the line
+#' #'correspond to a switch in decision.
+#' 
+#' 
+#' #'I've labelled this as sketchy because it depended on the monodose team days but the plot that
+#' #'follows is irrespective of team days and only depends on the parameters of choice, i.e wastage (dose10)
+#' #'and storage. I think that is a much desirable result
+#' # isocline_plot_sketchy_data <- team_days_monodose_occ_dose10_fcc %>% 
+#' #     mutate(wastage_diag = 1 - (site_data$far_pop/(dose10_capacity * team_days_monodose_occ)))
+#' # 
+#' # #View(isocline_df)
+#' # 
+#' # isocline_plot_sketchy <- ggplot(isocline_plot_data %>% filter(wastage_diag > 1 - sc_model_params$dose10_ovw_mobile_team/100)) +
+#' #     geom_point(aes(x = storage_capacity_ratio,
+#' #                    y = wastage_diag)
+#' #                , size = 2
+#' #                ) +
+#' #     geom_line(aes(x = storage_capacity_ratio,
+#' #                    y = wastage_diag)
+#' #               , size = 1
+#' #     ) 
+#' # 
+#' # isocline_plot_sketchy <- isocline_plot_sketchy + 
+#' #     annotate('text', label = '10-dose', x = 0.25, y = 0.7, size = 4) +
+#' #     annotate('text', label = 'Monodose', x = 0.3, y = 0.75, size = 4)
+#' # 
+#' # isocline_plot_sketchy <- isocline_plot_sketchy + 
+#' #     labs(x = 'Storage capacity ratio (monodose vs 10-dose)',
+#' #          y = 'Open vial wastage (10-dose)'
+#' #          )
+#' # isocline_plot_sketchy <- isocline_plot_sketchy + theme_pubr()
+#' #     
+#' # if(display_sc_plots){
+#' # plot(isocline_plot_sketchy)
+#' # }
+#' # 
+#' # 
+#' # if(save_sc_plots){
+#' #     ggsave(filename = 'mobile_team_days_isocline.png'
+#' #           # , plot = isocline_plot + presentation_plot_theme #uncomment this line to save a powerpoint version
+#' #           , plot = isocline_plot_sketchy
+#' #           , path = './figures/'
+#' #            , width = 9
+#' #            , height = 5)
+#' # }
+#' 
+#' 
+#' #'I believe this is the result I've been seeking: The plot eliminates anything relating to the population size
+#' #'and indicates the wastage (10-dose) and storage (monodose) pairs that give the same team days
+#' #'
+#' 
+#' #' Monodose is worse when the volume capacity < 250
+#' #' 10 dose is worse when the effective doses < 250
+#' #' The relationship that links these two ideas leads to a single equation in
+#' #' two variables - wastage and storage, that is, wastage (10-dose) = 1 - storage 
+#' #' (monodose) / storage (10 dose). 
+#' #' Solving the above in the regions where storage (monodose) < mobile team 
+#' #' performance will yield the following
+#' #' 
+#' isocline_data <- team_days_monodose_occ_dose10_fcc %>%
+#'     filter(monodose_capacity < tp_mobile) %>% 
+#'     mutate(dose10_ovw = 1 - storage_capacity_ratio
+#'            , dose10_effec_dose = 750 * (1 - dose10_ovw / 100)
+#'     )
+#' 
+#' 
+#' isocline_plot <- ggplot(data = isocline_data) + 
+#'     geom_point(aes(x = storage_capacity_ratio, y = dose10_ovw), size = 2) + 
+#'     geom_line(aes(x = storage_capacity_ratio, y = dose10_ovw), size = 1) + 
+#'     scale_y_continuous(breaks = round(isocline_data$dose10_ovw, 2), labels = round(isocline_data$dose10_ovw, 2)) 
+#' 
+#' isocline_plot <- isocline_plot +
+#'     labs(x = 'Storage capacity ratio (monodose over 10-dose)', y = 'Open vial wastage (10-dose)') + 
+#'     annotate('text', label = '10-dose', x = 0.25, y = 0.70, size = 7) +
+#'     annotate('text', label = 'Monodose', x = 0.3, y = 0.75, size = 7) 
+#' 
+#' isocline_plot <- isocline_plot + theme_economist()
+#' 
+#' if (display_sc_plots) {
+#'     plot(isocline_plot)  
+#' }   
+#' 
+#' if(save_sc_plots){
+#'     ggsave(filename = 'figures/isocline_plot.pdf')
+#}
 
-
-isocline_plot <- ggplot(data = isocline_data) + 
-    geom_point(aes(x = storage_capacity_ratio, y = dose10_ovw), size = 2) + 
-    geom_line(aes(x = storage_capacity_ratio, y = dose10_ovw), size = 1) + 
-    scale_y_continuous(breaks = round(isocline_data$dose10_ovw, 2), labels = round(isocline_data$dose10_ovw, 2)) 
-
-isocline_plot <- isocline_plot +
-    labs(x = 'Storage capacity ratio (monodose over 10-dose)', y = 'Open vial wastage (10-dose)') + 
-    annotate('text', label = '10-dose', x = 0.25, y = 0.70, size = 7) +
-    annotate('text', label = 'Monodose', x = 0.3, y = 0.75, size = 7)
-
-isocline_plot <- isocline_plot + theme_economist()
-
-if (display_sc_plots) {
-    plot(isocline_plot)  
-}   
-
-if(save_sc_plots){
-    ggsave(filename = 'figures/isocline_plot.pdf')
-}
-
-team_days_monodose_occ_dose10_fcc_long <- team_days_monodose_occ_dose10_fcc %>%
-    select(-dose10_capacity, -monodose_capacity) %>%
-    gather(key = 'strategy'
-           , value = 'team_days'
-           , c('team_days_dose10_fcc', 'team_days_monodose_occ')
-           , factor_key = T
-    ) %>%  
-    dplyr::mutate(dose10_ovw = if_else(strategy == 'team_days_dose10_fcc', dose10_ovw, 0))
-
-#' #I do some further reshaping of the results for 10-dose so I can plot the team days wrt constant wastage rates across the monodose plot
-team_days_output_dose10_long <- dplyr::filter(team_days_monodose_occ_dose10_fcc_long
-                                              , strategy == 'team_days_dose10_fcc') %>%
-    dplyr::mutate(storage_capacity_ratio = paste(storage_capacity_ratio, collapse = ',')) %>%
-    separate_rows(storage_capacity_ratio, convert = T)
-
+#' team_days_monodose_occ_dose10_fcc_long <- team_days_monodose_occ_dose10_fcc %>%
+#'     select(-dose10_capacity, -monodose_capacity) %>%
+#'     gather(key = 'strategy'
+#'            , value = 'team_days'
+#'            , c('team_days_dose10_fcc', 'team_days_monodose_occ')
+#'            , factor_key = T
+#'     ) %>%  
+#'     dplyr::mutate(dose10_ovw = if_else(strategy == 'team_days_dose10_fcc', dose10_ovw, 0))
+#' 
+#' #' #I do some further reshaping of the results for 10-dose so I can plot the team days wrt constant wastage rates across the monodose plot
+#' team_days_output_dose10_long <- dplyr::filter(team_days_monodose_occ_dose10_fcc_long
+#'                                               , strategy == 'team_days_dose10_fcc') %>%
+#'     dplyr::mutate(storage_capacity_ratio = paste(storage_capacity_ratio, collapse = ',')) %>%
+#'     separate_rows(storage_capacity_ratio, convert = T)
+#' 
 
 
 
@@ -609,7 +612,198 @@ total_cases_plot_rd_ppt <- ggplot(data = total_cases_df,
 plot(total_cases_plot_rd_ppt)
 
 #' #Other Plots
-
+#' ################################################################################
+#' #' #'TOWARDS THE ISOCLINE!! 
+#' #' 
+#' #' We have determined that the mixed FCC and monodose FCC
+#' #' are out of the question now. Also, we know that vaccine wastage is a function 
+#' #' of the demand during an outbreak hence, is non-linear. Additionally, we know 
+#' #' the vaccine carrier design is optimised for transporting ice but not so for
+#' #' transporting enough monodose vials as 10-dose.
+#' #' 
+#' #' Q: The question then arises: if the vaccine carriers could be optimised to carry
+#' #' more monodose, would that solve there be a point in the parameter space where
+#' #' the partial OCC strategy would match the 10-dose strategy or even surpass it? 
+#' #' We consider that the fixed post team requirements are the same for the two 
+#' #' strategies and the difference is in the mobile teams. Therefore, we will zoom 
+#' #' in on the mobile campaign. 
+#' #' 
+#' #' Here, we have the choice 
+#' #' between using 10-dose vials in full cold chain or the monodose out of the 
+#' #' cold chain. We want to investigate
+#' #' under what combinations of 10-dose wastage and higher storage capacity for 
+#' #' monodose vials will 
+#' #' the use of monodose outside of the cold chain be better than the 10-dose 
+#' #' vaccine?
+#' #' We will answer this using an isocline formulation.
+#' #' ################################################################################
+#' #' 
+#' #' #####################
+#' #' #Far campaigns: monodose Outside of Cold Chain versus 10-dose in Full Cold Chain
+#' #' #########################
+#' #' 
+#' #' 
+#' #' ###############################
+#' #' 
+#' #how many doses of the 10-dose vials can we transport in a vaccine carrier?
+#' 
+#' 
+#' #target_pop <- 100
+#' 
+#' monodose_occ_capacity <- calc_dose_capacity(vial_type = 'monodose'
+#'                                             , vax_vol = 21.09
+#'                                             , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
+#'                                             , with_ice = F)
+#' 
+#' #how many doses of the 10-dose vials can we transport in a vaccine carrier?
+#' dose10_fcc_capacity <- calc_dose_capacity(vial_type = 'dose10'
+#'                                           , vax_vol = dose10_vial_vol[1]
+#'                                           , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
+#'                                           , with_ice = T)
+#' 
+#' 
+#' monodose_occ_capacity_larger <- seq(monodose_occ_capacity, dose10_fcc_capacity, 5) #just a vector of possible increasing volume capacities to consider. The idea is to increase it to as high as the capacity for 10-dose carriage per trip.
+#' 
+#' 
+#' #mobile team days for monodose OCC with increasing storage/transport volume
+#' #monodose_occ_team_days_increasing_vol <- vector()
+#' # team_days_mobile_monodose_occ <- for (storage_capacity_index in seq_along(monodose_occ_capacity_larger)){
+#' #     monodose_occ_team_days_increasing_vol[storage_capacity_index] <- calc_monodose_team_days(target_pop = target_pop
+#' #                                                                                              , team_performance = min(monodose_occ_capacity_larger[storage_capacity_index], tp_mobile)
+#' #                                                                                              , carrier_vol_capacity = monodose_occ_capacity_larger[storage_capacity_index]
+#' #     )
+#' # }
+#' # 
+#' # ###############################
+#' # #10 dose FCC 
+#' # ###############################
+#' 
+#' #Considering wastage ranging from 0% to 100%, with 0% meaning no wastage and 100%, wastage of whole vial. MSF considers an average of 15% wastage rate in field operations.
+#' 
+#' dose10_fcc_ovw_increasing <- seq(0, 100, length.out = length(monodose_occ_team_days_increasing_vol)) #ovw = open vial wastage
+#' 
+#' #dose10_FCC_far_trip_eff_doses_vect <- ceiling(dose10_vaxCarr_cap_ice * (1 - wastage_dose10_mt_vect)) #effectively, how many vaccinations is a mobile team actually undertaking?
+#' 
+#' # team_days_mobile_dose10_fcc <- vector()
+#' # for(ovw_index in 1: length(dose10_fcc_ovw_increasing)){
+#' #     team_days_mobile_dose10_fcc[ovw_index] <- calc_dose10_team_days(target_pop = target_pop
+#' #                                                                     , dose10_wastage = dose10_fcc_ovw_increasing[ovw_index]
+#' #                                                                     , vaxCarr_capacity = dose10_fcc_capacity
+#' #                                                                     , team_performance = tp_mobile
+#' #     )
+#' # }
+#' # 
+#' # #there's a division by zero here, returning an infinity, so we'll replace it with NA to allow for better manipulation
+#' # 
+#' # 
+#' # team_days_mobile_dose10_fcc <- ifelse(!is.infinite(team_days_mobile_dose10_fcc), team_days_mobile_dose10_fcc, NA) #I do a correction here to avoid division by zero.
+#' 
+#' #data.frame(wastage = wastage_dose10_mt_vect, team_days = team_days_mobile_dose10_Ice)
+#' 
+#' #x-axis of plot: ratio of increasing vaccine carrier volume capacity for monodose vs fixed for 10-dose
+#' monodose_to_dose10_capacity_ratio <- round(monodose_occ_capacity_larger / dose10_fcc_capacity, 3)
+#' 
+#' 
+#' team_days_monodose_occ_dose10_fcc <- tibble(
+#'     dose10_ovw = dose10_fcc_ovw_increasing,
+#'     dose10_capacity = dose10_fcc_capacity,
+#'     monodose_capacity = monodose_occ_capacity_larger,
+#'     storage_capacity_ratio = monodose_to_dose10_capacity_ratio,
+#'    # team_days_dose10_fcc = team_days_mobile_dose10_fcc,
+#'     team_days_monodose_occ = monodose_occ_team_days_increasing_vol
+#' )
+#' 
+#' 
+#' #' #####################################
+#' #' #Isocline plot
+#' #' #####################################
+#' #' 
+#' #'The isocline represents the point on the intersection between the monodose and 10-dose
+#' #'strategies where there is no difference in team days. The areas above and below the line
+#' #'correspond to a switch in decision.
+#' 
+#' 
+#' #'I've labelled this as sketchy because it depended on the monodose team days but the plot that
+#' #'follows is irrespective of team days and only depends on the parameters of choice, i.e wastage (dose10)
+#' #'and storage. I think that is a much desirable result
+#' # isocline_plot_sketchy_data <- team_days_monodose_occ_dose10_fcc %>% 
+#' #     mutate(wastage_diag = 1 - (site_data$far_pop/(dose10_capacity * team_days_monodose_occ)))
+#' # 
+#' # #View(isocline_df)
+#' # 
+#' # isocline_plot_sketchy <- ggplot(isocline_plot_data %>% filter(wastage_diag > 1 - sc_model_params$dose10_ovw_mobile_team/100)) +
+#' #     geom_point(aes(x = storage_capacity_ratio,
+#' #                    y = wastage_diag)
+#' #                , size = 2
+#' #                ) +
+#' #     geom_line(aes(x = storage_capacity_ratio,
+#' #                    y = wastage_diag)
+#' #               , size = 1
+#' #     ) 
+#' # 
+#' # isocline_plot_sketchy <- isocline_plot_sketchy + 
+#' #     annotate('text', label = '10-dose', x = 0.25, y = 0.7, size = 4) +
+#' #     annotate('text', label = 'Monodose', x = 0.3, y = 0.75, size = 4)
+#' # 
+#' # isocline_plot_sketchy <- isocline_plot_sketchy + 
+#' #     labs(x = 'Storage capacity ratio (monodose vs 10-dose)',
+#' #          y = 'Open vial wastage (10-dose)'
+#' #          )
+#' # isocline_plot_sketchy <- isocline_plot_sketchy + theme_pubr()
+#' #     
+#' # if(display_sc_plots){
+#' # plot(isocline_plot_sketchy)
+#' # }
+#' # 
+#' # 
+#' # if(save_sc_plots){
+#' #     ggsave(filename = 'mobile_team_days_isocline.png'
+#' #           # , plot = isocline_plot + presentation_plot_theme #uncomment this line to save a powerpoint version
+#' #           , plot = isocline_plot_sketchy
+#' #           , path = './figures/'
+#' #            , width = 9
+#' #            , height = 5)
+#' # }
+#' 
+#' 
+#' #'I believe this is the result I've been seeking: The plot eliminates anything relating to the population size
+#' #'and indicates the wastage (10-dose) and storage (monodose) pairs that give the same team days
+#' #'
+#' 
+#' #' Monodose is worse when the volume capacity < 250
+#' #' 10 dose is worse when the effective doses < 250
+#' #' The relationship that links these two ideas leads to a single equation in
+#' #' two variables - wastage and storage, that is, wastage (10-dose) = 1 - storage 
+#' #' (monodose) / storage (10 dose). 
+#' #' Solving the above in the regions where storage (monodose) < mobile team 
+#' #' performance will yield the following
+#' #' 
+#' isocline_data <- team_days_monodose_occ_dose10_fcc %>%
+#'     filter(monodose_capacity < tp_mobile) %>% 
+#'     mutate(dose10_ovw = 1 - storage_capacity_ratio
+#'            , dose10_effec_dose = 750 * (1 - dose10_ovw / 100)
+#'     )
+#' 
+#' 
+#' isocline_plot <- ggplot(data = isocline_data) + 
+#'     geom_point(aes(x = storage_capacity_ratio, y = dose10_ovw), size = 2) + 
+#'     geom_line(aes(x = storage_capacity_ratio, y = dose10_ovw), size = 1) + 
+#'     scale_y_continuous(breaks = round(isocline_data$dose10_ovw, 2), labels = round(isocline_data$dose10_ovw, 2)) 
+#' 
+#' isocline_plot <- isocline_plot +
+#'     labs(x = 'Storage capacity ratio (monodose over 10-dose)', y = 'Open vial wastage (10-dose)') + 
+#'     annotate('text', label = '10-dose', x = 0.25, y = 0.70, size = 7) +
+#'     annotate('text', label = 'Monodose', x = 0.3, y = 0.75, size = 7) 
+#' 
+#' isocline_plot <- isocline_plot + theme_economist()
+#' 
+#' if (display_sc_plots) {
+#'     plot(isocline_plot)  
+#' }   
+#' 
+#' if(save_sc_plots){
+#'     ggsave(filename = 'figures/isocline_plot.pdf')
+#'     
 #I create a dataframe here which I use to draw line segments to indicate the campaign period
 # near_campaign_period_df <- data.frame(campaign_indicators_df, cases_peak = max(near_orv_dynamics$Inf4))
 # near_campaign_period_df <- mutate(near_campaign_period_df, cases_peak = cases_peak - c(0, 10, 20, 30))
