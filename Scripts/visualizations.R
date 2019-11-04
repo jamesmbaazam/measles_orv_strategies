@@ -2,17 +2,23 @@
 #packages
 library('ggplot2')
 library('ggpubr')
+library('reshape2')
 library('ggthemes')
 library('gridExtra')
 
-
+#load scripts
+source('scripts/Parameters.R')
+source('scripts/analyses_parameters.R')
+source('scripts/Supply_chain_functions.R')
 
 
 #load saved model output
 strategy_campaign_prep_delays_assump1 <- readRDS('model_output/strategy_campaign_prep_delays_assump1.rds')
 strategy_team_days_long <- readRDS('model_output/strategy_team_days_long.rds')
 strategy_logistical_needs_long <- readRDS('model_output/strategy_logistical_needs_long.rds')
-
+orv_far_strategy_results <- readRDS('model_output/orv_far_strategy_results.rds')
+orv_near_strategy_results <- readRDS('model_output/orv_near_strategy_results.rds')
+sc_analysis_output <- readRDS('model_output/sc_analysis_output.rds')
 
 ##########################################################################
 #'SUPPLY CHAIN PLOTS
