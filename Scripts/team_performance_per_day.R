@@ -32,7 +32,7 @@ teamDay <- function(mkpd = 250 # mean kids encountered per team per day
       vialTimes <- vialTimes[1:doses]
     }
     vaxed <- vaxed + length(vialTimes)
-    reconstTime <- vaxTimes[vaxed+1]
+    reconstTime <- vaxTimes[vaxed + 1]
   }
   
   if(vials < vialLimit & vaxed != length(vaxTimes)) warning('Inconsistency in vaccination numbers.')
@@ -61,20 +61,41 @@ for(ii in 1:nrow(pargrid)){
 
 wastage_plot <- ggplot(out, aes(x = doses, y = doses_wasted, color = doses)) +
   geom_boxplot() +
-  facet_grid(kk ~ mkpd)
+  labs(x = 'Vial type', y = 'Wasted doses') +
+  facet_grid(kk ~ mkpd) +
+  presentation_plot_theme
+
 plot(wastage_plot)
 
 vaccinations_plot <- ggplot(out, aes(x = doses, y = kids_vaxed, color = doses)) +
   geom_boxplot() +
-  facet_grid(kk ~ mkpd)
+  labs(x = 'Vial type', y = 'Children vaccinated') +
+  facet_grid(kk ~ mkpd) +
+  presentation_plot_theme
+
 plot(vaccinations_plot)
 
 dose_usage_plot <- ggplot(out, aes(x = doses, y = doses_used, color = doses)) +
   geom_boxplot() +
-  facet_grid(kk ~ mkpd) 
+  labs(x = 'Vial type', y = 'Doses used') +
+  facet_grid(kk ~ mkpd) +
+  presentation_plot_theme
+
 plot(dose_usage_plot)
 
 vial_usage <- ggplot(out, aes(x = doses, y = vials_used, color = doses)) +
   geom_boxplot() +
-  facet_grid(kk ~ mkpd)
+  labs(x = 'Vial type', y = 'Vials used') +
+  facet_grid(kk ~ mkpd) +
+  presentation_plot_theme
+
 plot(vial_usage)
+
+
+#' Interpretation: (1) We find that there is virtually no wasted associated with
+#' the monodose but the 10-dose vials tend to experience more wastage as the
+#' population size decreases and population clustering decreases. This seems to
+#' suggest the monodose will be useful in targetting small pockets of populations
+#' in sparce locations. However, even in such settings, the 10-dose still achieves
+#' comparable vaccinations as the 10-dose. Other questions about cost and speed of
+#' response may tend to favour (or not) the monodose. 
