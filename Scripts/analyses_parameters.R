@@ -37,12 +37,3 @@ orv_model_params <- list(near_pop_R0 = 12
 #                     , far_pop = 169)
 #                            
 
-###########################################################################
-#Plot control parameters
-###########################################################################
-#Supply chain plot control parameters
-display_sc_plots <- TRUE
-save_sc_plots <- F
-#epidemiological
-display_epi_plots <- TRUE
-save_epi_plots <- F
