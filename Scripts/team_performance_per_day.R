@@ -1,6 +1,10 @@
 library(tidyverse)
 set.seed(20191023)
 
+#scripts
+source('scripts/plotting_functions.R')
+
+
 teamDay <- function(mkpd = 250 # mean kids encountered per team per day
                     , kk = 1 # shape parameter
                     , vialLimit = 170 # max number of vials that can be carried
