@@ -433,30 +433,3 @@ calc_campaign_start <- function(fixedT_freeze_time,
 
 
 
-# plotting functions ----
-
-
-# every_nth() ====
-# is a useful function I got from Stack Overflow for adding blank labels inbetween
-# vectors for labelling graphs, if you want to have unlabelled ticks
-
-every_nth <- function(x,
-                      nth,
-                      empty = TRUE,
-                      inverse = FALSE) {
-  if (!inverse) {
-    if (empty) {
-      x[1:nth == 1] <- ""
-      x
-    } else {
-      x[1:nth != 1]
-    }
-  } else {
-    if (empty) {
-      x[1:nth != 1] <- ""
-      x
-    } else {
-      x[1:nth == 1]
-    }
-  }
-}
