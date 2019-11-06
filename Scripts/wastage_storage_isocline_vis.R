@@ -6,6 +6,7 @@ library(tibble)
 source('scripts/Supply_chain_functions.R')
 source('scripts/analyses_parameters.R')
 source('scripts/Parameters.R')
+source('scripts/plotting_functions.R')
 
 
 
@@ -105,7 +106,7 @@ isocline_plot <- isocline_plot +
     annotate('text', label = '10-dose', x = 0.25, y = 0.70, size = 7) +
     annotate('text', label = 'Monodose', x = 0.3, y = 0.75, size = 7) 
 
-isocline_plot <- isocline_plot + theme_economist()
+isocline_plot <- isocline_plot + presentation_plot_theme
 
 if (display_sc_plots) {
     plot(isocline_plot)  
