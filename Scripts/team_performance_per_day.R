@@ -77,7 +77,7 @@ plot(vaccinations_plot)
 
 dose_usage_plot <- ggplot(out, aes(x = doses, y = doses_used, color = doses)) +
   geom_boxplot() +
-  labs(x = 'Vial type', y = 'Doses used') +
+  labs(x = 'Vial presentation', y = 'Doses used') +
   facet_grid(kk ~ mkpd) +
   presentation_plot_theme
 
