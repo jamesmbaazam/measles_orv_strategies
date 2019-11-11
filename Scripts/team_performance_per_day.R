@@ -63,14 +63,23 @@ wastage_plot <- ggplot(out, aes(x = doses, y = doses_wasted, color = doses)) +
   geom_boxplot() +
   labs(x = 'Vial type', y = 'Wasted doses') +
   facet_grid(kk ~ mkpd) +
+  theme(legend.position = 'bottom') + 
   presentation_plot_theme
 
 plot(wastage_plot)
+ggsave(filename = 'children_vaccinated_team_days_model.png', 
+       plot = wastage_plot
+       , path = "C:/Users/JAMESAZAM/GitRepositories/measles_orv_strategies/figures/"
+       , width = 23
+       , height = 15
+       , units = 'cm'
+       )
 
 vaccinations_plot <- ggplot(out, aes(x = doses, y = kids_vaxed, color = doses)) +
   geom_boxplot() +
   labs(x = 'Vial type', y = 'Children vaccinated') +
   facet_grid(kk ~ mkpd) +
+  theme(legend.position = 'bottom') + 
   presentation_plot_theme
 
 plot(vaccinations_plot)
