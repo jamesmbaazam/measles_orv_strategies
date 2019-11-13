@@ -80,6 +80,13 @@ wastage_plot <- ggplot(out, aes(x = doses, y = doses_wasted, color = doses)) +
   presentation_plot_theme
 
 plot(wastage_plot)
+ggsave(filename = 'children_vaccinated_team_days_model.png', 
+       plot = wastage_plot
+       , path = "C:/Users/JAMESAZAM/GitRepositories/measles_orv_strategies/figures/"
+       , width = 23
+       , height = 15
+       , units = 'cm'
+       )
 
 #vax_and_wastage_plot <- gridExtra::grid.arrange(vaccinations_plot, wastage_plot, wastage_plot, ncol = 2)
 
