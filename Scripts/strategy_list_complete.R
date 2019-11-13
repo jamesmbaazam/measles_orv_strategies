@@ -1,10 +1,10 @@
 #all possible combinations
-# strategy_scenarios <- expand.grid(fixed_team_with_dose10 = c(T, F)
-#                         , fixed_team_with_ice = c(T, F)
-#                         , mobile_team_with_dose10 = c(T, F)
-#                         , mobile_team_with_ice = c(T, F)
-#                         , team_dispatch = c('parallel', 'asap')
-#                         )
+strategy_scenarios_complete <- expand.grid(fixed_team_with_dose10 = c(T, F)
+                        , fixed_team_with_ice = c(T, F)
+                        , mobile_team_with_dose10 = c(T, F)
+                        , mobile_team_with_ice = c(T, F)
+                        , team_dispatch = c('parallel', 'asap')
+                        )
 
 #Full list of strategies
 strategy_analysis_list <- list(
