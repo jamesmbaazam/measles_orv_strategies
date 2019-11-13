@@ -63,7 +63,7 @@ for (pop_index in 1:nrow(site_pops_df)){
             , site_details = site_pops_df[pop_index, ]
           #  , site_row = pop_index
             , fixed_team_equip_type = 'both'
-            , mobile_team_equip_type = 'vaxCarr'
+            , mobile_team_equip_type = 'rcw25'
             , rcw25_ice_replacement_days = 2
             , n_teams_fixed = 1
             , n_teams_mobile = 1
