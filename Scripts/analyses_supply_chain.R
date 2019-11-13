@@ -13,27 +13,11 @@ source('./scripts/parameters.R')
 source('./scripts/supply_chain_functions.R')
 source('./scripts/wrappers_supply_chain.R')
 
-######################################################
-#Plot parameters
-######################################################
-#Control parameters
-display_sc_plots <- TRUE
-save_sc_plots <- TRUE
-
-
-
 
 
 ##########################################################
 #Strategies to analyse
 ###########################################################
-#all possible combinations
-# strategy_scenarios <- expand.grid(fixed_team_with_dose10 = c(T, F)
-#                         , fixed_team_with_ice = c(T, F)
-#                         , mobile_team_with_dose10 = c(T, F)
-#                         , mobile_team_with_ice = c(T, F)
-#                         , team_dispatch = c('parallel', 'asap')
-#                         )
 
 #List of strategies
 strategy_analysis_list <- list(
