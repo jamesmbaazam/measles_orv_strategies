@@ -1,4 +1,6 @@
 library(tidyverse)
+library(ggthemes)
+
 set.seed(20191023)
 
 #scripts
@@ -59,34 +61,48 @@ for(ii in 1:nrow(pargrid)){
   out <- rbind(out, tmp)
 }
 
-wastage_plot <- ggplot(out, aes(x = doses, y = doses_wasted, color = doses)) +
-  geom_boxplot() +
-  labs(x = 'Vial type', y = 'Wasted doses') +
-  facet_grid(kk ~ mkpd) +
-  theme(legend.position = 'bottom') + 
-  presentation_plot_theme
-
-plot(wastage_plot)
-ggsave(filename = 'children_vaccinated_team_days_model.png', 
-       plot = wastage_plot
-       , path = "C:/Users/JAMESAZAM/GitRepositories/measles_orv_strategies/figures/"
-       , width = 23
-       , height = 15
-       , units = 'cm'
-       )
-
+#Number of children vaccinated per vial type
 vaccinations_plot <- ggplot(out, aes(x = doses, y = kids_vaxed, color = doses)) +
   geom_boxplot() +
-  labs(x = 'Vial type', y = 'Children vaccinated') +
   facet_grid(kk ~ mkpd) +
+  labs(x = '', y = 'Children vaccinated', color = 'Vial type') +
   theme(legend.position = 'bottom') + 
   presentation_plot_theme
 
 plot(vaccinations_plot)
 
+#Number of vials wasted per vial type
+wastage_plot <- ggplot(out, aes(x = doses, y = doses_wasted, color = doses)) +
+  geom_boxplot() +
+  labs(x = '', y = 'Doses wasted', color = 'Vial type') +
+  facet_grid(kk ~ mkpd) +
+  theme(legend.position = 'bottom') + 
+  presentation_plot_theme
+
+plot(wastage_plot)
+
+#vax_and_wastage_plot <- gridExtra::grid.arrange(vaccinations_plot, wastage_plot, wastage_plot, ncol = 2)
+
+ggsave(filename = 'vaccinations_plot.png', 
+       plot = vaccinations_plot
+       , path = "C:/Users/JAMESAZAM/GitRepositories/measles_orv_strategies/figures/"
+       , width = 23
+       , height = 15
+       , units = 'cm'
+)
+
+ggsave(filename = 'wastage_plot.png', 
+       plot = wastage_plot
+       , path = "C:/Users/JAMESAZAM/GitRepositories/measles_orv_strategies/figures/"
+       , width = 23
+       , height = 15
+       , units = 'cm'
+)
+
+
 dose_usage_plot <- ggplot(out, aes(x = doses, y = doses_used, color = doses)) +
   geom_boxplot() +
-  labs(x = 'Vial presentation', y = 'Doses used') +
+  labs(x = 'Vial presentation', y = 'Doses used', color = 'Vial type') +
   facet_grid(kk ~ mkpd) +
   presentation_plot_theme
 
@@ -94,11 +110,16 @@ plot(dose_usage_plot)
 
 vial_usage <- ggplot(out, aes(x = doses, y = vials_used, color = doses)) +
   geom_boxplot() +
-  labs(x = 'Vial type', y = 'Vials used') +
+  labs(x = 'Vial type', y = 'Vials used', color = 'Vial type') +
   facet_grid(kk ~ mkpd) +
   presentation_plot_theme
 
 plot(vial_usage)
+
+
+
+
+
 
 
 #' Interpretation: (1) We find that there is virtually no wasted associated with
