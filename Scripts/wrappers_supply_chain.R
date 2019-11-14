@@ -209,7 +209,7 @@ analyse_prep_delay_assump2 <- function(strategy_name
                                        , site_details 
                                      #  , site_row #which site to analyse
                                        , fixed_team_equip_type = 'both' #fixed teams can use one of options = c('rcw25', 'vaxCarr', 'both') for now, we assume fixed teams use both
-                                       , mobile_team_equip_type = 'vaxCarr' # options = c('rcw25', 'vaxCarr', 'both') for now, we assume mobile teams use vaxCarr
+                                       , mobile_team_equip_type  # options = c('rcw25', 'vaxCarr', 'both') for now, we assume mobile teams use vaxCarr
                                        , n_teams_fixed
                                        , n_teams_mobile
                                        , mf314 = sc_model_params$mf314_quant
@@ -389,10 +389,11 @@ analyse_team_days <- function(strategy_name
                               #    , team_dispatch #options = "parallel", "asap"
                               
                               #defaults follow: can do sensitivity analyses on them as well
-                              , site_details = site_data
+                              , site_details 
                               , site_row = 1 #analyse first row of the site data frame
                               , dose10_vial_volume = sc_model_params$dose10_vial_vol[1]
                               , monodose_vial_volume = sc_model_params$monodose_vial_vol
+                              , mobile_team_equip_type
                               , browse = F
                               
 ){
@@ -409,7 +410,7 @@ analyse_team_days <- function(strategy_name
     #Mobile teams only use a vaccine carrier, hence, are contrained by how much they can transport
     mobile_team_vol_capacity <- calc_dose_capacity(vial_type = ifelse(mobile_team_with_dose10, 'dose10', 'monodose')
                                                    , vax_vol = ifelse(mobile_team_with_dose10, dose10_vial_volume, monodose_vial_volume)
-                                                   , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
+                                                   , equip_type = mobile_team_equip_type #we assume a mobile team uses one vaccine carrier
                                                    , with_ice = mobile_team_with_ice
     )
     
