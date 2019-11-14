@@ -50,7 +50,8 @@ site_pops_df <- make_site_data(near_pop_sizes, far_pop_sizes)
 campaign_delay_results_assump2 <- list()
 delay_results <- vector('list', length = nrow(site_pops_df))
 
-
+# Campaign delay: Mobile team equipment scenario analyses ----
+# Scenario 1: rcw25 ####
 for (pop_index in 1:nrow(site_pops_df)){
     for (strategy in seq_along(strategy_names_subset)) {
         campaign_delay_results_assump2[[strategy_names_subset[strategy]]] <- analyse_prep_delay_assump2(
@@ -74,22 +75,59 @@ for (pop_index in 1:nrow(site_pops_df)){
 }
 
 #save to file
-saveRDS(campaign_delay_results_assump2, file = 'model_output/campaign_delay_results_assump2.rds')
+#saveRDS(campaign_delay_results_assump2, file = 'model_output/campaign_delay_results_assump2.rds')
 
 
 #Convert the list of dataframes output into a single data frame
-strategy_campaign_prep_delays_1 <- do.call(rbind, args = c(delay_results[[1]], make.row.names = F))
-strategy_campaign_prep_delays_2 <- do.call(rbind, args = c(delay_results[[2]], make.row.names = F))
-strategy_campaign_prep_delays_3 <- do.call(rbind, args = c(delay_results[[3]], make.row.names = F))
+delay_results_rcw25_scenario_unlisted <- unlist(delay_results, recursive = F)
+
+delay_results_rcw25_scenario_df <- do.call(rbind, args = c(delay_results_rcw25_scenario_unlisted, make.row.names = F))
+
+#View(delay_results_rcw25_scenario_df)
 
 
+# Scenario 2: vaccine carrier ####
+for (pop_index in 1:nrow(site_pops_df)){
+    for (strategy in seq_along(strategy_names_subset)) {
+        campaign_delay_results_assump2[[strategy_names_subset[strategy]]] <- analyse_prep_delay_assump2(
+            strategy_name = strategy_names_subset[strategy]
+            , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[strategy]]]$fixed_team_with_dose10
+            , fixed_team_with_ice = strategy_analysis_list[[strategy_names_subset[strategy]]]$fixed_team_with_ice
+            , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[strategy]]]$mobile_team_with_dose10
+            , mobile_team_with_ice = strategy_analysis_list[[strategy_names_subset[strategy]]]$mobile_team_with_ice
+            , team_dispatch = strategy_analysis_list[[strategy_names_subset[strategy]]]$team_dispatch
+            , site_details = site_pops_df[pop_index, ]
+            #  , site_row = pop_index
+            , fixed_team_equip_type = 'both'
+            , mobile_team_equip_type = 'vaxCarr'
+            , rcw25_ice_replacement_days = 2
+            , n_teams_fixed = 1
+            , n_teams_mobile = 1
+        )
+    }
+    
+    delay_results[[pop_index]] = campaign_delay_results_assump2
+}
 
 
-strategy_campaign_prep_delays_assump2 <- do.call(rbind, args = c(campaign_delay_results_assump2, make.row.names = F))
+# Convert the list of dataframes output into a single data frame
+delay_results_vaxCarr_scenario_unlisted <- unlist(delay_results, recursive = F)
+
+delay_results_vaxCarr_scenario_df <- do.call(rbind, args = c(delay_results_vaxCarr_scenario_unlisted, make.row.names = F))
+
+#View(delay_results_vaxCarr_scenario_df)
+
+
+# Combine the results from the two into one dataframe
+
+campaign_delay_equipment_scenarios <- rbind(delay_results_rcw25_scenario_df, delay_results_vaxCarr_scenario_df)
+
+View(campaign_delay_equipment_scenarios)
+
 
 #save to file
 # saveRDS(strategy_campaign_prep_delays_assump1, file = 'model_output/strategy_campaign_prep_delays_assump1.rds')
-saveRDS(strategy_campaign_prep_delays_assump2, file = 'model_output/strategy_campaign_prep_delays_assump2.rds')
+saveRDS(campaign_delay_equipment_scenarios, file = 'model_output/campaign_delay_equipment_scenarios.rds')
 
 
 ##########################################################################
@@ -97,35 +135,93 @@ saveRDS(strategy_campaign_prep_delays_assump2, file = 'model_output/strategy_cam
 #'TODO: change the for loop to an lapply function for efficiency
 ##########################################################################
 
-team_days_results <- list()
-#strategy_names <- names(strategy_analysis_list)
-for (i in seq_along(strategy_names_subset)) {
-    team_days_results[[strategy_names_subset[i]]] <- analyse_team_days(
-        strategy_name = strategy_names_subset[i]
-        , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[i]]]$fixed_team_with_dose10
-        , fixed_team_with_ice = strategy_analysis_list[[strategy_names_subset[i]]]$fixed_team_with_ice
-        , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[i]]]$mobile_team_with_dose10
-        , mobile_team_with_ice = strategy_analysis_list[[strategy_names_subset[i]]]$mobile_team_with_ice
-    )
+
+# Team days: Mobile team equipment scenario analyses ----
+# Scenario 1: rcw25 ####
+team_days_rcw25_scenario <- vector('list', length(strategy_names_subset))
+team_days_results_tmp <- vector('list', length(strategy_names_subset))
+
+for (pop_index in 1:nrow(site_pops_df)){
+    for (i in seq_along(strategy_names_subset)) {
+        team_days_results_tmp[[strategy_names_subset[i]]] <- analyse_team_days(
+            strategy_name = strategy_names_subset[i]
+            , site_details = site_pops_df[pop_index, ]
+            , mobile_team_equip_type = 'rcw25'
+            , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[i]]]$fixed_team_with_dose10
+            , fixed_team_with_ice = strategy_analysis_list[[strategy_names_subset[i]]]$fixed_team_with_ice
+            , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[i]]]$mobile_team_with_dose10
+            , mobile_team_with_ice = strategy_analysis_list[[strategy_names_subset[i]]]$mobile_team_with_ice
+        )
+    }
+    team_days_rcw25_scenario[[pop_index]] <- team_days_results_tmp 
 }
 
-#save to file
-saveRDS(team_days_results, file = 'model_output/team_days_results.rds')
+team_days_rcw25_scenario_unlisted <- unlist(team_days_rcw25_scenario, recursive = F)
 
-#Convert the list of dataframes output into a single data frame 
-strategy_team_days <- do.call(rbind, args = c(team_days_results, make.row.names = F))
+team_days_rcw25_scenario_df <- do.call(rbind, args = c(team_days_rcw25_scenario_unlisted, make.row.names = F))
+
+#View(team_days_rcw25_scenario_df)
+
+
+# Team days: Mobile team equipment scenario analyses ----
+# Scenario 2: vaccine carrier ####
+team_days_vaxCarr_scenario <- vector('list', length(strategy_names_subset))
+team_days_results_tmp <- vector('list', length(strategy_names_subset))
+
+for (pop_index in 1:nrow(site_pops_df)){
+    for (i in seq_along(strategy_names_subset)) {
+        team_days_results_tmp[[strategy_names_subset[i]]] <- analyse_team_days(
+            strategy_name = strategy_names_subset[i]
+            , site_details = site_pops_df[pop_index, ]
+            , mobile_team_equip_type = 'vaxCarr'
+            , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[i]]]$fixed_team_with_dose10
+            , fixed_team_with_ice = strategy_analysis_list[[strategy_names_subset[i]]]$fixed_team_with_ice
+            , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[i]]]$mobile_team_with_dose10
+            , mobile_team_with_ice = strategy_analysis_list[[strategy_names_subset[i]]]$mobile_team_with_ice
+        )
+    }
+    team_days_vaxCarr_scenario[[pop_index]] <- team_days_results_tmp 
+}
+
+team_days_vaxCarr_scenario_unlisted <- unlist(team_days_vaxCarr_scenario, recursive = F)
+
+team_days_vaxCarr_scenario_df <- do.call(rbind, args = c(team_days_vaxCarr_scenario_unlisted, make.row.names = F))
+
+#View(team_days_vaxCarr_scenario_df)
+
+#a quick look at the results 
+ggplot(data = team_days_rcw25_scenario_df, aes(x = strategy, y = mt_team_days, fill = far_pop)) + 
+    geom_bar(stat = 'identity') + 
+    facet_grid( ~ far_pop) + 
+    labs(x = 'Strategy', y = 'Mobile team days', title = 'Team days (Mobile teams use vaccine carriers)') +
+    scale_x_discrete(breaks = strategy_names_subset, labels = strategy_names_subset) +
+    coord_flip()
+
+ggplot(data = team_days_vaxCarr_scenario_df, aes(x = strategy, y = mt_team_days, fill = far_pop)) + 
+    geom_bar(stat = 'identity') + 
+    facet_grid( ~ far_pop) + 
+    labs(x = 'Strategy', y = 'Mobile team days', title = 'Team days (Mobile teams use vaccine carriers)') +
+    scale_x_discrete(breaks = strategy_names_subset, labels = strategy_names_subset) +
+    coord_flip()
+
+# combine the two equipment scenarios' results of team days into one dataframe
+team_days_equipment_scenarios_df <- rbind(team_days_rcw25_scenario_df, team_days_vaxCarr_scenario_df)
+
+View(team_days_equipment_scenarios_df)
+
 
 #save to file
-saveRDS(strategy_team_days, file = 'model_output/strategy_team_days.rds')
+saveRDS(team_days_equipment_scenarios_df, file = 'model_output/strategy_team_days.rds')
 
 
 #all supply chain results combined
-# sc_assump1_analysis_output <- left_join(strategy_campaign_prep_delays_assump1, strategy_team_days, by = 'strategy')
-sc_assump2_analysis_output <- left_join(strategy_campaign_prep_delays_assump2, strategy_team_days, by = 'strategy')
+supply_chain_analysis_complete <- left_join(campaign_delay_equipment_scenarios, team_days_equipment_scenarios_df, by = 'strategy')
+
+View(supply_chain_analysis_complete)
 
 #save to file
 # saveRDS(sc_assump1_analysis_output, file = 'model_output/sc_assump1_analysis_output.rds')
-saveRDS(sc_assump2_analysis_output, file = 'model_output/sc_assump2_analysis_output.rds')
+saveRDS(supply_chain_analysis_complete, file = 'model_output/supply_chain_analysis_complete.rds')
 
 ################################################################################
 #Data wrangling for epi analyses and plots: convert the wide table to long
