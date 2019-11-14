@@ -351,8 +351,10 @@ else{stop('unknown mobile team equipment scenario')}
   
   ## Results - Campaign delays ====
   res <- data.frame(strategy = strategy_name
-                        , near_pop = site_details$near_pop
-                        , far_pop = site_details$far_pop
+                    , near_pop = site_details$near_pop
+                    , far_pop = site_details$far_pop
+                    , mt_equip_type = mobile_team_equip_type
+                    , ft_equip_type = fixed_team_equip_type
                     , ft_vial_type = ifelse(fixed_team_with_dose10, 'dose10', 'monodose')
                     , ft_doses_required = n_doses_fixed_team
                     , mt_vial_type = ifelse(mobile_team_with_dose10, 'dose10', 'monodose')
@@ -433,6 +435,9 @@ analyse_team_days <- function(strategy_name
     
     ## Results - Team days  ====
     out <- data.frame(strategy = strategy_name
+                      , near_pop = site_details$near_pop
+                      , far_pop = site_details$far_pop
+                      , mt_equip_type = mobile_team_equip_type
                       , ft_vial_type = ifelse(fixed_team_with_dose10, 'dose10', 'monodose')
                       , ft_with_ice = ifelse(fixed_team_with_ice, 'yes', 'no')
                       , ft_team_days = team_days_fixed_team
