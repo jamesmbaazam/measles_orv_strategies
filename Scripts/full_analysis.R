@@ -215,7 +215,7 @@ saveRDS(team_days_equipment_scenarios_df, file = 'model_output/strategy_team_day
 
 
 #all supply chain results combined
-supply_chain_analysis_complete <- left_join(campaign_delay_equipment_scenarios, team_days_equipment_scenarios_df, by = 'strategy')
+supply_chain_analysis_complete <- left_join(campaign_delay_equipment_scenarios, team_days_equipment_scenarios_df)
 
 View(supply_chain_analysis_complete)
 
