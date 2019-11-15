@@ -283,43 +283,84 @@ saveRDS(campaign_delay_analysis_long, file = 'model_output/campaign_delay_analys
 
 
 #running it for different far population sizes
-orv_far_strategy_multiple_pops_results <- list()
-simulation_pop <- list()
-for (pop_size in 1: length(far_pop_sizes)) {
-    simulation_pop[[pop_size]] <- far_pop_sizes[pop_size] 
-    for (i in 1:length(strategy_names_subset)) {
-        orv_far_strategy_multiple_pops_results[[strategy_names_subset[i]]][[far_pop = far_pop]] <- runSimulations(
+orv_far_pop_dynamics <- vector('list', nrow(supply_chain_analysis_complete))
+
+far_pop_size <- vector('list', nrow(site_pops_df))
+
+# for (fp in 1: nrow(supply_chain_analysis_complete)) {
+#   #  simulation_pop[[pop_size]] <- far_pop_sizes[pop_size] 
+#     for (strategy in 1:length(strategy_names_subset)) {
+#         orv_far_pop_dynamics[[strategy_names_subset[strategy]]][[far_pop = supply_chain_analysis_complete$far_pop[fp]]] <- runSimulations(
+#             R0 = orv_model_params$far_pop_R0 # transmission coeficient
+#             , run_time = orv_model_params$model_time # 1 yr!
+#             , pop = initializePop(N = far_pop_sizes[pop_size], initPropImmune = 0.25, I0 = 1)
+#             , strategy_name = strategy_names_subset[strategy]
+#             , vaxDay = as.numeric(subset(strategy_campaign_prep_delays, strategy == strategy_names_subset[strategy])['mt_freezing_time'])
+#             , orv_duration = as.numeric(subset(strategy_team_days_long, strategy_name == strategy_names_subset[strategy] & team_type == 'mobile_team')[ ,'team_days']) #for now we're only looking at the far campaigns 
+#             , n_team_type = 2
+#             , vax_eff = orv_model_params$vaccine_efficacy
+#             , team_performance = ifelse(strategy_analysis_list[[strategy_names_subset[strategy]]][["mobile_team_with_dose10"]], as.numeric(sc_model_params$vax_rate['mobile_team']), ifelse(strategy_analysis_list[[strategy_names_subset[strategy]]][["mobile_team_with_ice"]], 77, 170))
+#             , time_to_immunity = orv_model_params$immune_response_timing
+#             , browse = F
+#         ) 
+#     }
+#     }
+
+orv_far_pop_dynamics <- vector('list', nrow(supply_chain_analysis_complete))
+
+strategy_name <- vector('list', nrow(supply_chain_analysis_complete))
+
+for (sc_result_row in 1: nrow(supply_chain_analysis_complete)) {
+    
+    tp <- ifelse(strategy_analysis_list[[supply_chain_analysis_complete$strategy[sc_result_row]]][["mobile_team_with_dose10"]], as.numeric(sc_model_params$vax_rate['mobile_team']), ifelse(strategy_analysis_list[[supply_chain_analysis_complete$strategy[sc_result_row]]][["mobile_team_with_ice"]], 77, 170))
+
+    orv_tmp <- runSimulations(
             R0 = orv_model_params$far_pop_R0 # transmission coeficient
             , run_time = orv_model_params$model_time # 1 yr!
-            , pop = initializePop(N = far_pop_sizes[pop_size], initPropImmune = 0.25, I0 = 1)
-            , strategy_name = strategy_names_subset[i]
-            , vaxDay = as.numeric(subset(strategy_campaign_prep_delays, strategy == strategy_names_subset[i])['mt_freezing_time'])
-            , orv_duration = as.numeric(subset(strategy_team_days_long, strategy_name == strategy_names_subset[i] & team_type == 'mobile_team')[ ,'team_days']) #for now we're only looking at the far campaigns 
-            , n_team_type = 2
+            , pop = initializePop(N = supply_chain_analysis_complete[sc_result_row, 'far_pop'], initPropImmune = 0.25, I0 = 1)
+            , strategy_name = supply_chain_analysis_complete[sc_result_row, 'strategy']
+            , vaxDay = as.numeric(campaign_delay_equipment_scenarios[sc_result_row, 'mt_freezing_time'])
+            , orv_duration = as.numeric(subset(team_days_analysis_long, team_type == 'mobile_team')[sc_result_row ,'team_days']) #for now we're only looking at the far campaigns 
+            , n_team_type = 1
             , vax_eff = orv_model_params$vaccine_efficacy
-            , team_performance = ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["mobile_team_with_dose10"]], as.numeric(sc_model_params$vax_rate['mobile_team']), ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["mobile_team_with_ice"]], 77, 170))
+            , team_performance = tp
             , time_to_immunity = orv_model_params$immune_response_timing
             , browse = F
         ) 
-    }
+    
+    orv_far_pop_dynamics[[sc_result_row]] <- list(strategy = supply_chain_analysis_complete$strategy[sc_result_row], 
+                                     far_pop = supply_chain_analysis_complete$far_pop[sc_result_row],
+                                     dynamics = orv_tmp
+                                     )
+
     }
 
-orv_far_strategy_results <- list()
-for (i in 1:length(strategy_names_subset)) {
-    orv_far_strategy_results[[strategy_names_subset[i]]] <- runSimulations(
-        R0 = orv_model_params$far_pop_R0 # transmission coeficient
-        , run_time = orv_model_params$model_time # 1 yr!
-        , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.25, I0 = 1)
-        , strategy_name = strategy_names_subset[i]
-        , vaxDay = as.numeric(subset(strategy_campaign_prep_delays, strategy == strategy_names_subset[i])['mt_freezing_time'])
-        , orv_duration = as.numeric(subset(strategy_team_days_long, strategy_name == strategy_names_subset[i] & team_type == 'mobile_team')[ ,'team_days']) #for now we're only looking at the far campaigns 
-        , n_team_type = 2
-        , vax_eff = orv_model_params$vaccine_efficacy
-        , team_performance = ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["mobile_team_with_dose10"]], as.numeric(sc_model_params$vax_rate['mobile_team']), ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["mobile_team_with_ice"]], 77, 170))
-        , time_to_immunity = orv_model_params$immune_response_timing
-        , browse = F
-    ) 
-}
+
+orv_far_pop_dynamics_unlisted <- unlist(orv_far_pop_dynamics, recursive = F)
+
+
+
+
+
+
+
+
+# orv_far_strategy_results <- list()
+# for (i in 1:length(strategy_names_subset)) {
+#     orv_far_strategy_results[[strategy_names_subset[i]]] <- runSimulations(
+#         R0 = orv_model_params$far_pop_R0 # transmission coeficient
+#         , run_time = orv_model_params$model_time # 1 yr!
+#         , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.25, I0 = 1)
+#         , strategy_name = strategy_names_subset[i]
+#         , vaxDay = as.numeric(subset(strategy_campaign_prep_delays, strategy == strategy_names_subset[i])['mt_freezing_time'])
+#         , orv_duration = as.numeric(subset(strategy_team_days_long, strategy_name == strategy_names_subset[i] & team_type == 'mobile_team')[ ,'team_days']) #for now we're only looking at the far campaigns 
+#         , n_team_type = 2
+#         , vax_eff = orv_model_params$vaccine_efficacy
+#         , team_performance = ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["mobile_team_with_dose10"]], as.numeric(sc_model_params$vax_rate['mobile_team']), ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["mobile_team_with_ice"]], 77, 170))
+#         , time_to_immunity = orv_model_params$immune_response_timing
+#         , browse = F
+#     ) 
+# }
 
 #save to file
 saveRDS(orv_far_strategy_results, file = 'model_output/orv_far_strategy_results.rds')
