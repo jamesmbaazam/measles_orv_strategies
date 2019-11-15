@@ -24,7 +24,7 @@ source('scripts/strategy_list_complete.R')
 #'TODO: change the for loop to an lapply function for efficiency
 ##########################################################################
 strategy_names_subset <- c("dose10_fcc_asap", "monodose_fcc_asap", "monodose_occ_asap", "mixed_fcc_asap", "part_occ_asap")
-
+strategy_names_subset_plot_labels <- c('10 dose FCC', 'Monodose FCC', 'Monodose OCC', 'Mixed FCC', 'Part OCC')
 
 #campaign delay - assumption 1
 # campaign_delay_results_assump1 <- list()
@@ -193,15 +193,15 @@ team_days_vaxCarr_scenario_df <- do.call(rbind, args = c(team_days_vaxCarr_scena
 ggplot(data = team_days_rcw25_scenario_df, aes(x = strategy, y = mt_team_days, fill = far_pop)) + 
     geom_bar(stat = 'identity') + 
     facet_grid( ~ far_pop) + 
-    labs(x = 'Strategy', y = 'Mobile team days', title = 'Team days (Mobile teams use vaccine carriers)') +
-    scale_x_discrete(breaks = strategy_names_subset, labels = strategy_names_subset) +
+    labs(x = 'Strategy', y = 'Mobile team days', title = 'Team days (Mobile teams use vaccine carriers)', fill = 'Far Population size') +
+    scale_x_discrete(labels = c('10-dose FCC' , 'Monodose FCC', 'Monodose OCC', 'Mixed FCC', 'Part OCC')) +
     coord_flip()
 
 ggplot(data = team_days_vaxCarr_scenario_df, aes(x = strategy, y = mt_team_days, fill = far_pop)) + 
     geom_bar(stat = 'identity') + 
     facet_grid( ~ far_pop) + 
-    labs(x = 'Strategy', y = 'Mobile team days', title = 'Team days (Mobile teams use vaccine carriers)') +
-    scale_x_discrete(breaks = strategy_names_subset, labels = strategy_names_subset) +
+    labs(x = 'Strategy', y = 'Mobile team days', title = 'Team days (Mobile teams use vaccine carriers)', fill = 'Far Population size') +
+    scale_x_discrete(labels = c('10-dose FCC' , 'Monodose FCC', 'Monodose OCC', 'Mixed FCC', 'Part OCC')) +
     coord_flip()
 
 # combine the two equipment scenarios' results of team days into one dataframe
