@@ -236,7 +236,7 @@ team_days_analysis_long <- team_days_equipment_scenarios_df %>%
     mutate(team_type = factor(team_type))
 
 #save to file
-saveRDS(strategy_team_days_long, file = 'model_output/strategy_team_days_long.rds')
+saveRDS(team_days_analysis_long, file = 'model_output/team_days_analysis_long.rds')
 
 
 
@@ -256,13 +256,14 @@ campaign_delay_analysis_long <- campaign_delay_equipment_scenarios %>%
 
 #save to file
 # saveRDS(strategy_assump1_logistical_needs_long, file = 'model_output/strategy_assump1_logistical_needs_long.rds')
-saveRDS(strategy_assump2_logistical_needs_long, file = 'model_output/strategy_assump2_logistical_needs_long.rds')
+saveRDS(campaign_delay_analysis_long, file = 'model_output/campaign_delay_analysis_long.rds')
 
 
-#' #' Question: If we need more than 1 vaccine carrier for the doses, how do we translate that? Does that translate into
-#' #' how many teams we'll need or how many trips should be undertaken by a single team? The latter will draw in the 
-#' #' need for a rule for how the distance of the site from the base translates to trips in days and how that will affect
-#' #' the team days and campaign duration.
+#' #' Question: If we need more than 1 vaccine carrier for the doses, how do we 
+#' translate that? Does that translate into how many teams we'll need or how many 
+#' trips should be undertaken by a single team? The latter will draw in the need 
+#' for a rule for how the distance of the site from the base translates to trips 
+#' in days and how that will affect the team days and campaign duration.
 #' 
 
 
