@@ -228,7 +228,7 @@ saveRDS(supply_chain_analysis_complete, file = 'model_output/supply_chain_analys
 ################################################################################
 
 #team days results
-strategy_team_days_long <- strategy_team_days %>%
+team_days_analysis_long <- team_days_equipment_scenarios_df %>%
     select(-c(ft_vial_type, mt_vial_type)) %>%
     filter(strategy == strategy_names_subset) %>% 
     dplyr::rename(strategy_name = strategy, fixed_team = ft_team_days, mobile_team = mt_team_days) %>% 
@@ -247,7 +247,7 @@ saveRDS(strategy_team_days_long, file = 'model_output/strategy_team_days_long.rd
 #     separate(col = 'equip_name', into = c('team_type', 'equip_name'), sep = '_') %>% 
 #     mutate(team_type = factor(if_else(team_type == 'ft', 'fixed_team', 'mobile_team')))
 
-strategy_assump2_logistical_needs_long <- sc_assump2_analysis_output %>% 
+campaign_delay_analysis_long <- campaign_delay_equipment_scenarios %>% 
     select(strategy, ft_RCW25, ft_vaxCarr, mt_RCW25, mt_vaxCarr) %>%
     gather('equip_name', 'equip_quantity', 2:5) %>% 
     separate(col = 'equip_name', into = c('team_type', 'equip_name'), sep = '_') %>% 
