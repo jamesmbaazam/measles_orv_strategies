@@ -197,7 +197,7 @@ ggplot(data = team_days_rcw25_scenario_df, aes(x = strategy, y = mt_team_days, f
     scale_x_discrete(labels = c('10-dose FCC' , 'Monodose FCC', 'Monodose OCC', 'Mixed FCC', 'Part OCC')) +
     coord_flip()
 
-ggplot(data = team_days_vaxCarr_scenario_df, aes(x = strategy, y = mt_team_days, fill = far_pop)) + 
+ggplot(data = team_days_vaxCarr_scenario_df, aes(x = strategy, y = mt_team_days)) + 
     geom_bar(stat = 'identity') + 
     facet_grid( ~ far_pop) + 
     labs(x = 'Strategy', y = 'Mobile team days', title = 'Team days (Mobile teams use vaccine carriers)', fill = 'Far Population size') +
@@ -208,7 +208,6 @@ ggplot(data = team_days_vaxCarr_scenario_df, aes(x = strategy, y = mt_team_days,
 team_days_equipment_scenarios_df <- rbind(team_days_rcw25_scenario_df, team_days_vaxCarr_scenario_df)
 
 View(team_days_equipment_scenarios_df)
-
 
 #save to file
 saveRDS(team_days_equipment_scenarios_df, file = 'model_output/strategy_team_days.rds')
@@ -283,9 +282,9 @@ saveRDS(campaign_delay_analysis_long, file = 'model_output/campaign_delay_analys
 
 
 #running it for different far population sizes
-orv_far_pop_dynamics <- vector('list', nrow(supply_chain_analysis_complete))
+#orv_far_pop_dynamics <- vector('list', nrow(supply_chain_analysis_complete))
 
-far_pop_size <- vector('list', nrow(site_pops_df))
+#far_pop_size <- vector('list', nrow(site_pops_df))
 
 # for (fp in 1: nrow(supply_chain_analysis_complete)) {
 #   #  simulation_pop[[pop_size]] <- far_pop_sizes[pop_size] 
@@ -328,18 +327,46 @@ for (sc_result_row in 1: nrow(supply_chain_analysis_complete)) {
             , browse = F
         ) 
     
-    orv_far_pop_dynamics[[sc_result_row]] <- list(strategy = supply_chain_analysis_complete$strategy[sc_result_row], 
-                                     far_pop = supply_chain_analysis_complete$far_pop[sc_result_row],
-                                     dynamics = orv_tmp
-                                     )
+    orv_far_pop_dynamics[[sc_result_row]] <- list(far_pop = supply_chain_analysis_complete$far_pop[sc_result_row], 
+                                                  dynamics = orv_tmp
+                                                  )
 
     }
+#Exploring the list elements
+#listviewer::jsonedit(orv_far_pop_detailed_dynamics_list)
 
 
-orv_far_pop_dynamics_unlisted <- unlist(orv_far_pop_dynamics, recursive = F)
+# Outbreak size (far dynamics) ----
+
+#extract the detailed dynamics
+orv_far_pop_detailed_dynamics_list <- map(orv_far_pop_dynamics, function(x){x[['dynamics']]$Detailed})
+
+#create a column to calculate the cumulative sums of infected cases, to determine the outbreak size
+far_orv_add_outbreak_size <- map(orv_far_pop_detailed_dynamics_list, function(x){mutate(x, cases_cumulative = cumsum(x$Inf5))})
+
+#listviewer::jsonedit(far_orv_add_outbreak_size)
+
+
+orv_far_pop_detailed_dynamics_df <- do.call(rbind, args = c(far_orv_add_outbreak_size, make.row.names = F))
+
+#head(orv_far_pop_detailed_dynamics_df)
+#tail(orv_far_pop_detailed_dynamics_df)
+
+#extract the outbreak sizes
+
+orv_far_outbreak_size <- map(orv_far_pop_dynamics, function(x){x[['dynamics']]$epiTotal})
+
+orv_far_results <- supply_chain_analysis_complete %>% mutate(outbreak_size = round(as.numeric(orv_far_outbreak_size)))
+
+View(orv_far_results)
 
 
 
+
+ggplot(orv_far_results, aes(x = strategy, y = outbreak_size, fill = mt_equip_type)) + 
+    geom_bar(stat = 'identity', position = 'dodge') + 
+    facet_grid( ~ far_pop) + 
+    coord_flip()
 
 
 
