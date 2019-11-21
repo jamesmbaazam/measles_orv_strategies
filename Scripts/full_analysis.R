@@ -193,7 +193,7 @@ team_days_vaxCarr_scenario_df <- do.call(rbind, args = c(team_days_vaxCarr_scena
 ggplot(data = team_days_rcw25_scenario_df, aes(x = strategy, y = mt_team_days)) + 
     geom_bar(stat = 'identity') + 
     facet_grid( ~ far_pop) + 
-    labs(x = 'Strategy', y = 'Mobile team days', title = 'Team days (Mobile teams use vaccine carriers)', fill = 'Far Population size') +
+    labs(x = 'Strategy', y = 'Mobile team days', title = 'Team days (Mobile teams use RCW25)', fill = 'Far Population size') +
     scale_x_discrete(labels = c('10-dose FCC' , 'Monodose FCC', 'Monodose OCC', 'Mixed FCC', 'Part OCC')) +
     coord_flip()
 
