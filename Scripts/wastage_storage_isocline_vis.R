@@ -32,22 +32,36 @@ source('scripts/plotting_functions.R')
 #' of the strategy and only relies on the apriori knowledge that the best strategy
 #' will commence and finish in the shortest possible time
 #' 
-#how many doses of the monodose vials can we transport in a vaccine carrier?
-monodose_occ_vaxCarr <- calc_dose_capacity(vial_type = 'monodose'
+#how many doses of the monodose vials can we transport in a vaccine carrier and rcw25?
+monodose_occ_capacity_lower_bound <- calc_dose_capacity(vial_type = 'monodose'
                                             , vax_vol = 21.09
                                             , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
                                             , with_ice = F)
 
-#how many doses of the 10-dose vials can we transport in a vaccine carrier?
-dose10_fcc_vaxCarr <- calc_dose_capacity(vial_type = 'dose10'
+
+monodose_occ_capacity_upper_bound <- calc_dose_capacity(vial_type = 'monodose'
+                                                  , vax_vol = 21.09
+                                                  , equip_type = 'rcw25' #we assume a mobile team uses one vaccine carrier
+                                                  , with_ice = F)
+
+
+
+#how many doses of the 10-dose vials can we transport in a vaccine carrier and rcw25?
+dose10_fcc_lower_bound <- calc_dose_capacity(vial_type = 'dose10'
                                           , vax_vol = dose10_vial_vol[1]
                                           , equip_type = 'vaxCarr' #we assume a mobile team uses one vaccine carrier
                                           , with_ice = T)
 
 
+dose10_fcc_upper_bound <- calc_dose_capacity(vial_type = 'dose10'
+                                             , vax_vol = dose10_vial_vol[1]
+                                             , equip_type = 'rcw25' #we assume a mobile team uses one vaccine carrier
+                                             , with_ice = T)
+
+
 #' We are going to increase the storage volume for monodose occ, and in so doing, 
 #' accomodate the best case scenario for monodose storage volume
-monodose_occ_larger_capacity <- seq(monodose_occ_vaxCarr, dose10_fcc_vaxCarr, 5) #just a vector of possible increasing volume capacities to consider. The idea is to increase it to as high as the capacity for 10-dose carriage per trip.
+monodose_occ_larger_capacity <- seq(monodose_occ_capacity_lower_bound, dose10_fcc_upper_bound, 5) #just a vector of possible increasing volume capacities to consider. The idea is to increase it to as high as the capacity for 10-dose carriage per trip.
 
 
 #' We are going to consider the full spectrum of 10-dose wastage on the open 
@@ -58,12 +72,12 @@ monodose_occ_larger_capacity <- seq(monodose_occ_vaxCarr, dose10_fcc_vaxCarr, 5)
 dose10_fcc_perc_ovw <- seq(0, 100, length.out = length(monodose_occ_larger_capacity)) #ovw = open vial wastage
 
 #x-axis of plot: ratio of increasing vaccine carrier volume capacity for monodose vs fixed for 10-dose
-monodose_to_dose10_capacity_ratio <- round(monodose_occ_larger_capacity / dose10_fcc_vaxCarr, 3)
+monodose_to_dose10_capacity_ratio <- round(monodose_occ_larger_capacity / dose10_fcc_upper_bound, 3)
 
 
 volume_capacity_and_wastage_df <- tibble(
     dose10_perc_ovw = dose10_fcc_perc_ovw,
-    dose10_capacity = dose10_fcc_vaxCarr,
+    dose10_capacity = dose10_fcc_lower_bound,
     monodose_capacity = monodose_occ_larger_capacity,
     storage_capacity_ratio = monodose_to_dose10_capacity_ratio
 )
@@ -99,12 +113,12 @@ isocline_df <- volume_capacity_and_wastage_df %>%
 isocline_plot <- ggplot(data = isocline_df) + 
     geom_point(aes(x = storage_capacity_ratio, y = dose10_ovw), size = 2) + 
     geom_line(aes(x = storage_capacity_ratio, y = dose10_ovw), size = 1) + 
-    scale_y_continuous(breaks = round(isocline_df$dose10_ovw, 2), labels = round(isocline_df$dose10_ovw, 2)) 
+    scale_y_continuous(breaks = seq(0, 1, 0.05), labels = seq(0, 1, 0.05)) 
 
 isocline_plot <- isocline_plot +
     labs(x = 'Storage capacity ratio (monodose over 10-dose)', y = 'Open vial wastage (10-dose)') + 
-    annotate('text', label = '10-dose', x = 0.25, y = 0.70, size = 7) +
-    annotate('text', label = 'Monodose', x = 0.3, y = 0.75, size = 7) 
+    annotate('text', label = '10-dose', x = 0.25, y = 0.45, size = 7) +
+    annotate('text', label = 'Monodose', x = 0.75, y = 0.75, size = 7) 
 
 isocline_plot <- isocline_plot + presentation_plot_theme
 
@@ -127,3 +141,7 @@ if(save_sc_plots){
 #' on the team encounters per day. The next model considers what happens in a team
 #' day in a bid to understand how population clustering and team encounters impact
 #' vaccine usage and wastage.
+#' 
+#' 
+#' 
+#' 
