@@ -311,7 +311,7 @@ strategy_name <- vector('list', nrow(supply_chain_analysis_complete))
 
 for (sc_result_row in 1: nrow(supply_chain_analysis_complete)) {
     
-    tp <- ifelse(strategy_analysis_list[[supply_chain_analysis_complete$strategy[sc_result_row]]][["mobile_team_with_dose10"]], as.numeric(sc_model_params$vax_rate['mobile_team']), ifelse(strategy_analysis_list[[supply_chain_analysis_complete$strategy[sc_result_row]]][["mobile_team_with_ice"]], 77, 170))
+    tp <- ifelse(strategy_analysis_list[[as.character(supply_chain_analysis_complete$strategy[sc_result_row])]][["mobile_team_with_dose10"]], as.numeric(sc_model_params$vax_rate['mobile_team']), ifelse(strategy_analysis_list[[as.character(supply_chain_analysis_complete$strategy[sc_result_row])]][["mobile_team_with_ice"]], 77, 170))
 
     orv_tmp <- runSimulations(
             R0 = orv_model_params$far_pop_R0 # transmission coeficient
