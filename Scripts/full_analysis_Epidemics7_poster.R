@@ -337,82 +337,42 @@ listviewer::jsonedit(orv_far_pop_dynamics)
 
 #extract the detailed dynamics
 orv_far_pop_detailed_dynamics_list <- unlist(rlist::list.select(orv_far_pop_dynamics, Detailed), recursive = F)
+listviewer::jsonedit(orv_far_pop_detailed_dynamics_list)
+
+#extract the collapsed dynamics
+orv_far_pop_collapsed_dynamics_list <- unlist(rlist::list.select(orv_far_pop_dynamics, Collapsed), recursive = F)
+listviewer::jsonedit(orv_far_pop_collapsed_dynamics_list)
+
 
 #create a column to calculate the cumulative sums of infected cases, to determine the outbreak size
-far_orv_add_outbreak_size <- round(as.numeric(unlist(rlist::list.select(orv_far_pop_dynamics, epiTotal))))
+far_orv_outbreak_size <- round(as.numeric(unlist(rlist::list.select(orv_far_pop_dynamics, epiTotal))))
 
-#listviewer::jsonedit(far_orv_add_outbreak_size)
-
-
-orv_far_pop_detailed_dynamics_df <- do.call(rbind, args = c(far_orv_add_outbreak_size, make.row.names = F))
-
-#head(orv_far_pop_detailed_dynamics_df)
-#tail(orv_far_pop_detailed_dynamics_df)
-
-#extract the outbreak sizes
-
-orv_far_outbreak_size <- map(orv_far_pop_dynamics, function(x){x[['dynamics']]$epiTotal})
-
-orv_far_results <- sc_result %>% mutate(outbreak_size = round(as.numeric(orv_far_outbreak_size)))
-
-View(orv_far_results)
+strategy_outbreak_size_df <- data.frame(strategy = sc_results_final$strategy, outbreak_size = far_orv_outbreak_size)
+strategy_outbreak_size_df
 
 
+strategy_outbreak_size_baseline <- filter(strategy_outbreak_size_df, strategy == 'dose10_fcc_asap') %>% 
+    select(outbreak_size) %>% unlist(use.names = F)
 
 
-ggplot(orv_far_results, aes(x = strategy, y = outbreak_size, fill = mt_equip_type)) + 
+strategy_outbreak_size_baseline_vec <- rep(strategy_outbreak_size_baseline, times = length(strategy_names_subset))
+
+strategy_cases_averted <- mutate(strategy_outbreak_size_df, 
+                                 cases_averted = strategy_outbreak_size_baseline_vec - outbreak_size,
+                                 location = rep(site_pops_df$location, times = length(strategy_names_subset)))
+strategy_cases_averted
+
+
+ggplot(strategy_cases_averted, aes(x = location, y = round(cases_averted), fill = strategy)) + 
     geom_bar(stat = 'identity', position = 'dodge') + 
-    facet_grid( ~ far_pop) + 
-    coord_flip()
+    scale_fill_manual(values = c('black', 'tomato3', 'navy'), 
+                      breaks = unique(strategy_cases_averted$strategy),
+                      labels = strategy_names_subset_plot_labels) +
+    scale_y_continuous(breaks = seq(0, 10, 2), labels = seq(0, 10, 2)) +
+    labs(x = 'Location', y = 'Cases averted', fill = 'Strategy') +
+    presentation_plot_theme
 
 
 
 
 
-# orv_far_strategy_results <- list()
-# for (i in 1:length(strategy_names_subset)) {
-#     orv_far_strategy_results[[strategy_names_subset[i]]] <- runSimulations(
-#         R0 = orv_model_params$far_pop_R0 # transmission coeficient
-#         , run_time = orv_model_params$model_time # 1 yr!
-#         , pop = initializePop(N = site_data$far_pop, initPropImmune = 0.25, I0 = 1)
-#         , strategy_name = strategy_names_subset[i]
-#         , vaxDay = as.numeric(subset(strategy_campaign_prep_delays, strategy == strategy_names_subset[i])['mt_freezing_time'])
-#         , orv_duration = as.numeric(subset(strategy_team_days_long, strategy_name == strategy_names_subset[i] & team_type == 'mobile_team')[ ,'team_days']) #for now we're only looking at the far campaigns 
-#         , n_team_type = 2
-#         , vax_eff = orv_model_params$vaccine_efficacy
-#         , team_performance = ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["mobile_team_with_dose10"]], as.numeric(sc_model_params$vax_rate['mobile_team']), ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["mobile_team_with_ice"]], 77, 170))
-#         , time_to_immunity = orv_model_params$immune_response_timing
-#         , browse = F
-#     ) 
-# }
-
-#save to file
-saveRDS(orv_far_strategy_results, file = 'model_output/orv_far_strategy_results.rds')
-
-
-#near/urban location
-orv_near_strategy_results <- list()
-for (i in 1:length(strategy_names_subset)) {
-    orv_near_strategy_results[[strategy_names_subset[i]]] <- runSimulations(
-        R0 = orv_model_params$near_pop_R0 # transmission coeficient
-        , run_time = orv_model_params$model_time # 1 yr!
-        , pop = initializePop(N = site_data$near_pop, initPropImmune = 0.25, I0 = 1)
-        , strategy_name = strategy_names_subset[i]
-        , vaxDay = as.numeric(subset(strategy_campaign_prep_delays, strategy == strategy_names_subset[i])['ft_freezing_time'])
-        , orv_duration = as.numeric(subset(strategy_team_days_long, strategy_name == strategy_names_subset[i] & team_type == 'fixed_team')[ ,'team_days']) #for now we're only looking at the far campaigns 
-        , n_team_type = 1
-        , vax_eff = orv_model_params$vaccine_efficacy
-        , team_performance = ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["fixed_team_with_dose10"]], as.numeric(sc_model_params$vax_rate['fixed_team']), ifelse(strategy_analysis_list[[strategy_names_subset[i]]][["fixed_team_with_ice"]], 77, 170))
-        , time_to_immunity = orv_model_params$immune_response_timing
-        , browse = F
-    ) 
-}
-
-#save to file
-saveRDS(orv_near_strategy_results, file = 'model_output/orv_near_strategy_results.rds')
-
-#################################################################################
-#Sensitivity on number of freezers
-#################################################################################
-
-#mf314_quant <- 1:10 #we currently run the sc model on only one freezer. What if the base has more than 1?
