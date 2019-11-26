@@ -370,6 +370,7 @@ ggplot(strategy_cases_averted, aes(x = location, y = round(cases_averted), fill 
                       labels = strategy_names_subset_plot_labels) +
     scale_y_continuous(breaks = seq(0, 10, 2), labels = seq(0, 10, 2)) +
     labs(x = 'Location', y = 'Cases averted', fill = 'Strategy') +
+    theme(legend.position = 'none') +
     presentation_plot_theme
 
 
