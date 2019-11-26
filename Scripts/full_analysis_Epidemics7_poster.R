@@ -24,7 +24,7 @@ source('scripts/strategy_list_complete.R')
 #'TODO: change the for loop to an lapply function for efficiency
 ##########################################################################
 strategy_names_subset <- c("dose10_fcc_asap", "monodose_fcc_asap", "monodose_occ_asap")
-strategy_names_subset_plot_labels <- c('10 dose FCC', 'Monodose FCC', 'Monodose OCC')
+strategy_names_subset_plot_labels <- c('10-dose FCC', '1-dose FCC', '1-dose OCC')
 
 #Location characteristics
 far_pop_sizes <- rep(1000, times = 5)
