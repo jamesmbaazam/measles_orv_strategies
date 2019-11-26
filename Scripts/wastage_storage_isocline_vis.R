@@ -1,5 +1,6 @@
 #packages
 library(ggplot2)
+library(ggthemes)
 library(tibble)
 
 #scripts
@@ -61,7 +62,7 @@ dose10_fcc_upper_bound <- calc_dose_capacity(vial_type = 'dose10'
 
 #' We are going to increase the storage volume for monodose occ, and in so doing, 
 #' accomodate the best case scenario for monodose storage volume
-monodose_occ_larger_capacity <- seq(monodose_occ_capacity_lower_bound, dose10_fcc_upper_bound, 5) #just a vector of possible increasing volume capacities to consider. The idea is to increase it to as high as the capacity for 10-dose carriage per trip.
+monodose_occ_larger_capacity <- seq(monodose_occ_capacity_lower_bound, dose10_fcc_lower_bound, 5) #just a vector of possible increasing volume capacities to consider. The idea is to increase it to as high as the capacity for 10-dose carriage per trip.
 
 
 #' We are going to consider the full spectrum of 10-dose wastage on the open 
@@ -69,16 +70,16 @@ monodose_occ_larger_capacity <- seq(monodose_occ_capacity_lower_bound, dose10_fc
 #' scenarios for the 10-dose in fcc. 
 
 
-dose10_fcc_perc_ovw <- seq(0, 100, length.out = length(monodose_occ_larger_capacity)) #ovw = open vial wastage
+dose10_fcc_percent_ovw <- seq(0, 100, length.out = length(monodose_occ_larger_capacity)) #ovw = open vial wastage
 
 #x-axis of plot: ratio of increasing vaccine carrier volume capacity for monodose vs fixed for 10-dose
-monodose_to_dose10_capacity_ratio <- round(monodose_occ_larger_capacity / dose10_fcc_upper_bound, 3)
+monodose_to_dose10_capacity_ratio <- round(monodose_occ_larger_capacity / dose10_fcc_lower_bound, 3)
 
 
 volume_capacity_and_wastage_df <- tibble(
-    dose10_perc_ovw = dose10_fcc_perc_ovw,
-    dose10_capacity = dose10_fcc_lower_bound,
-    monodose_capacity = monodose_occ_larger_capacity,
+    dose10_fcc_percent_ovw = dose10_fcc_percent_ovw,
+    dose10_vaxCarr_capacity = dose10_fcc_lower_bound,
+    monodose_ideal_capacity = monodose_occ_larger_capacity,
     storage_capacity_ratio = monodose_to_dose10_capacity_ratio
 )
 
@@ -103,24 +104,52 @@ volume_capacity_and_wastage_df <- tibble(
 #' Solving the above in the regions where storage capacity for monodose < mobile team 
 #' performance will yield the following
 #' 
-isocline_df <- volume_capacity_and_wastage_df %>%
-    filter(monodose_capacity < tp_mobile) %>% 
-    mutate(dose10_ovw = 1 - storage_capacity_ratio
-           , dose10_effec_dose = 750 * (1 - dose10_ovw / 100)
+isocline_data_df <- volume_capacity_and_wastage_df %>%
+    filter(monodose_ideal_capacity <= tp_mobile) %>% 
+    mutate(dose10_ovw = (1 - storage_capacity_ratio)
+           , dose10_effec_dose = 750 * (1 - dose10_ovw)
     )
 
 
-isocline_plot <- ggplot(data = isocline_df) + 
-    geom_point(aes(x = storage_capacity_ratio, y = dose10_ovw), size = 2) + 
-    geom_line(aes(x = storage_capacity_ratio, y = dose10_ovw), size = 1) + 
-    scale_y_continuous(breaks = seq(0, 1, 0.05), labels = seq(0, 1, 0.05)) 
+isocline_data <- tibble(monodose_capacity = seq(min(isocline_data_df$storage_capacity_ratio), max(isocline_data_df$storage_capacity_ratio), 0.01),
+                            dose10_ovw = rev(seq(0, max(isocline_data_df$dose10_ovw), length.out = length(monodose_capacity)))
+                        )
 
-isocline_plot <- isocline_plot +
-    labs(x = 'Storage capacity ratio (monodose over 10-dose)', y = 'Open vial wastage (10-dose)') + 
-    annotate('text', label = '10-dose', x = 0.25, y = 0.45, size = 7) +
-    annotate('text', label = 'Monodose', x = 0.75, y = 0.75, size = 7) 
 
-isocline_plot <- isocline_plot + presentation_plot_theme
+# p1 <- plot(1, 
+#            xlab = "transport capacity", 
+#            ylab = "open vial wastage", 
+#            ylim = range(volume_capacity_and_wastage_df$dose10_fcc_percent_ovw), 
+#            xlim = range(volume_capacity_and_wastage_df$monodose_ideal_capacity),
+#            add = TRUE
+#            )
+# 
+# p1 <- lines(isocline_data$monodose_capacity, isocline_data$dose10_ovw)
+# 
+# plot(p1)
+
+isocline_plot_empty <- ggplot(volume_capacity_and_wastage_df, aes(x = storage_capacity_ratio, y = dose10_fcc_percent_ovw/100)) + geom_blank()
+
+isocline_plot <- isocline_plot_empty + 
+    geom_point(data = isocline_data, aes(x = monodose_capacity, y = dose10_ovw), size = 3) + 
+    geom_line(data = isocline_data, aes(x = monodose_capacity, y = dose10_ovw), size = 2) + 
+    scale_y_continuous(breaks = seq(0, 1, 0.25), labels = seq(0, 1, 0.25), expand = c(0,0)) +
+    scale_x_continuous(limits = c(min(isocline_data$monodose_capacity), max(volume_capacity_and_wastage_df$storage_capacity_ratio)),
+                       expand = c(0, 0),
+                       breaks = round(seq(min(isocline_data$monodose_capacity), max(volume_capacity_and_wastage_df$storage_capacity_ratio), length.out = 7), 2),
+                       labels = round(seq(min(isocline_data$monodose_capacity), max(volume_capacity_and_wastage_df$storage_capacity_ratio), length.out = 7), 2))
+
+
+isocline_plot <- isocline_plot + labs(x = 'Transport capacity ratio (Monodose:10-dose)', y = 'Open vial wastage (10-dose)') 
+
+    
+isocline_plot <- isocline_plot +    annotate('text', label = '10-dose', x = 0.265, y = 0.10, size = 5) +
+    annotate('text', label = 'Monodose', x = 0.37, y = 0.35, size = 5) +
+    theme(axis.line.x = element_line(color="black", size = 1.5),
+          axis.line.y = element_line(color="black", size = 1.5)
+          )
+
+isocline_plot <- isocline_plot + presentation_plot_theme 
 
 if (display_sc_plots) {
     plot(isocline_plot)  
