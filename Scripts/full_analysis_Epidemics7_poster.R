@@ -13,6 +13,7 @@ source('./scripts/supply_chain_functions.R') #functions for performing individua
 source('./scripts/wrappers_supply_chain.R') #functions for running the supply chain model
 source('scripts/measlesFunctions.R') #functions for running the orv model
 source('scripts/strategy_list_complete.R')
+source('scripts/plotting_functions.R')
 
 ##########################################################
 #SUPPLY CHAIN ANALYSIS
