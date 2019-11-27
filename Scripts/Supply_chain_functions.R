@@ -431,5 +431,15 @@ calc_campaign_start <- function(fixedT_freeze_time,
   }
 }
 
-
-
+# compound_delays(): ----
+#' Calculates the compounded delays from a sequential campaign based on the 
+#' strategy commencement delay and campaign durations from previous locations.
+calc_compounded_delays <- function(delays, team_days){
+  cpd_delays <- rep(NA, length(delays))
+  cpd_delays[1] <- delays[1] 
+  
+  for (i in 2: length(delays)) {
+    cpd_delays[i] <- delays[1] + sum(team_days[1:i-1]) 
+  }
+  return(cpd_delays) 
+} 
