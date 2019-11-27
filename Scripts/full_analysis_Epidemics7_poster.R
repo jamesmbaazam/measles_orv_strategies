@@ -28,7 +28,7 @@ strategy_names_subset <- c("dose10_fcc_asap", "monodose_fcc_asap", "monodose_occ
 strategy_names_subset_plot_labels <- c('10-dose FCC', '1-dose FCC', '1-dose OCC')
 
 #Location characteristics
-far_pop_sizes <- rep(1000, times = 5)
+far_pop_sizes <- rep(2500, times = 5)
 near_pop_sizes <- rep(10000, times = length(far_pop_sizes))
 site_pops_df <- make_site_data(near_pop_sizes, far_pop_sizes)
 site_pops_df <- site_pops_df %>% mutate(location = 1:length(far_pop_sizes))
@@ -235,20 +235,11 @@ sc_results <- cbind(campaign_delay_rcw25_scenario, select(team_days_rcw25_scenar
 
 
 
-compound_delays <- function(delays, team_days){
-    cpd_delays <- rep(NA, length(delays))
-    cpd_delays[1] <- delays[1] 
-    
-    for (i in 2: length(delays)) {
-        cpd_delays[i] <- delays[1] + sum(team_days[1:i-1]) 
-    }
-    return(cpd_delays) 
-} 
-
-
+#' split the supply chain results based on strategy and apply a function to calculate
+#' the compounded delays based on sequential campaigns using one team.
 sc_results_split_modified <- sc_results %>% 
     group_split(strategy) %>% 
-    map(function(dat){mutate(dat, campaign_start_compounded = compound_delays(campaign_start, mt_team_days))})
+    map(function(dat){mutate(dat, campaign_start_compounded = calc_compounded_delays(campaign_start, mt_team_days))})
 
 
 sc_results_final <- do.call(rbind, args = sc_results_split_modified)
@@ -275,32 +266,6 @@ sc_results_final
 ###############################################################################
 
 #far/remote location
-
-
-
-#running it for different far population sizes
-#orv_far_pop_dynamics <- vector('list', nrow(sc_results))
-
-#far_pop_size <- vector('list', nrow(site_pops_df))
-
-# for (fp in 1: nrow(sc_results)) {
-#   #  simulation_pop[[pop_size]] <- far_pop_sizes[pop_size] 
-#     for (strategy in 1:length(strategy_names_subset)) {
-#         orv_far_pop_dynamics[[strategy_names_subset[strategy]]][[far_pop = sc_results$far_pop[fp]]] <- runSimulations(
-#             R0 = orv_model_params$far_pop_R0 # transmission coeficient
-#             , run_time = orv_model_params$model_time # 1 yr!
-#             , pop = initializePop(N = far_pop_sizes[pop_size], initPropImmune = 0.25, I0 = 1)
-#             , strategy_name = strategy_names_subset[strategy]
-#             , vaxDay = as.numeric(subset(strategy_campaign_prep_delays, strategy == strategy_names_subset[strategy])['mt_freezing_time'])
-#             , orv_duration = as.numeric(subset(strategy_team_days_long, strategy_name == strategy_names_subset[strategy] & team_type == 'mobile_team')[ ,'team_days']) #for now we're only looking at the far campaigns 
-#             , n_team_type = 2
-#             , vax_eff = orv_model_params$vaccine_efficacy
-#             , team_performance = ifelse(strategy_analysis_list[[strategy_names_subset[strategy]]][["mobile_team_with_dose10"]], as.numeric(sc_model_params$vax_rate['mobile_team']), ifelse(strategy_analysis_list[[strategy_names_subset[strategy]]][["mobile_team_with_ice"]], 77, 170))
-#             , time_to_immunity = orv_model_params$immune_response_timing
-#             , browse = F
-#         ) 
-#     }
-#     }
 
 orv_far_pop_dynamics <- vector('list', nrow(sc_results))
 
@@ -362,18 +327,92 @@ strategy_cases_averted <- mutate(strategy_outbreak_size_df,
                                  location = rep(site_pops_df$location, times = length(strategy_names_subset)))
 strategy_cases_averted
 
+# Plots ----
 
-ggplot(strategy_cases_averted, aes(x = location, y = round(cases_averted), fill = strategy)) + 
+
+# Transmission dynamics from the first lcoation of each strategy
+location_1_dynamics <- rbind(orv_far_pop_collapsed_dynamics_list[[1]], 
+                             orv_far_pop_collapsed_dynamics_list[[6]], 
+                             orv_far_pop_collapsed_dynamics_list[[11]]
+)
+
+
+#Time delays and campaign durations
+loc_1_delays_df <- filter(sc_results_final, location == 1) %>% 
+    select(strategy, campaign_start_compounded, mt_team_days)
+
+loc_1_campaign_period_df <- loc_1_delays_df %>% 
+    group_by(strategy) %>% 
+    mutate(cases_peak = round(max(location_1_dynamics$totalInf))) %>% 
+    ungroup() %>% 
+    mutate(cases_peak = round(cases_peak  + c(0, 5, 10)))
+
+
+
+#1. Transmission dynamics from Location one
+
+location_1_dynamics_plot <- ggplot(data = filter(location_1_dynamics, time <= 150), aes(x = time, y = totalInf, color = strategy)) +
+    geom_line(size = 2) 
+
+
+location_1_dynamics_plot <- location_1_dynamics_plot +
+    geom_segment(data = loc_1_campaign_period_df, 
+                                  aes(x = campaign_start_compounded
+                                      , xend = campaign_start_compounded + mt_team_days
+                                      , y = cases_peak
+                                      , yend = cases_peak
+                                      , color = strategy
+                                      )
+                                  , size = 2
+                                  , arrow = arrow(length = unit(0.01, "npc"), ends = 'both', type = 'closed')
+                                  )
+
+
+location_1_dynamics_plot <- location_1_dynamics_plot + 
+    scale_color_manual(values = cbbPalette[c(2, 6, 4)], labels = strategy_names_subset_plot_labels) 
+ 
+    
+    
+location_1_dynamics_plot <- location_1_dynamics_plot + labs(x = 'Time (days)', y = 'Total infected') +
+    theme(legend.position = 'top') +
+    presentation_plot_theme
+
+
+plot(location_1_dynamics_plot)
+
+
+
+# 2. Cases averted ####
+strategy_cases_averted_plot <- ggplot(strategy_cases_averted, aes(x = location, y = round(cases_averted), fill = strategy)) + 
     geom_bar(stat = 'identity', position = 'dodge') + 
-    scale_fill_manual(values = c('black', 'tomato3', 'navy'), 
-                      breaks = unique(strategy_cases_averted$strategy),
-                      labels = strategy_names_subset_plot_labels) +
-    scale_y_continuous(breaks = seq(0, 10, 2), labels = seq(0, 10, 2)) +
+    scale_fill_manual(values = cbbPalette[c(2, 6, 4)], labels = strategy_names_subset_plot_labels) +
+    scale_y_continuous(breaks = seq(0, max(strategy_cases_averted$cases_averted), length.out = 5), labels = seq(0, max(strategy_cases_averted$cases_averted), length.out = 5)) +
     labs(x = 'Location', y = 'Cases averted', fill = 'Strategy') +
     theme(legend.position = 'none') +
     presentation_plot_theme
 
+plot(strategy_cases_averted_plot)
 
 
+strategy_outbreak_size_split <- strategy_cases_averted %>% 
+    group_split(strategy) 
 
 
+strategy_aggregated_outbreak_size <- map(strategy_outbreak_size_split, mutate, aggregated_outbreak_size = cumsum(outbreak_size))
+
+strategy_aggregated_outbreak_size_df <- do.call(rbind, args = strategy_aggregated_outbreak_size)
+strategy_aggregated_outbreak_size_df
+
+final_outbreak_sizes <- strategy_aggregated_outbreak_size_df[c(5, 10, 15), c('strategy', 'aggregated_outbreak_size')]
+final_outbreak_sizes
+
+# 3. Outbreak sizes ####
+location_outbreak_sizes_plot <- ggplot(data = strategy_cases_averted, aes(x = location, y = outbreak_size, fill = strategy), color = 'black') + 
+    geom_bar(stat = 'identity', position = 'dodge') + 
+    scale_fill_manual(values = cbbPalette[c(2, 6, 4)], labels = strategy_names_subset_plot_labels) +
+  #  geom_smooth(method = "auto") +
+    labs(x = 'Location', y = 'Outbreak size', fill = 'Strategy') +
+    theme(legend.position = 'top') +
+    presentation_plot_theme
+
+plot(location_outbreak_sizes_plot)
