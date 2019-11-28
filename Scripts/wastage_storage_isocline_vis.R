@@ -144,14 +144,14 @@ equip_region <- tibble(dose_10_ovw_component = c(isocline_data$dose10_ovw, seq(m
 isocline_plot_empty <- ggplot(volume_capacity_and_wastage_df, aes(x = storage_capacity_ratio, y = dose10_fcc_percent_ovw/100)) + geom_blank()
 
 isocline_plot <- isocline_plot_empty + 
-    geom_point(data = isocline_data, aes(x = monodose_capacity, y = dose10_ovw), size = 3, color = 'navy') + 
+   # geom_point(data = isocline_data, aes(x = monodose_capacity, y = dose10_ovw), size = 3, color = 'navy') + 
     geom_line(data = isocline_data, aes(x = monodose_capacity, y = dose10_ovw), size = 2, color = 'navy') + 
-    scale_y_continuous(breaks = seq(0, 1, 0.25), labels = seq(0, 1, 0.25), expand = c(0,0)) +
-    scale_x_continuous(limits = c(min(isocline_data$monodose_capacity), max(volume_capacity_and_wastage_df$storage_capacity_ratio)),
-                       expand = c(0, 0),
-                       breaks = round(seq(min(isocline_data$monodose_capacity), max(volume_capacity_and_wastage_df$storage_capacity_ratio), length.out = 7), 2),
-                       labels = round(seq(min(isocline_data$monodose_capacity), max(volume_capacity_and_wastage_df$storage_capacity_ratio), length.out = 7), 2))
-    # scale_x_continuous(breaks = round(seq(min(isocline_data$monodose_capacity), max(volume_capacity_and_wastage_df$storage_capacity_ratio), length.out = 7), 2),
+     scale_y_continuous(breaks = seq(0, 1, 0.25), labels = seq(0, 1, 0.25), expand = c(0,0)) #+
+    # scale_x_continuous(limits = c(min(isocline_data$monodose_capacity), max(volume_capacity_and_wastage_df$storage_capacity_ratio)),
+    #                    expand = c(0, 0),
+    #                    breaks = round(seq(min(isocline_data$monodose_capacity), max(volume_capacity_and_wastage_df$storage_capacity_ratio), length.out = 7), 2),
+    #                    labels = round(seq(min(isocline_data$monodose_capacity), max(volume_capacity_and_wastage_df$storage_capacity_ratio), length.out = 7), 2))
+    # # scale_x_continuous(breaks = round(seq(min(isocline_data$monodose_capacity), max(volume_capacity_and_wastage_df$storage_capacity_ratio), length.out = 7), 2),
     #                    labels = round(seq(min(isocline_data$monodose_capacity), max(volume_capacity_and_wastage_df$storage_capacity_ratio), length.out = 7), 2))
 
 isocline_plot <- isocline_plot + geom_line(data = equip_region, aes(x = monodose_capacity_cut_off, y = dose_10_ovw_component), size = 2, color = 'navy')
@@ -166,6 +166,11 @@ isocline_plot <- isocline_plot +
           axis.line.y = element_line(color="black", size = 1.5)
           )
 
+
+isocline_plot <- isocline_plot + scale_x_continuous(trans = squish_trans(0.36, 1, 100), breaks = seq(0, 1, by = 2), labels = seq(0, 1, by = 2))
+                     
+
+
 isocline_plot <- isocline_plot + presentation_plot_theme 
 
 if (display_sc_plots) {
@@ -175,6 +180,48 @@ if (display_sc_plots) {
 if(save_sc_plots){
     ggsave(filename = 'figures/isocline_plot.pdf')
 }
+
+
+
+
+#Gap x-axis plot with plotrix
+
+# gap.plot(x, y, gap=c(from,to), type="b", xlab="index", ylab="value")
+# axis.break(2, from, breakcol="snow", style="gap")
+# axis.break(2, from*(1+0.02), breakcol="black", style="slash")
+# axis.break(4, from*(1+0.02), breakcol="black", style="slash")
+# axis(2, at=from)
+# 
+# 
+# 
+# 
+# gap.plot(volume_capacity_and_wastage_df$storage_capacity_ratio, 
+#          volume_capacity_and_wastage_df$dose10_fcc_percent_ovw/100, 
+#          gap = c(0.36,0.9),
+#          gap.axis = 'x',
+#          type = 'n',
+#          xlab = 'Transport capacity ratio (Monodose:10-dose)',
+#          ylab = 'Open vial wastage (10-dose)'
+#          )
+# 
+# axis.break(1, 0.36, breakcol="red", style="slash")
+# 
+# plot(isocline_data_df$storage_capacity_ratio, 
+#      isocline_data_df$dose10_ovw,
+#      type = "n"
+# )
+
+
+
+
+
+
+
+
+
+
+
+
 
 #' Interpretation: Irrespective of population size, so far as the storage 
 #' capacity for monodose is (monodose storage/750) > 32.5% , monodose will lead to 
