@@ -373,13 +373,14 @@ location_1_dynamics_plot <- location_1_dynamics_plot +
  
     
     
-location_1_dynamics_plot <- location_1_dynamics_plot + labs(x = 'Time (days)', y = 'Total infected') +
-    theme(legend.position = 'top') +
-    presentation_plot_theme
+location_1_dynamics_plot <- location_1_dynamics_plot + labs(x = 'Time (days)', y = 'Total infected', color = 'Strategy') +
+    theme(legend.position = 'top') #+
+   # presentation_plot_theme
 
 
 plot(location_1_dynamics_plot)
 
+ggsave(filename = 'figures/transmission_dynamics_location1.png', plot = location_1_dynamics_plot, device = 'png')
 
 
 # 2. Cases averted ####
@@ -388,11 +389,12 @@ strategy_cases_averted_plot <- ggplot(strategy_cases_averted, aes(x = location, 
     scale_fill_manual(values = cbbPalette[c(2, 6, 4)], labels = strategy_names_subset_plot_labels) +
     scale_y_continuous(breaks = seq(0, max(strategy_cases_averted$cases_averted), length.out = 5), labels = seq(0, max(strategy_cases_averted$cases_averted), length.out = 5)) +
     labs(x = 'Location', y = 'Cases averted', fill = 'Strategy') +
-    theme(legend.position = 'none') +
-    presentation_plot_theme
+    theme(legend.position = 'none') #+
+  #  presentation_plot_theme
 
 plot(strategy_cases_averted_plot)
 
+ggsave(filename = 'figures/strategy_cases_averted_plot.png', plot = strategy_cases_averted_plot, device = 'png')
 
 strategy_outbreak_size_split <- strategy_cases_averted %>% 
     group_split(strategy) 
@@ -416,3 +418,5 @@ location_outbreak_sizes_plot <- ggplot(data = strategy_cases_averted, aes(x = lo
     presentation_plot_theme
 
 plot(location_outbreak_sizes_plot)
+
+ggsave(filename = 'figures/location_outbreak_sizes_plot.png', plot = location_outbreak_sizes_plot, device = 'png')
