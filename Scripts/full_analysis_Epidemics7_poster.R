@@ -99,7 +99,7 @@ for (loc in 1:nrow(site_pops_df)){
 
 campaign_delay_equipment_scenarios <- do.call(rbind, args = c(delay_results_rcw25, delay_results_vaxCarr)) 
 
-View(campaign_delay_equipment_scenarios)
+#View(campaign_delay_equipment_scenarios)
 
 
 
@@ -164,13 +164,13 @@ team_days_vaxCarr_scenario_df
 # combine the two equipment scenarios' results of team days into one dataframe
 team_days_equipment_scenarios_df <- rbind(team_days_rcw25_scenario_df, team_days_vaxCarr_scenario_df)
 
-View(team_days_equipment_scenarios_df)
+#View(team_days_equipment_scenarios_df)
 
 
 #a quick look at the results 
 ggplot(data = team_days_rcw25_scenario_df, aes(x = strategy, y = mt_team_days, fill = strategy)) + 
     geom_bar(stat = 'identity') + 
-    facet_wrap( ~ location) +
+  #  facet_wrap( ~ location) +
     labs(x = 'Strategy', y = 'Mobile team days', title = 'Team days (Mobile teams use RCW25)') +
     scale_x_discrete(labels = c('10-dose FCC' , 'Monodose FCC', 'Monodose OCC', 'Mixed FCC', 'Part OCC')) +
     theme(legend.position = 'none')
@@ -295,18 +295,18 @@ far_orv_dynamics_unlist <- unlist(orv_far_pop_dynamics, recursive = F)
 
 
 #Exploring the list elements
-listviewer::jsonedit(orv_far_pop_dynamics)
+#listviewer::jsonedit(orv_far_pop_dynamics)
 
 
 # Outbreak size (far dynamics) ----
 
 #extract the detailed dynamics
 orv_far_pop_detailed_dynamics_list <- unlist(rlist::list.select(orv_far_pop_dynamics, Detailed), recursive = F)
-listviewer::jsonedit(orv_far_pop_detailed_dynamics_list)
+#listviewer::jsonedit(orv_far_pop_detailed_dynamics_list)
 
 #extract the collapsed dynamics
 orv_far_pop_collapsed_dynamics_list <- unlist(rlist::list.select(orv_far_pop_dynamics, Collapsed), recursive = F)
-listviewer::jsonedit(orv_far_pop_collapsed_dynamics_list)
+#listviewer::jsonedit(orv_far_pop_collapsed_dynamics_list)
 
 
 #create a column to calculate the cumulative sums of infected cases, to determine the outbreak size
