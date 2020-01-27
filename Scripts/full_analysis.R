@@ -11,7 +11,7 @@ source('./scripts/parameters.R') #global parameter list
 source('./scripts/analyses_parameters.R') #specific parameter list for this analysis
 source('./scripts/supply_chain_functions.R') #functions for performing individual supply chain calculations
 source('./scripts/wrappers_supply_chain.R') #functions for running the supply chain model
-source('scripts/measlesFunctions.R') #functions for running the orv model
+source('scripts/measles_functions.R') #functions for running the orv model
 source('scripts/strategy_list_complete.R')
 
 ##########################################################

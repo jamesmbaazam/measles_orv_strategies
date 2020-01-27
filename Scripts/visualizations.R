@@ -7,9 +7,10 @@ library('ggthemes')
 library('gridExtra')
 
 #load scripts
-source('scripts/Parameters.R')
+source('scripts/parameters.R')
 source('scripts/analyses_parameters.R')
 source('scripts/Supply_chain_functions.R')
+source('scripts/plotting_functions.R')
 
 
 #load saved model output
