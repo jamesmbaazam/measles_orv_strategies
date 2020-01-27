@@ -1,8 +1,16 @@
 # To do
 1. Make a design diagram (workflow) for the model and simulation structure
-2. Make scenario definitions a dataframe instead of a list of data frames
-3. Create a data frame of scenarios for running epidemiological scenarios
-4. Create a separate script for running and saving supply chain analyses per strategy and scenario (equipment type and team dispatch rules)
-5. Create a separate script that loads the supply chain output as input for running the transmission dynamics scenarios
-6. Create separate scripts for each figure. Each script should load and transform the relevant model outputs
-7. 
+   
+2. Reflow *Epidemics7* simulation workflow as follows:
+   - Define strategies as a dataframe instead of a list of data frames. 
+   - Dynamically generate strategy names instead of hardcoding them
+   - Define a single instance of the simulation scenarios: *team_equip_type*, *location_id*
+   - Create a separate script for running and saving supply chain analyses per strategy and scenario (equipment type and team dispatch rules) as `.rds` 
+   - Create a separate script that loads the supply chain output as input for running the transmission dynamics scenarios
+   - Save transmission dynamics resutls as `.rds`
+   - Generate each figure with a separate script. Each script should individually load and transform the relevant simulation outputs
+   - Reduce verbose subsetting in analysis scripts:
+     - `tidyverse` grouping and subsetting? 
+     - `data.table`? 
+     -  employ the `with()` function?
+   
