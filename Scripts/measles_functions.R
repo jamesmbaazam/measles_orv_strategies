@@ -108,13 +108,13 @@ step <- function(pop, R0, browse = FALSE) {
 #'1. tp = team performance/expected number of vaccinations per day
 #'2. v = vaccine efficacy between 0 and 1
 #'
-vaccinate <- function(pop, tp, v, browse = FALSE) {
+vaccinate <- function(pop, tp, v, n_team_type = 1, browse = FALSE) {
   if (browse) browser()
   
   totalPop <- sum(pop)
   
   #calculate the vaccination "rate" from the team performance
-  vax_rate <-  ifelse(pop$Sus1 > tp, tp/totalPop, pop$Sus1/totalPop)
+  vax_rate <-  ifelse(pop$Sus1 > n_team_type*tp, (n_team_type*tp)/totalPop, pop$Sus1/totalPop)
   # vax_rate <-  ifelse(pop$Sus1 > tp, tp, pop$Sus1)
   #calculate the proportions of individuals who'll be immunised and those who'll fail immunisation
   newly_immunised_batch <- v * vax_rate * pop$Sus1
@@ -159,6 +159,8 @@ runSimulations <- function(R0 # transmission coeficient
                            , orv_duration
                            , strategy_name
                            , vax_eff
+                           , n_team_type = 1
+                          # , team_type
                            , team_performance
                            , time_to_immunity
                            , browse = FALSE
@@ -171,10 +173,10 @@ runSimulations <- function(R0 # transmission coeficient
   #while (simResults[time, 'Sus1'] > 0) {
   while (time < run_time) {
     # for (time in 1: run_time) {
-    if (!is.na(vaxDay) & (time < vaxDay  | time > vaxDay + orv_duration )) {
+    if (!is.na(vaxDay) & time < vaxDay + 1  | time > vaxDay + 1 + (orv_duration/n_team_type)) {
       simResults <- rbind(simResults, data.frame(time, step(pop = simResults[time, -1], R0 = R0)))
-    }else if (!is.na(vaxDay) & (time >= vaxDay  & time <= vaxDay + orv_duration)){
-      simResults <- rbind(simResults, data.frame(time, step(pop = vaccinate(simResults[time, -1], v = vax_eff, tp = team_performance), R0 = R0)))
+    }else if (!is.na(vaxDay) & time >= vaxDay + 1  & time <= vaxDay + 1 + (orv_duration/n_team_type)){
+      simResults <- rbind(simResults, data.frame(time, step(pop = vaccinate(simResults[time, -1], v = vax_eff, n_team_type = n_team_type, tp = team_performance), R0 = R0)))
     }else if (is.na(vaxDay)){
       simResults <- rbind(simResults, data.frame(time, step(pop = simResults[time, -1], R0 = R0)))
     }

@@ -66,28 +66,3 @@ dose10_wr_mt <- dose10_wr_ft*2 #value between 0 and 100; #wastage rate for mobil
 # icepack_quants <- read_excel('/data/passiveCC_icepack_quantity_data.xlsx')
 # vax_storage_capacity <- read_excel('/data/passiveCC_vaccine_storage_capacity_data.xlsx')
 
-######################################################
-#Plot parameters
-######################################################
-#Control parameters
-display_epi_plots <- TRUE
-display_sc_plots <- FALSE
-save_plots <- FALSE
-
-
-# formatting the labels
-presentation_plot_theme <- theme(
-    axis.text.x = element_text(size = 15)
-    , axis.text = element_text(size = 15)
-    , axis.title.x = element_text(size = 20)
-    , legend.text = element_text(size = 15)
-    , axis.title.y = element_text(size = 20)
-    , legend.title = element_text(size = 20)
-)
-
-
-#plot theme
-shiny_plot_theme <-  theme(title = element_text(size = 12,
-                                          face = 'bold'
-)
-)
