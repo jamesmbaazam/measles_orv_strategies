@@ -8,19 +8,27 @@ library('dplyr')
 library('reshape2')
 library('tidyr')
 
-#scripts
+#helper functions and parameters
 source('./scripts/parameters.R') #global parameter list
-source('./scripts/analyses_parameters.R') #specific parameter list for this analysis
 source('./scripts/supply_chain_functions.R') #functions for performing individual supply chain calculations
 source('./scripts/wrappers_supply_chain.R') #functions for running the supply chain model
-source('scripts/strategy_list_complete.R')
+source('./scripts/strategy_list_complete.R')
+source('./scripts/analyses_parameters.R') #specific parameter list for this analysis
+source('./scripts/epidemics7_analysis/scenarios.R') 
+
 
 ##########################################################################
 #'STRATEGY-SPECIFIC CAMPAIGN DELAY ANALYSIS 
 #'TODO: change the for loop to an lapply function for efficiency
 ##########################################################################
+
+#subset the strategies we're interested in
 strategy_subset <- c("dose10_fcc_asap", "monodose_fcc_asap", "monodose_occ_asap")
+strategy_config <- filter(strategy_list, strategy %in% strategy_subset)
 strategy_plot_labels <- c('10-dose FCC', '1-dose FCC', '1-dose OCC')
+
+#subset the scenarios we're interested in
+scenario_subset <- scenarios %>% filter((equip_type == 'rcw25'| equip_type == 'vaxCarr') & dispatch == 'asap')
 
 # Analyse the campaign delays
 campaign_delay_results_assump2 <- list()
@@ -28,27 +36,29 @@ delay_results_rcw25 <- vector('list', length = length(strategy_subset))
 
 # Campaign delay: Mobile team equipment scenario analyses ----
 # Scenario 1: rcw25 ####
-for (strategy in seq_along(strategy_names_subset)) {
-    for (loc in 1:nrow(site_pops_df)){
-        campaign_delay_results_assump2[[loc]] <- analyse_prep_delay_assump2(
-            strategy_name = strategy_names_subset[strategy]
-            , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[strategy]]]$fixed_team_with_dose10
-            , fixed_team_with_ice = strategy_analysis_list[[strategy_names_subset[strategy]]]$fixed_team_with_ice
-            , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[strategy]]]$mobile_team_with_dose10
-            , mobile_team_with_ice = strategy_analysis_list[[strategy_names_subset[strategy]]]$mobile_team_with_ice
-            , team_dispatch = strategy_analysis_list[[strategy_names_subset[strategy]]]$team_dispatch
-            , site_details = site_pops_df[loc, ]
-            #  , site_row = loc
-            , fixed_team_equip_type = 'both'
-            , mobile_team_equip_type = 'rcw25'
-            , rcw25_ice_replacement_days = 2
-            , n_teams_fixed = 1
-            , n_teams_mobile = 1
-        )
+for (scenario in 1:nrow(scenario_subset)) {
+  for (strategy in strategy_subset) {
+    for (loc in 1:nrow(site_pops_df)) {
+      campaign_delay_results_assump2[[loc]] <- with(strategy_config, analyse_prep_delay_assump2(
+        strategy_name = strategy,
+        fixed_team_with_dose10 = strategy_analysis_list[[strategy]]$fixed_team_with_dose10,
+        fixed_team_with_ice = strategy_analysis_list[[strategy]]$fixed_team_with_ice,
+        mobile_team_with_dose10 = strategy_analysis_list[[strategy]]$mobile_team_with_dose10,
+        mobile_team_with_ice = strategy_analysis_list[[strategy]]$mobile_team_with_ice,
+        team_dispatch = strategy_analysis_list[[strategy]]$team_dispatch,
+        site_details = site_pops_df[loc, ]
+        #  , site_row = loc
+        , fixed_team_equip_type = "both",
+        mobile_team_equip_type = scenario_subset$equip_type[strategy],
+        rcw25_ice_replacement_days = 2,
+        n_teams_fixed = 1,
+        n_teams_mobile = 1
+      ))
     }
-    
-    delay_results_rcw25[[strategy]] = do.call(rbind, args = campaign_delay_results_assump2) %>% 
-        mutate(location_id = site_pops_df$location)
+
+    delay_results_rcw25[[strategy]] <- do.call(rbind, args = campaign_delay_results_assump2) %>%
+      mutate(location_id = site_pops_df$location)
+  }
 }
 
 
@@ -59,12 +69,12 @@ delay_results_vaxCarr <- vector('list', length = length(strategy_names_subset))
 for (strategy in seq_along(strategy_names_subset)) {
     for (loc in 1:nrow(site_pops_df)){
         campaign_delay_results_assump2[[loc]] <- analyse_prep_delay_assump2(
-            strategy_name = strategy_names_subset[strategy]
-            , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[strategy]]]$fixed_team_with_dose10
-            , fixed_team_with_ice = strategy_analysis_list[[strategy_names_subset[strategy]]]$fixed_team_with_ice
-            , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[strategy]]]$mobile_team_with_dose10
-            , mobile_team_with_ice = strategy_analysis_list[[strategy_names_subset[strategy]]]$mobile_team_with_ice
-            , team_dispatch = strategy_analysis_list[[strategy_names_subset[strategy]]]$team_dispatch
+            strategy_name = strategy
+            , fixed_team_with_dose10 = strategy_analysis_list[[strategy]]$fixed_team_with_dose10
+            , fixed_team_with_ice = strategy_analysis_list[[strategy]]$fixed_team_with_ice
+            , mobile_team_with_dose10 = strategy_analysis_list[[strategy]]$mobile_team_with_dose10
+            , mobile_team_with_ice = strategy_analysis_list[[strategy]]$mobile_team_with_ice
+            , team_dispatch = strategy_analysis_list[[strategy]]$team_dispatch
             , site_details = site_pops_df[loc, ]
             #  , site_row = loc
             , fixed_team_equip_type = 'both'
@@ -104,13 +114,13 @@ team_days_results_tmp <- vector('list', length(strategy_names_subset))
 for (strategy in seq_along(strategy_names_subset)) {
     for (loc in 1:nrow(site_pops_df)){
         team_days_results_tmp[[loc]] <- analyse_team_days(
-            strategy_name = strategy_names_subset[strategy]
+            strategy_name = strategy
             , site_details = site_pops_df[loc, ]
             , mobile_team_equip_type = 'rcw25'
-            , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[strategy]]]$fixed_team_with_dose10
-            , fixed_team_with_ice = strategy_analysis_list[[strategy_names_subset[strategy]]]$fixed_team_with_ice
-            , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[strategy]]]$mobile_team_with_dose10
-            , mobile_team_with_ice = strategy_analysis_list[[strategy_names_subset[strategy]]]$mobile_team_with_ice
+            , fixed_team_with_dose10 = strategy_analysis_list[[strategy]]$fixed_team_with_dose10
+            , fixed_team_with_ice = strategy_analysis_list[[strategy]]$fixed_team_with_ice
+            , mobile_team_with_dose10 = strategy_analysis_list[[strategy]]$mobile_team_with_dose10
+            , mobile_team_with_ice = strategy_analysis_list[[strategy]]$mobile_team_with_ice
         )
     }
     team_days_rcw25_scenario[[strategy]] <- do.call(rbind, args = team_days_results_tmp) 
@@ -130,13 +140,13 @@ team_days_results_tmp <- vector('list', length(strategy_names_subset))
 for (strategy in seq_along(strategy_names_subset)) {
     for (loc in 1:nrow(site_pops_df)){
         team_days_results_tmp[[loc]] <- analyse_team_days(
-            strategy_name = strategy_names_subset[strategy]
+            strategy_name = strategy
             , site_details = site_pops_df[loc, ]
             , mobile_team_equip_type = 'vaxCarr'
-            , fixed_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[strategy]]]$fixed_team_with_dose10
-            , fixed_team_with_ice = strategy_analysis_list[[strategy_names_subset[strategy]]]$fixed_team_with_ice
-            , mobile_team_with_dose10 = strategy_analysis_list[[strategy_names_subset[strategy]]]$mobile_team_with_dose10
-            , mobile_team_with_ice = strategy_analysis_list[[strategy_names_subset[strategy]]]$mobile_team_with_ice
+            , fixed_team_with_dose10 = strategy_analysis_list[[strategy]]$fixed_team_with_dose10
+            , fixed_team_with_ice = strategy_analysis_list[[strategy]]$fixed_team_with_ice
+            , mobile_team_with_dose10 = strategy_analysis_list[[strategy]]$mobile_team_with_dose10
+            , mobile_team_with_ice = strategy_analysis_list[[strategy]]$mobile_team_with_ice
         )
     }
     team_days_vaxCarr_scenario[[strategy]] <- do.call(rbind, args = team_days_results_tmp) 
