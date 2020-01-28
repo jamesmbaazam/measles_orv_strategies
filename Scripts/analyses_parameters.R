@@ -33,7 +33,8 @@ orv_model_params <- list(near_pop_R0 = 12
                          )
 
 
-# site_data <- tibble(near_pop = 1000
-#                     , far_pop = 169)
-#                            
+#Location characteristics
+far_pop_sizes <- rep(2500, times = 5)
+near_pop_sizes <- rep(10000, times = length(far_pop_sizes))
+site_pops_df <- make_site_data(near_pop_sizes, far_pop_sizes)
 
