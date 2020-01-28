@@ -48,7 +48,7 @@ for (strategy in seq_along(strategy_names_subset)) {
     }
     
     delay_results_rcw25[[strategy]] = do.call(rbind, args = campaign_delay_results_assump2) %>% 
-        mutate(location = site_pops_df$location)
+        mutate(location_id = site_pops_df$location)
 }
 
 
@@ -76,7 +76,7 @@ for (strategy in seq_along(strategy_names_subset)) {
     }
     
     delay_results_vaxCarr[[strategy]] = do.call(rbind, args = campaign_delay_results_assump2) %>% 
-        mutate(location = site_pops_df$location)
+        mutate(location_id = site_pops_df$location)
 }
 
 
@@ -117,7 +117,7 @@ for (strategy in seq_along(strategy_names_subset)) {
 }
 
 team_days_rcw25_scenario_df <- do.call(rbind, args = team_days_rcw25_scenario) %>% 
-    mutate(location = rep(site_pops_df$location, times = length(strategy_names_subset))) %>% 
+    mutate(location_id = rep(site_pops_df$location, times = length(strategy_names_subset))) %>% 
     as_tibble()
 
 team_days_rcw25_scenario_df    
@@ -143,7 +143,7 @@ for (strategy in seq_along(strategy_names_subset)) {
 }
 
 team_days_vaxCarr_scenario_df <- do.call(rbind, args = team_days_vaxCarr_scenario) %>% 
-    mutate(location = rep(site_pops_df$location, times = length(strategy_names_subset))) %>% 
+    mutate(location_id = rep(site_pops_df$location, times = length(strategy_names_subset))) %>% 
     as_tibble()
 
 team_days_vaxCarr_scenario_df
@@ -200,7 +200,7 @@ team_days_rcw25_scenario <- filter(team_days_equipment_scenarios_df, mt_equip_ty
 
 
 sc_results <- cbind(campaign_delay_rcw25_scenario, select(team_days_rcw25_scenario, -c(strategy, near_pop, far_pop))) %>% 
-    mutate(location = rep(site_pops_df$location, times = length(strategy_names_subset)))
+    mutate(location_id = rep(site_pops_df$location, times = length(strategy_names_subset)))
 
 
 
