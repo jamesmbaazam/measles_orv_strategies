@@ -13,28 +13,18 @@ source('./scripts/parameters.R') #global parameter list
 source('./scripts/analyses_parameters.R') #specific parameter list for this analysis
 source('./scripts/supply_chain_functions.R') #functions for performing individual supply chain calculations
 source('./scripts/wrappers_supply_chain.R') #functions for running the supply chain model
-source('scripts/measles_functions.R') #functions for running the orv model
 source('scripts/strategy_list_complete.R')
-source('scripts/plotting_functions.R')
 
 ##########################################################################
 #'STRATEGY-SPECIFIC CAMPAIGN DELAY ANALYSIS 
 #'TODO: change the for loop to an lapply function for efficiency
 ##########################################################################
-strategy_names_subset <- c("dose10_fcc_asap", "monodose_fcc_asap", "monodose_occ_asap")
-strategy_names_subset_plot_labels <- c('10-dose FCC', '1-dose FCC', '1-dose OCC')
-
-#Location characteristics
-far_pop_sizes <- rep(2500, times = 5)
-near_pop_sizes <- rep(10000, times = length(far_pop_sizes))
-site_pops_df <- make_site_data(near_pop_sizes, far_pop_sizes)
-site_pops_df <- site_pops_df %>% mutate(location = 1:length(far_pop_sizes))
-site_pops_df    
-
+strategy_subset <- c("dose10_fcc_asap", "monodose_fcc_asap", "monodose_occ_asap")
+strategy_plot_labels <- c('10-dose FCC', '1-dose FCC', '1-dose OCC')
 
 # Analyse the campaign delays
 campaign_delay_results_assump2 <- list()
-delay_results_rcw25 <- vector('list', length = length(strategy_names_subset))
+delay_results_rcw25 <- vector('list', length = length(strategy_subset))
 
 # Campaign delay: Mobile team equipment scenario analyses ----
 # Scenario 1: rcw25 ####
