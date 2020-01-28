@@ -1,3 +1,6 @@
+# Project overview
+This project is on assessing various measles outbreak response vaccination strategies. The assessments will be done based on the logistical (cold chain) needs in terms of ice packs, freezing times for ice packs, and passive cold chain requirements for vaccination teams.
+
 # Requirements
 ## Directories
 1. app - contains the R scripts to run the shiny app
