@@ -21,7 +21,8 @@ compute_rcw25_icepacks <- function(amb_temp, replacement_days) { # replacement_d
 }
 
 
-compute_vaxCarr_icepacks <- function(amb_temp, replacement_days = 1) {
+compute_vaxCarr_icepacks <- function(amb_temp, ...) {
+  replacement_days <- 1
   if (amb_temp == "below 40" & replacement_days == 1) {
     6
   } else if (amb_temp == "above 40" & replacement_days == 1) {
