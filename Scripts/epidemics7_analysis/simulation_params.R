@@ -30,5 +30,8 @@ key_table <- expand.grid(location_id = site_pops_df$location_id,
 
 ## simulation data
 
-sim_data <- merge(key_table, strategy_subset_config, by = 'strategy')
-sim_data
+sim_params_tmp <- merge(key_table, strategy_subset_config, by = 'strategy')
+
+sim_params_table <- merge(site_pops_df, sim_params_tmp, by = "location_id")
+
+sim_params_table
