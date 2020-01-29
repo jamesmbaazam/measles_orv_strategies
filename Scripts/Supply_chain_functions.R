@@ -4,6 +4,25 @@
 #' temperature and number of days to replace ice, which is daily for the 
 #' vaccine carrier ice packs and 1, 2, or 3 days for the RCW25s
 
+## the two functions below will potentially be a better way to do the ice pack
+## lookup
+# icepack_lookup <- array(dim = c(2, 2, 3), 
+#                         dimnames = list(equip_type = c("rcw25","vaxCarr"), 
+#                                         amb_temp = c("below 40", "above 40")
+#                                         )
+#                         )
+# 
+# compute_icepacks <- function(
+#   equipment = c("rcw25", "vaxCarr"),
+#   amb_temp = c("below 40", "above 40"),
+#   replacement_days = 1:3
+# ) {
+#   equipment <- equipment[1]
+#   amb_temp  <- amb_temp[1]
+#   replacement_days <- replacement_days[1]
+#   
+# }
+
 compute_rcw25_icepacks <- function(amb_temp, replacement_days) { # replacement_days = c(1, 2, 3)
   if (amb_temp == "below 40" & (replacement_days == 1 | replacement_days == 2)) {
     12
