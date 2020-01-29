@@ -12,11 +12,11 @@ strategy_list <- expand.grid(
 
 #dynamically create the strategy names from their composition
 strategy_list <- strategy_list %>%
-  mutate(strategy = sprintf(
+  mutate(strategy = as.factor(sprintf(
     "%s_%s_%s",
     c("monodose", "mixed", "dose10")[1 + ft_with_dose10 + mt_with_dose10],
     c("occ", "pcc", "fcc")[1 + ft_with_ice + mt_with_ice],
     dispatch
-  ))
+  )))
 
 
