@@ -3,10 +3,15 @@
 ###########################################################
 
 #packages
-
+library('conflicted')
 library('dplyr')
 library('reshape2')
 library('tidyr')
+
+
+#resolve conflicts
+conflict_prefer('filter', 'dplyr') #anytime I call the function 'filter', I mean dplyr::filter
+conflict_prefer('select', 'dplyr')
 
 #helper functions and parameters
 source('./scripts/parameters.R') #global parameter list
@@ -15,6 +20,7 @@ source('./scripts/wrappers_supply_chain.R') #functions for running the supply ch
 source('./scripts/strategy_list_complete.R')
 source('./scripts/analyses_parameters.R') #specific parameter list for this analysis
 source('./scripts/epidemics7_analysis/scenarios.R') 
+source('./scripts/epidemics7_analysis/simulation_params.R')
 
 
 ##########################################################################
