@@ -36,7 +36,7 @@ orv_far_pop_dynamics <- vector('list', nrow(sc_results))
 
 for (sc_result_row in 1: nrow(sc_results_final)) {
     
-    # tp <- ifelse(strategy_analysis_list[[as.character(sc_results$strategy[sc_result_row])]][["mobile_team_with_dose10"]], as.numeric(sc_model_params$vax_rate['mobile_team']), ifelse(strategy_analysis_list[[as.character(sc_results$strategy[sc_result_row])]][["mobile_team_with_ice"]], 616, 1301)) #mobile teams are using rcw25 for monodose campaigns, either with or without ice
+    
     tp <- as.numeric(sc_model_params$vax_rate['mobile_team']) #if all mobile teams can exceed the doses needed to achieve the average daily performance, then it's safe to assume all teams can hit the average team performance
     orv_far_pop_dynamics[[sc_result_row]] <- runSimulations(
         R0 = orv_model_params$far_pop_R0 # transmission coeficient
@@ -55,3 +55,28 @@ for (sc_result_row in 1: nrow(sc_results_final)) {
 }
 
 far_orv_dynamics_unlist <- unlist(orv_far_pop_dynamics, recursive = F)
+
+
+
+sc_results %>% 
+    group_split(strategy, mt_equip_type) %>% 
+    rowwise() %>% 
+    do({with(., 
+             runSimulations(
+                 R0 = orv_model_params$far_pop_R0 # transmission coeficient
+                 , run_time = orv_model_params$model_time # 1 yr!
+                 , pop = initializePop(N = far_pop, initPropImmune = 0.25, I0 = 1)
+                 , strategy_name = strategy
+                 , vaxDay = campaign_start_compounded
+                 , orv_duration = mt_team_days
+                 , n_team_type = 1
+                 , vax_eff = orv_model_params$vaccine_efficacy
+                 , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
+                 , time_to_immunity = orv_model_params$immune_response_timing
+                 , browse = F
+             )  
+             )
+        })
+
+
+
