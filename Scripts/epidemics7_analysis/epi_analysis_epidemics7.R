@@ -1,7 +1,28 @@
-##########################################################
-#EPIDEMIOLOGICAL ANALYSIS
-###########################################################
 
+## Transmission dynamics ####
+
+## Packages ####
+library('conflicted')
+library('dplyr')
+library('reshape2')
+library('tidyr')
+library('purrr')
+
+
+## Resolve package conflicts ####
+conflict_prefer('filter', 'dplyr') #anytime I call the function 'filter', I mean dplyr::filter
+conflict_prefer('select', 'dplyr')
+conflict_prefer('merge', 'base')
+
+#helper functions and parameters
+source('./scripts/parameters.R') #global parameter list
+source('./scripts/analyses_parameters.R') #specific parameter list for this analysis
+source('./scripts/epidemics7_analysis/scenarios.R') 
+source('./scripts/epidemics7_analysis/simulation_params.R')
+
+
+## Supply chain data ----
+sc_results <- readRDS('./model_output/sc_results_full.rds')
 
 ###############################################################################
 #Running the simulations for each strategy
