@@ -10,6 +10,7 @@ source('./scripts/analyses_parameters.R')
 
 #resolve conflicts
 conflict_prefer('mutate', 'dplyr')
+conflict_prefer('filter', 'dplyr')
 
 
 ##we're only interested in a subset of scenarios and strategies for now
