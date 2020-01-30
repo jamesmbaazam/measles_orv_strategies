@@ -351,6 +351,7 @@ else{stop('unknown mobile team equipment scenario')}
   
   ## Results - Campaign delays ====
   res <- data.frame(strategy = strategy_name
+                    , location_id = site_details$location_id
                     , near_pop = site_details$near_pop
                     , far_pop = site_details$far_pop
                     , mt_equip_type = mobile_team_equip_type
@@ -435,6 +436,7 @@ analyse_team_days <- function(strategy_name
     
     ## Results - Team days  ====
     out <- data.frame(strategy = strategy_name
+                      , location_id = site_details$location_id
                       , near_pop = site_details$near_pop
                       , far_pop = site_details$far_pop
                       , mt_equip_type = mobile_team_equip_type
