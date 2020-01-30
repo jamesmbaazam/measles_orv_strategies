@@ -22,16 +22,16 @@ strategy_subset_config <- filter(strategy_list, strategy %in% strategy_subset)
 
 #key table
 key_table <- expand.grid(location_id = site_pops_df$location_id,
-                         strategy = strategy_subset_config$strategy, 
-                         equip_type = scenario_subset$equip_type
+                         equip_type = scenario_subset$equip_type,
+                         strategy = strategy_subset_config$strategy
                          )
 
 
 
 ## simulation data
 
-sim_params_tmp <- merge(key_table, strategy_subset_config, by = 'strategy')
+sim_params_tmp <- left_join(key_table, strategy_subset_config, by = 'strategy')
 
-sim_params_table <- merge(site_pops_df, sim_params_tmp, by = "location_id")
+sim_params_table <- left_join(sim_params_tmp, site_pops_df, by = "location_id")
 
 sim_params_table
