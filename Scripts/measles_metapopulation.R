@@ -1,32 +1,61 @@
-# Stochastic version
-# SIRstep<-function(S,I,beta,births,migration,mortalityrate){
-# 	#browser()
-# 	It<-rbinom(1,S,1-exp(-beta*I^.95))+rpois(1,migration)
-# 	St<-S-It-floor(mortalityrate*S)+floor(births)
-# 	return(list(S=St,I=It))
-# 	}
-# Deterministic version
-# SIRstep<-function(S,I,beta,births,migration,mortalityrate){
-# 	#browser()
-# 	It<-min(S,S*(1-exp(-beta*I^.95)))+migration
-# 	St<-S-It-mortalityrate*S+births
-# 	return(list(S=St,I=It))
-# 	}
-
-SIRstep <- function(S, I, Beta, births, migration, mortalityrate) {
-  # browser()
-  It <- min(S, Beta * S * I^.95) + migration
-  St <- S + births - It - mortalityrate * S
+# 
+#' SIR_step
+#'
+#' @param S the susceptible class
+#' @param I the infected class
+#' @param births number of births per time period
+#' @param migration positive integer number of migrations 
+#' @param mortality_rate the number of natural deaths
+#' @param run_type the dynamic way to run the function
+#' @param browse if true, the browser will be opened for debugging purposes
+#' @param beta 
+#'
+#' @return a list with the current state of the system
+#' @export 
+#'
+#' @examples SIR_step(S = 1000, I = 1, beta = 0.012, births = 20, migration = 20, 
+#' mortality_rate = 0.2,run_type = 'det')
+#' 
+SIR_step <- function(S, I, beta, births, migration, mortality_rate, run_type = "det", browse = F) {
+  
+  if (browse) browser()
+  
+  switch(run_type,
+    "det" = {
+      It <- min(S, beta * S * I^.95) + migration
+    },
+    "stoc" = {
+      It <- rbinom(1, S, 1 - exp(-beta * I^.95)) + rpois(1, migration)
+    }
+  )
+  St <- S + births - It - mortality_rate * S
   return(list(S = St, I = It))
 }
-SIRrun <- function(S.init, I.init, beta, years, births, migration, mortalityrate) {
+
+
+#' Title
+#'
+#' @param S0 
+#' @param I0 
+#' @param beta 
+#' @param years 
+#' @param births 
+#' @param migration 
+#' @param mortality_rate 
+#'
+#' @return
+#' @export
+#'
+#' @examples SIR_run(S0 = 1000, I0 = 1, beta = 0.012, years = 1, births = 20, migration = 20, mortality_rate = 0.1)
+SIR_run <- function(S0, I0, beta, years, births, migration, mortality_rate) {
+  
   # beta is specified as a vector of values for each "biweek",
   beta <- rep(beta, years)
-  Susc <- S.init
-  Infect <- I.init
+  Susc <- S0
+  Infect <- I0
   timesteps <- 26 * years
-  for (i in 1:timesteps) {
-    out <- SIRstep(Susc[i], Infect[i], beta[i], births, migration, mortalityrate)
+  for (time in 1:timesteps) {
+    out <- SIR_step(Susc[time], Infect[time], beta[time], births, migration, mortality_rate)
     Susc <- c(Susc, out$S)
     Infect <- c(Infect, out$I)
     # cat(out$I,".\n")
