@@ -71,15 +71,31 @@ SIR_run <- function(S0, I0, beta, years, births, migration, mortality_rate) {
 # beta<-source("/Users/mattferrari/Documents/Current Projects/MSF Measles/Measles_Dynamics_ms/Seasonality/MCMC(new)/niamey/niamey_beta.q")$value
 
 
-SIRstep <- function(S, I, beta, births, migration, mortalityrate) {
+SIR_step <- function(S, I, beta, births, migration, mortality_rate) {
   # browser()
   It <- rbinom(1, S, 1 - exp(-beta * I^.95)) + rpois(1, migration) + rpois(1, 1) # migration + extra random introduction external to metapop
   # It<-min(S,S*(1-exp(-beta*I^.95)))+migration
-  St <- S - It - floor(mortalityrate * S) + floor(births)
+  St <- S - It - floor(mortality_rate * S) + floor(births)
   return(list(S = St, I = It))
 }
 
-SIRmeta <- function(S.init, I.init, beta, coupling, scaling, timesteps, births, mortalityrate) {
+#' Metapopulation with SIR dynamics
+#'
+#' @param S.init 
+#' @param I.init 
+#' @param beta 
+#' @param coupling 
+#' @param scaling 
+#' @param timesteps 
+#' @param births 
+#' @param mortality_rate 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+SIR_meta <- function(S.init, I.init, beta, coupling, scaling, timesteps, births, mortality_rate) {
+  
   Npatches <- length(S.init)
   Susc <- matrix(S.init, nrow = 1)
   Infect <- matrix(I.init, nrow = 1)
@@ -99,7 +115,7 @@ SIRmeta <- function(S.init, I.init, beta, coupling, scaling, timesteps, births, 
       migr <- ifelse(I.ext > 0, min(10, rpois(1, coupling[j, -j] * I.ext)), 0)
       migr <- ifelse(runif(1) > .9,  migr,  0)
       # browser()
-      out.tmp <- SIRstep(Susc[i - 1, j], Infect[i - 1, j], beta.i, births[j], mortalityrate[j], migration = migr)
+      out.tmp <- SIR_step(Susc[i - 1, j], Infect[i - 1, j], beta.i, births[j], mortality_rate[j], migration = migr)
       Susc.tmp <- c(Susc.tmp, out.tmp$S)
       Infect.tmp <- c(Infect.tmp, out.tmp$I)
       cat(i, "-", j, ".\n")
@@ -115,28 +131,28 @@ SIRmeta <- function(S.init, I.init, beta, coupling, scaling, timesteps, births, 
 }
 
 
-n.patches <- 10
+n_patches <- 10
 
-N.init <- 1e7 + rpois(n.patches, 100)
+N0 <- 1e7 + rpois(n_patches, 100)
 ppn_atrisk <- .4
 ppn_vacc <- .95
-S.init <- floor(N.init * ppn_atrisk * (1 - ppn_vacc))
+S0 <- floor(N0 * ppn_atrisk * (1 - ppn_vacc))
 ############################################
 # Birth and death rate based on CIA factbook values
 #
-b_rate <- rep(0.3 * 0.88 * (50.73 / 24) * (N.init / 1000), n.patches) # vaccinated births
-m_rate <- rep((20.91 / 24) / 1000, n.patches)
+b_rate <- rep(0.3 * 0.88 * (50.73 / 24) * (N0 / 1000), n_patches) # vaccinated births
+m_rate <- rep((20.91 / 24) / 1000, n_patches)
 
 ############################################
 # beta <- rep(1e-5,24)
 beta <- rep(c(.5e-5, 1e-5, 1.5e-5, 1.5e-5, 1e-5, .5e-5), each = 4) * .007 # seasonal transmission rate
-beta.sim <- matrix(smooth.spline(beta)$y, nrow = 24, ncol = n.patches, byrow = F) # make transmission rate smooth, apply to all locations
+beta_sim <- matrix(smooth.spline(beta)$y, nrow = 24, ncol = n_patches, byrow = F) # make transmission rate smooth, apply to all locations
 
-I.init <- 100 + rpois(n.patches, 3)
+I0 <- 100 + rpois(n_patches, 3)
 years <- 200
 Tmax <- 24 * years
-coupling <- matrix(0.01, n.patches, n.patches)
+coupling <- matrix(0.01, n_patches, n_patches)
 
-out <- SIRmeta(S.init, I.init, beta = beta.sim, coupling = coupling, scaling = 1, timesteps = 24 * years, births = b_rate, mortalityrate = m_rate)
+out <- SIRmeta(S0, I0, beta = beta_sim, coupling = coupling, scaling = 1, timesteps = 24 * years, births = b_rate, mortality_rate = m_rate)
 # plot(out$I[4201:4800],type="l")
 matplot(out$I[4201:4800, ], type = "l")
