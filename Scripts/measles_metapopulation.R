@@ -36,8 +36,53 @@ infect <- function(S,
     }
   )
   St <- S + births - It - mortality_rate * S
-  return(list(S = St, I = It))
+  return(data.frame(S = St, I = It))
 }
+
+
+#' Title
+#'
+#' @param S 
+#' @param I 
+#' @param births 
+#' @param migration 
+#' @param mortality_rate 
+#' @param vax_eff 
+#' @param vax_rate 
+#' @param n_team_type 
+#' @param run_type 
+#' @param browse 
+#'
+#' @return
+#' @export
+#'
+#' @examples vaccinate(S = 1000, I = 1, births = 20, migration = 20, mortality_rate = 0.2, vax_eff = 0.95, vax_rate = 250, n_team_type = 1)
+vaccinate <- function(S, 
+                      I, 
+                      births, 
+                      migration, 
+                      mortality_rate, 
+                      vax_eff, 
+                      vax_rate,
+                      n_team_type, 
+                      run_type = "det", 
+                      browse = F
+                      ) {
+  
+  if (browse) browser()
+  
+  switch(run_type,
+         "det" = {
+           Rt <- min(S, vax_rate*n_team_type*vax_eff) + migration
+         },
+         "stoc" = {
+           Rt <- rbinom(1, S, vax_eff) + rpois(1, migration)
+         }
+  )
+  St <- S + births - Rt - mortality_rate * S
+  return(data.frame(S = St, R = Rt))
+}
+
 
 
 #' Title
