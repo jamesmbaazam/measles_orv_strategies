@@ -99,22 +99,37 @@ vaccinate <- function(S,
 #' @export
 #'
 #' @examples SIR_run(S0 = 1000, I0 = 1, beta = 0.012, years = 1, births = 20, migration = 20, mortality_rate = 0.1)
-SIR_run <- function(S0, I0, beta, years, births, migration, mortality_rate) {
+SIR_run <- function(S0, 
+                    I0, 
+                    beta, 
+                    years, 
+                    births, 
+                    migration, 
+                    mortality_rate, 
+                    vax_day = NA, 
+                    orv_duration,
+                    n_team_type
+                    ) {
   
   # beta is specified as a vector of values for each "biweek",
   beta <- rep(beta, years)
   Susc <- S0
   Infect <- I0
-  timesteps <- 26 * years
+  timesteps <- 26 * years #26 biweeks in a year
+  time <- 0
+  simResults <- data.frame(time = 0, S = S0, I = I0, R = R0)
+  
   for (time in 1:timesteps) {
-    out <- SIR_step(Susc[time], Infect[time], beta[time], births, migration, mortality_rate)
-    Susc <- c(Susc, out$S)
-    Infect <- c(Infect, out$I)
-    # cat(out$I,".\n")
-    if (!is.finite(out$I)) {
-      break
-    }
-    # if(out$I==0){break}
+    if (!is.na(vax_day) & time < vax_day + 1  | time > vax_day + 1 + (orv_duration/n_team_type)){
+    simResults <- rbind(simResults, data.frame(time = time, infect(Susc[time], Infect[time], beta[time], births, migration, mortality_rate)))
+    }else if(!is.na(vaxDay) & time >= vaxDay + 1  & time <= vaxDay + 1 + (orv_duration/n_team_type))
+      #fix the line below to reference the right pops
+   # simResults <- rbind(simResults, data.frame(time = time, infect(Susc[time], Infect[time], beta[time], births, migration, mortality_rate)))
+    
+    # if (!is.finite(out$I)) {
+    #   break
+    # }
+    # # if(out$I==0){break}
   }
   # browser()
   return(list(S = Susc, I = Infect))
@@ -123,7 +138,7 @@ SIR_run <- function(S0, I0, beta, years, births, migration, mortality_rate) {
 # beta<-source("/Users/mattferrari/Documents/Current Projects/MSF Measles/Measles_Dynamics_ms/Seasonality/MCMC(new)/niamey/niamey_beta.q")$value
 
 
-SIR_step <- function(S, I, beta, births, migration, mortality_rate) {
+infect <- function(S, I, beta, births, migration, mortality_rate) {
   # browser()
   It <- rbinom(1, S, 1 - exp(-beta * I^.95)) + rpois(1, migration) + rpois(1, 1) # migration + extra random introduction external to metapop
   # It<-min(S,S*(1-exp(-beta*I^.95)))+migration
@@ -146,11 +161,11 @@ SIR_step <- function(S, I, beta, births, migration, mortality_rate) {
 #' @export
 #'
 #' @examples
-SIR_meta <- function(S.init, I.init, beta, coupling, scaling, timesteps, births, mortality_rate) {
+SIR_meta <- function(S0, I0, beta, coupling, scaling, timesteps, births, mortality_rate) {
   
-  Npatches <- length(S.init)
-  Susc <- matrix(S.init, nrow = 1)
-  Infect <- matrix(I.init, nrow = 1)
+  Npatches <- length(S0)
+  Susc <- matrix(S0, nrow = 1)
+  Infect <- matrix(I0, nrow = 1)
   beta.max <- max(beta)
   beta <- beta / beta.max
   beta <- beta^matrix(scaling, nrow = dim(beta)[1], ncol = Npatches, byrow = T)
@@ -167,7 +182,7 @@ SIR_meta <- function(S.init, I.init, beta, coupling, scaling, timesteps, births,
       migr <- ifelse(I.ext > 0, min(10, rpois(1, coupling[j, -j] * I.ext)), 0)
       migr <- ifelse(runif(1) > .9,  migr,  0)
       # browser()
-      out.tmp <- SIR_step(Susc[i - 1, j], Infect[i - 1, j], beta.i, births[j], mortality_rate[j], migration = migr)
+      out.tmp <- infect(Susc[i - 1, j], Infect[i - 1, j], beta.i, births[j], mortality_rate[j], migration = migr)
       Susc.tmp <- c(Susc.tmp, out.tmp$S)
       Infect.tmp <- c(Infect.tmp, out.tmp$I)
       cat(i, "-", j, ".\n")
