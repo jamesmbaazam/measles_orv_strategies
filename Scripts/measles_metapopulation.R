@@ -13,10 +13,17 @@
 #' @return a list with the current state of the system
 #' @export 
 #'
-#' @examples SIR_step(S = 1000, I = 1, beta = 0.012, births = 20, migration = 20, 
-#' mortality_rate = 0.2,run_type = 'det')
+#' @examples infect(S = 1000, I = 1, beta = 0.012, births = 20, migration = 20, mortality_rate = 0.2,run_type = 'det')
 #' 
-SIR_step <- function(S, I, beta, births, migration, mortality_rate, run_type = "det", browse = F) {
+infect <- function(S, 
+                   I, 
+                   beta, 
+                   births, 
+                   migration, 
+                   mortality_rate, 
+                   run_type = "det", 
+                   browse = F
+                   ) {
   
   if (browse) browser()
   
