@@ -76,7 +76,7 @@ vaccinate <- function(S,
            Rt <- min(S, vax_rate*n_team_type*vax_eff) + migration
          },
          "stoc" = {
-           Rt <- rbinom(1, S, vax_eff) + rpois(1, migration)
+           Rt <- rbinom(1, vax_rate*n_team_type, vax_eff) + rpois(1, migration)
          }
   )
   St <- S + births - Rt - mortality_rate * S
