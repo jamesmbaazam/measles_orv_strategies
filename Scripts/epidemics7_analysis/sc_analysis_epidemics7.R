@@ -53,7 +53,7 @@ campaign_delay_results_actual <- campaign_delay_results %>%
     select(-c(near_pop, far_pop, ft_vial_type, 
               mt_vial_type, ft_doses_required, mt_doses_required, ft_RCW25, 
               mt_RCW25, ft_vaxCarr, mt_vaxCarr, ft_icepacks_large, 
-              mt_icepacks_large, ft_icepacks_small, mt_icepacks_small,
+              mt_icepacks_large, ft_icepacks_small, mt_icepacks_small
               )
            )
 
