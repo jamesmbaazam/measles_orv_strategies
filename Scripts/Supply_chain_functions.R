@@ -256,7 +256,7 @@ calc_dose_capacity <- function(vial_type,
 }
 
 
-
+## calc_transport_equipment_needs ----
 
 calc_transport_equipment_needs <- function(equip_type,
                                            vial_type,
