@@ -7,11 +7,8 @@ strategy_list <- expand.grid(
   mt_with_dose10 = c(T, F),
   mt_with_ice = c(T, F),
   dispatch = c("parallel", "asap")
-)
-
-
-#dynamically create the strategy names from their composition
-strategy_list <- strategy_list %>%
+) %>%
+  #dynamically create the strategy names from their composition
   mutate(strategy = as.factor(sprintf(
     "%s_%s_%s",
     c("monodose", "mixed", "dose10")[1 + ft_with_dose10 + mt_with_dose10],
