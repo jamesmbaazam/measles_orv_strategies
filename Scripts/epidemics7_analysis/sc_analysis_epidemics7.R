@@ -33,10 +33,10 @@ prior_logistical_needs_results <- sim_params_table %>%
       .,
       estimate_prior_logistical_needs(
         strategy_name = strategy, 
-        fixed_team_with_dose10 = T, 
-        fixed_team_with_ice = T,
-        mobile_team_with_dose10 = T, 
-        mobile_team_with_ice = T,
+        fixed_team_with_dose10 = ft_with_dose10, 
+        fixed_team_with_ice = ft_with_ice,
+        mobile_team_with_dose10 = mt_with_dose10, 
+        mobile_team_with_ice = mt_with_ice,
         site_details = data.frame(location_id = location_id, 
                                   near_pop = near_pop, 
                                   far_pop = far_pop
