@@ -55,7 +55,7 @@ prior_logistical_needs <- prior_logistical_needs_results %>%
   select(-c(ft_vial_type, ft_doses_required, mt_vial_type, mt_doses_required))
 
 
-
+saveRDS(prior_logistical_needs, file = './model_output/prior_logistical_needs.rds')
 
 # Campaign commencement delay ----
 
