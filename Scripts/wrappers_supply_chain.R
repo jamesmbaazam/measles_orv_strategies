@@ -194,6 +194,8 @@ estimate_prior_logistical_needs <- function(strategy_name,
   # results of logistical needs estimation
   out <- data.frame(
     strategy = strategy_name,
+    near_pop = site_details$near_pop,
+    far_pop = site_details$far_pop,
     ft_vial_type = ifelse(fixed_team_with_dose10,
       "dose10",
       "monodose"
