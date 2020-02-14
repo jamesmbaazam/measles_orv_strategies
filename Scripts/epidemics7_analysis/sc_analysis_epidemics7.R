@@ -100,7 +100,6 @@ sc_results_full <- sc_analysis %>%
 
 saveRDS(sc_results_full, file = './model_output/sc_results_full.rds')
 
-rm(list = ls())
 
 #' #' Question: If we need more than 1 vaccine carrier for the doses, how do we 
 #' translate that? Does that translate into how many teams we'll need or how many 
