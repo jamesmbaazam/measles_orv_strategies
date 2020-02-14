@@ -24,6 +24,39 @@ source('./scripts/epidemics7_analysis/scenarios.R')
 source('./scripts/epidemics7_analysis/simulation_params.R')
 
 
+# Logistical needs for transporting vaccines to the field base to commence campaign
+
+prior_logistical_needs_results <- sim_params_table %>%
+  rowwise() %>%
+  do({
+    with(
+      .,
+      estimate_prior_logistical_needs(
+        strategy_name = strategy, 
+        fixed_team_with_dose10 = T, 
+        fixed_team_with_ice = T,
+        mobile_team_with_dose10 = T, 
+        mobile_team_with_ice = T,
+        site_details = data.frame(location_id = location_id, 
+                                  near_pop = near_pop, 
+                                  far_pop = far_pop
+                                  ),
+        mf314 = 1, 
+        rcw25_ice_replacement_days = 2, 
+        ambient_temperature = sc_model_params$ambient_temp[1],
+        dose10_vial_volume = sc_model_params$dose10_vial_vol[1],
+        monodose_vial_volume = sc_model_params$monodose_vial_vol[1]
+      )
+    )
+  })
+
+## Remove some columns ==== 
+prior_logistical_needs <- prior_logistical_needs_results %>% 
+  select(-c(ft_vial_type, ft_doses_required, mt_vial_type, mt_doses_required))
+
+
+
+
 # Campaign commencement delay ----
 
 campaign_delay_results <- sim_params_table %>%
