@@ -31,7 +31,7 @@ campaign_delay_results <- sim_params_table %>%
   do({
     with(
       .,
-      analyse_prep_delay_assump2(
+      analyse_prep_delay(
         strategy,
         ft_with_dose10,
         ft_with_ice,
