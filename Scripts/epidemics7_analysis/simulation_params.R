@@ -4,9 +4,9 @@ library(dplyr)
 
 
 #load pre-requisite scripts
-source('./scripts/strategy_list_complete.R')
 source('./scripts/epidemics7_analysis/scenarios.R')
 source('./scripts/analyses_parameters.R')
+source('./scripts/strategy_list_complete.R')
 
 #resolve conflicts
 conflict_prefer('mutate', 'dplyr')
