@@ -18,7 +18,8 @@ conflict_prefer('filter', 'dplyr')
 scenario_subset <- scenarios %>% filter((equip_type == 'rcw25'| equip_type == 'vaxCarr') & dispatch == 'asap')
 
 #subset the strategies 
-strategy_subset <- c("dose10_fcc_asap", "monodose_fcc_asap", "monodose_occ_asap")
+strategy_subset <- c("dose10_fcc_asap", "dose10_occ_asap", "monodose_fcc_asap", "monodose_occ_asap")
+
 strategy_subset_config <- filter(strategy_list, strategy %in% strategy_subset)
 
 #key table
