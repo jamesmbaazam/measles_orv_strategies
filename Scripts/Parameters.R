@@ -27,24 +27,29 @@ mf314_largepack_fr <- 54 #fr = freezing rate per day for large icepacks
 mf314_smallpack_fr <- 81 #fr = freezing rate per day for large icepacks
 
 
-# Passive cold chain gross volume
-rcw25_grossVol <- 43735.296 / 1E3 # convert to litres
-vax_carrier_grossVol <- 9504 / 1E3
+# Passive cold chain gross volume in cm3 
+rcw25_grossVol <- 43735.296 # convert to litres
+vax_carrier_grossVol <- 9504 
 
-# Passive cold chain net volume (after ice packs)
-rcw25_netVol <- 20700 / 1E3
-vax_carrier_netVol <- 2600 / 1E3
+# Passive cold chain net volume in cm3 (after ice packs)
+rcw25_netVol <- 20700 
+vax_carrier_netVol <- 2600 
 
 # passive cold chain ice pack capacity
 rcw25_ice_capacity <- rcw25_grossVol - rcw25_netVol
 vax_carrier_ice_capacity <- vax_carrier_grossVol - vax_carrier_netVol
 
-# Vaccine vial packed volume per dose (pvd) i.e vaccine + diluent
+
+
+#diluent volume per vaccine
+monodose_diluent <- 12.528
+dose10_diluent <- 3.1424
+
+
+# Vaccine vial packed volume per dose in cm3 (pvd) i.e vaccine + diluent 
 # Vaccines are assumed to have a volume of 2.5cm^3 per dose
-monodose_pvd <- 33.618 / 1E3
-dose_10_pvd <- 2.42324 / 1E3 # multi-dose refers to 10 doses
-
-
+monodose_pvd <- monodose_vial_vol + monodose_diluent 
+dose_10_pvd <- dose10_vial_vol + (dose10_diluent/10)  # multi-dose refers to 10 doses
 
 #expected vaccination rate per team type
 tp_fixed <- 450 #tp= team performance, in other words, how many people a fixed team is expected to vax per day (unit = people per day)
