@@ -49,7 +49,8 @@ dose10_diluent <- 3.1424
 # Vaccine vial packed volume per dose in cm3 (pvd) i.e vaccine + diluent 
 # Vaccines are assumed to have a volume of 2.5cm^3 per dose
 monodose_pvd <- monodose_vial_vol + monodose_diluent 
-dose_10_pvd <- dose10_vial_vol + (dose10_diluent/10)  # multi-dose refers to 10 doses
+dose_10_pvd <- c('2.1' = dose10_vial_vol[1] + (dose10_diluent/10), 
+                 '3' = dose10_vial_vol[2] + (dose10_diluent/10))  # multi-dose refers to 10 doses
 
 #expected vaccination rate per team type
 tp_fixed <- 450 #tp= team performance, in other words, how many people a fixed team is expected to vax per day (unit = people per day)
