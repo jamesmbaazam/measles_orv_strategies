@@ -28,12 +28,12 @@ mf314_smallpack_fr <- 81 #fr = freezing rate per day for large icepacks
 
 
 # Passive cold chain gross volume
-rcw25_grossVol <- 43735.296 / 1E3 # convert to litres
-vax_carrier_grossVol <- 9504 / 1E3
+rcw25_grossVol <- 43735.296 # convert to litres
+vax_carrier_grossVol <- 9504 
 
 # Passive cold chain net volume (after ice packs)
-rcw25_netVol <- 20700 / 1E3
-vax_carrier_netVol <- 2600 / 1E3
+rcw25_netVol <- 20700 
+vax_carrier_netVol <- 2600 
 
 # passive cold chain ice pack capacity
 rcw25_ice_capacity <- rcw25_grossVol - rcw25_netVol
@@ -41,8 +41,8 @@ vax_carrier_ice_capacity <- vax_carrier_grossVol - vax_carrier_netVol
 
 # Vaccine vial packed volume per dose (pvd) i.e vaccine + diluent
 # Vaccines are assumed to have a volume of 2.5cm^3 per dose
-monodose_pvd <- 33.618 / 1E3
-dose10_pvd <- 2.42324 / 1E3 # multi-dose refers to 10 doses
+monodose_pvd <- 33.618 
+dose10_pvd <- 2.42324  # multi-dose refers to 10 doses
 
 
 
