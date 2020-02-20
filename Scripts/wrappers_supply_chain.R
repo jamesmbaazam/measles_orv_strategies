@@ -217,12 +217,13 @@ analyse_prep_delay_assump2 <- function(strategy_name
                                        , ambient_temperature = sc_model_params$ambient_temp[1]
                                        , dose10_vial_volume = sc_model_params$dose10_vial_vol[1]
                                        , monodose_vial_volume = sc_model_params$monodose_vial_vol
+                                       , browse = F
 ){
   
   #' Equipment rules: 1 fixed team will require 1 RCW25 and 1 vaccine carrier, 
   #' 2 fixed teams at the same post will require 1 RCW25 and 2 vaccine carriers
   #' 
-
+if(browse) browser()
 #fixed team rules  
 fixed_teams_rcw25 <- ifelse(n_teams_fixed%%2 == 0, n_teams_fixed/2, floor(n_teams_fixed/2) + 1)
 fixed_teams_vaxCarr <- n_teams_fixed
