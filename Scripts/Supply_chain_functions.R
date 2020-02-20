@@ -230,24 +230,24 @@ calc_dose_capacity <- function(vial_type,
     5000
   }
   else if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "rcw25" & with_ice == F) {
-    as.numeric(round(rcw25_grossVol / dose_10_pvd["2.1"]))
+    as.numeric(round(rcw25_grossVol / dose10_pvd["2.1"]))
   }
   else if (vial_type == "dose10" & vax_vol == 3 & equip_type == "rcw25" & with_ice == T) {
     3300
   } else if (vial_type == "dose10" & vax_vol == 3 & equip_type == "rcw25" & with_ice == F) {
-    as.numeric(round(rcw25_grossVol / dose_10_pvd["3"]))
+    as.numeric(round(rcw25_grossVol / dose10_pvd["3"]))
   }
   else if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "vaxCarr" & with_ice == T) {
     750
   }
   else if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "vaxCarr" & with_ice == F) {
-    as.numeric(round(vax_carrier_grossVol / dose_10_pvd["2.1"]))
+    as.numeric(round(vax_carrier_grossVol / dose10_pvd["2.1"]))
   }
   else if (vial_type == "dose10" & vax_vol == 3 & equip_type == "vaxCarr" & with_ice == T) {
     500
   }
   else if (vial_type == "dose10" & vax_vol == 3 & equip_type == "vaxCarr" & with_ice == F) {
-    as.numeric(round(vax_carrier_grossVol / dose_10_pvd["3"]))
+    as.numeric(round(vax_carrier_grossVol / dose10_pvd["3"]))
   }
   else if (vial_type == "monodose" & vax_vol == 21.09 & equip_type == "rcw25" & with_ice == T) {
     616
