@@ -114,7 +114,8 @@ team_days_results <- sim_params_table %>%
 
 
 team_days_results_actual <- team_days_results %>% 
-    select(-c(ft_with_ice, mt_with_ice, ft_vial_type, mt_vial_type))
+    select(-c(ft_with_ice, mt_with_ice, ft_vial_type, mt_vial_type)) %>% 
+  ungroup()
 
 
 ## Combine campaign delays and team days results ----
