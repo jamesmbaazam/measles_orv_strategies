@@ -4,6 +4,27 @@
 #' temperature and number of days to replace ice, which is daily for the 
 #' vaccine carrier ice packs and 1, 2, or 3 days for the RCW25s
 
+## the two functions below will potentially be a better way to do the ice pack
+## lookup
+# icepack_lookup <- array(dim = c(2, 2, 3), 
+#                         dimnames = list(equip_type = c("rcw25","vaxCarr"), 
+#                                         amb_temp = c("below 40", "above 40")
+#                                         )
+#                         )
+# 
+# compute_icepacks <- function(
+#   equipment = c("rcw25", "vaxCarr"),
+#   amb_temp = c("below 40", "above 40"),
+#   replacement_days = 1:3
+# ) {
+#   equipment <- equipment[1]
+#   amb_temp  <- amb_temp[1]
+#   replacement_days <- replacement_days[1]
+#   
+# }
+
+source('./scripts/parameters.R')
+
 compute_rcw25_icepacks <- function(amb_temp, replacement_days) { # replacement_days = c(1, 2, 3)
   if (amb_temp == "below 40" & (replacement_days == 1 | replacement_days == 2)) {
     12
@@ -208,15 +229,25 @@ calc_dose_capacity <- function(vial_type,
   if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "rcw25" & with_ice == T) {
     5000
   }
+  else if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "rcw25" & with_ice == F) {
+    as.numeric(round(rcw25_grossVol / dose_10_pvd["2.1"]))
+  }
   else if (vial_type == "dose10" & vax_vol == 3 & equip_type == "rcw25" & with_ice == T) {
     3300
+  } else if (vial_type == "dose10" & vax_vol == 3 & equip_type == "rcw25" & with_ice == F) {
+    as.numeric(round(rcw25_grossVol / dose_10_pvd["3"]))
   }
-  else if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "vaxCarr" & with_ice == T) # I've not yet thrown in the numbers for 10 dose OCC because it's not operational and even being considered but might be good for a counterfactual.
-    {
-      750
-    }
+  else if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "vaxCarr" & with_ice == T) {
+    750
+  }
+  else if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "vaxCarr" & with_ice == F) {
+    as.numeric(round(vax_carrier_grossVol / dose_10_pvd["2.1"]))
+  }
   else if (vial_type == "dose10" & vax_vol == 3 & equip_type == "vaxCarr" & with_ice == T) {
     500
+  }
+  else if (vial_type == "dose10" & vax_vol == 3 & equip_type == "vaxCarr" & with_ice == F) {
+    as.numeric(round(vax_carrier_grossVol / dose_10_pvd["3"]))
   }
   else if (vial_type == "monodose" & vax_vol == 21.09 & equip_type == "rcw25" & with_ice == T) {
     616
