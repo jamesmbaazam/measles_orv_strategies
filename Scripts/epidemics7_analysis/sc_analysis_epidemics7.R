@@ -24,38 +24,6 @@ source('./scripts/epidemics7_analysis/scenarios.R')
 source('./scripts/epidemics7_analysis/simulation_params.R')
 
 
-# Logistical needs for transporting vaccines to the field base to commence campaign
-
-# prior_logistical_needs_results <- sim_params_table %>%
-#   rowwise() %>%
-#   do({
-#     with(
-#       .,
-#       estimate_prior_logistical_needs(
-#         strategy_name = strategy, 
-#         fixed_team_with_dose10 = ft_with_dose10, 
-#         fixed_team_with_ice = ft_with_ice,
-#         mobile_team_with_dose10 = mt_with_dose10, 
-#         mobile_team_with_ice = mt_with_ice,
-#         site_details = data.frame(location_id = location_id, 
-#                                   near_pop = near_pop, 
-#                                   far_pop = far_pop
-#                                   ),
-#         mf314 = 1, 
-#         rcw25_ice_replacement_days = 2, 
-#         ambient_temperature = sc_model_params$ambient_temp[1],
-#         dose10_vial_volume = sc_model_params$dose10_vial_vol[1],
-#         monodose_vial_volume = sc_model_params$monodose_vial_vol[1]
-#       )
-#     )
-#   })
-# 
-# ## Remove some columns ==== 
-# prior_logistical_needs <- prior_logistical_needs_results %>% 
-#   select(-c(ft_vial_type, ft_doses_required, mt_vial_type, mt_doses_required))
-# 
-# 
-# saveRDS(prior_logistical_needs, file = './model_output/prior_logistical_needs.rds')
 
 # Campaign commencement delay ----
 
@@ -136,13 +104,36 @@ sc_results_full <- sc_analysis %>%
 saveRDS(sc_results_full, file = './model_output/sc_results_full.rds')
 
 
-#' #' Question: If we need more than 1 vaccine carrier for the doses, how do we 
-#' translate that? Does that translate into how many teams we'll need or how many 
-#' trips should be undertaken by a single team? The latter will draw in the need 
-#' for a rule for how the distance of the site from the base translates to trips 
-#' in days and how that will affect the team days and campaign duration.
-#' 
 
+# Logistical needs for transporting vaccines to the field base to commence campaign
 
-
-
+# prior_logistical_needs_results <- sim_params_table %>%
+#   rowwise() %>%
+#   do({
+#     with(
+#       .,
+#       estimate_prior_logistical_needs(
+#         strategy_name = strategy, 
+#         fixed_team_with_dose10 = ft_with_dose10, 
+#         fixed_team_with_ice = ft_with_ice,
+#         mobile_team_with_dose10 = mt_with_dose10, 
+#         mobile_team_with_ice = mt_with_ice,
+#         site_details = data.frame(location_id = location_id, 
+#                                   near_pop = near_pop, 
+#                                   far_pop = far_pop
+#                                   ),
+#         mf314 = 1, 
+#         rcw25_ice_replacement_days = 2, 
+#         ambient_temperature = sc_model_params$ambient_temp[1],
+#         dose10_vial_volume = sc_model_params$dose10_vial_vol[1],
+#         monodose_vial_volume = sc_model_params$monodose_vial_vol[1]
+#       )
+#     )
+#   })
+# 
+# ## Remove some columns ==== 
+# prior_logistical_needs <- prior_logistical_needs_results %>% 
+#   select(-c(ft_vial_type, ft_doses_required, mt_vial_type, mt_doses_required))
+# 
+# 
+# saveRDS(prior_logistical_needs, file = './model_output/prior_logistical_needs.rds')
