@@ -33,17 +33,17 @@ campaign_delay_results <- sim_params_table %>%
     with(
       .,
       analyse_prep_delay(
-        strategy,
-        ft_with_dose10,
-        ft_with_ice,
-        mt_with_dose10,
-        mt_with_ice,
-        dispatch,
-        data.frame(location_id = location_id, near_pop = near_pop, far_pop = far_pop),
-        "both",
-        equip_type,
-        1,
-        1,
+        strategy_name = strategy,
+        fixed_team_with_dose10 = ft_with_dose10,
+        fixed_team_with_ice = ft_with_ice,
+        mobile_team_with_dose10 = mt_with_dose10,
+        mobile_team_with_ice = mt_with_ice,
+        team_dispatch = dispatch,
+        site_details = data.frame(location_id = location_id, near_pop = near_pop, far_pop = far_pop),
+        fixed_team_equip_type = "both",
+        mobile_team_equip_type = equip_type,
+        n_teams_fixed = 1,
+        n_teams_mobile = 1,
         rcw25_ice_replacement_days = 2
       )
     )
