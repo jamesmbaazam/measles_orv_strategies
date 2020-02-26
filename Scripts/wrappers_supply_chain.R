@@ -393,8 +393,8 @@ else{stop('unknown mobile team equipment scenario')}
   ## Campaign delay calculation ====
   #'this function uses the results of mobile and fixed post team freezing times and more importantly, the routing 
   #' decision to determine how long a strategy will be delayed before a campaign can start 
-  campaign_delay <- calc_campaign_start(fixedT_freeze_time = freezing_time_fixed_team
-                                        , mobileT_freeze_time = freezing_time_mobile_team
+  campaign_delay <- calc_campaign_start(ft_freeze_time = freezing_time_fixed_team
+                                        , mt_freeze_time = freezing_time_mobile_team
                                         , team_routing = team_dispatch
   )
   
