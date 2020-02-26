@@ -392,8 +392,10 @@ calc_freezing_time <- function(mf314_available,
                                large_icepacks_quantity,
                                small_icepacks_quantity) {
   ceiling(
-    (1 / mf314_available) * ((large_icepacks_quantity / mf314_largepack_fr) + (small_icepacks_quantity / mf314_smallpack_fr))
-  )
+    (1 / mf314_available) * ((large_icepacks_quantity / mf314_largepack_fr) + 
+                               (small_icepacks_quantity / mf314_smallpack_fr)
+                             )
+    )
 }
 
 # calc_teams_and_campaign_days() ----
@@ -430,8 +432,14 @@ calc_logistical_needs <- function(num_of_teams,
   } else if (team_equip_type == "vaxCarr" & !is.na(vaxCarr_per_team)) {
     out <- data.frame(vaxCarr = num_of_teams * vaxCarr_per_team)
     return(out)
-  } else if ((team_equip_type == "both" & vaxCarr_per_team) & (team_equip_type == "both" & !is.na(vaxCarr_per_team))) {
-    out <- data.frame(rcw25 = num_of_teams * rcw25_per_team, vaxCarr = num_of_teams * vaxCarr_per_team)
+  } else if (
+    (team_equip_type == "both" & vaxCarr_per_team) & (team_equip_type == "both" &
+      !is.na(vaxCarr_per_team)
+    )
+  ) {
+    out <- data.frame(rcw25 = num_of_teams * rcw25_per_team, 
+                      vaxCarr = num_of_teams * vaxCarr_per_team
+                      )
     return(out)
   } else {
     stop("check team_equip_type input")
