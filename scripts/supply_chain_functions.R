@@ -442,26 +442,59 @@ calc_logistical_needs <- function(num_of_teams,
 # calc_campaign_start(): ----
 # Calculates the delay to the start of a campaign based on routing rules: sequential or parallel
 
-calc_campaign_start <- function(fixedT_freeze_time,
-                                mobileT_freeze_time,
+calc_campaign_start <- function(ft_freeze_time,
+                                mt_freeze_time,
                                 team_routing # routing: "asap" or "parallel"
 ) {
-  team_prep_delays <- c(fixed_team = fixedT_freeze_time, mobile_team = mobileT_freeze_time)
+  team_prep_delays <- c(fixed_team = ft_freeze_time, mobile_team = mt_freeze_time)
   if (team_routing == "asap") {
     asap_campaign_day <- min(team_prep_delays)
-    faster_team <- ifelse(length(which(team_prep_delays == asap_campaign_day)) == 1, names(which(team_prep_delays == asap_campaign_day)), "both")
+    faster_team <- ifelse(length(which(team_prep_delays == asap_campaign_day)) == 1, 
+                          names(which(team_prep_delays == asap_campaign_day)), "both"
+                          )
     return(list(
       start_day = asap_campaign_day,
       which_team_first = faster_team
     ))
   } else if (team_routing == "parallel") {
-    parallel_campaign_day <- sum(fixedT_freeze_time, mobileT_freeze_time)
+    parallel_campaign_day <- sum(ft_freeze_time, mt_freeze_time)
     return(list(
       start_day = parallel_campaign_day,
       which_team_first = "both"
     ))
   }
 }
+
+
+
+calc_next_campaign_start <- function(ft_campaign_dur,
+                                mt_campaign_dur,
+                                team_movement # routing: "asap" or "parallel"
+) {
+  team_campaign_durations <- c(fixed_team = ft_campaign_dur, 
+                               mobile_team = mt_campaign_dur
+                               )
+  if (team_movement == "asap") {
+    next_campaign_time <- min(ft_campaign_dur, mt_campaign_dur)
+    faster_team <- ifelse(length(which(team_campaign_durations == next_campaign_time)) == 1, 
+                          names(which(team_campaign_durations == next_campaign_time)), 
+                          "both_asap"
+                          )
+    return(data.frame(
+      time_to_next_loc = next_campaign_time,
+      which_team_first = faster_team
+    ))
+  } else if (team_movement == "parallel") {
+    next_campaign_time <- max(ft_campaign_dur, ft_campaign_dur)
+    return(data.frame(
+      time_to_next_loc = next_campaign_time,
+      which_team_first = "both_parallel"
+    ))
+  }
+}
+
+
+
 
 # compound_delays(): ----
 #' Calculates the compounded delays from a sequential campaign based on the 
