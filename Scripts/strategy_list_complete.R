@@ -1,7 +1,7 @@
 library(dplyr)
 
 # all possible combinations
-strategy_list <- expand.grid(
+strategies <- expand.grid(
   ft_with_dose10 = c(T, F),
   ft_with_ice = c(T, F),
   mt_with_dose10 = c(T, F),
