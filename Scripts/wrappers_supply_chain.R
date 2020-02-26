@@ -231,201 +231,257 @@ estimate_prior_logistical_needs <- function(strategy_name,
 #' dispatched)
 #'
 #' @param strategy_name 
-#' @param fixed_team_with_dose10 
-#' @param fixed_team_with_ice 
-#' @param mobile_team_with_dose10 
-#' @param mobile_team_with_ice 
-#' @param team_dispatch 
+#' @param fixed_team_with_dose10 #' options = if "T", 10 dose, else monodose
+#' @param fixed_team_with_ice #' options = if "T", ice is used, else, no ice
+#' @param mobile_team_with_dose10 #' options = if "T", 10 dose, else monodose
+#' @param mobile_team_with_ice #' options = if "T", ice is used, else, no ice
+#' @param team_dispatch #' options = "parallel", "asap"
 #' @param site_details 
-#' @param fixed_team_equip_type 
-#' @param mobile_team_equip_type 
+#' @param fixed_team_equip_type # fixed teams can use one of options = c('rcw25', 'vaxCarr', 'both') for now, we assume fixed teams use both
+#' @param mobile_team_equip_type # options = c('rcw25', 'vaxCarr', 'both') for now, we assume mobile teams use vaxCarr
 #' @param n_teams_fixed 
 #' @param n_teams_mobile 
 #' @param mf314 
 #' @param rcw25_ice_replacement_days 
 #' @param ambient_temperature 
 #' @param dose10_vial_volume 
+#' @param res_type #c('simple', 'detailed'): 'simple' returns only the team days per team type. 'detailed' returns a detailed output
 #' @param monodose_vial_volume 
 
-analyse_prep_delay <- function(strategy_name
-                                       , fixed_team_with_dose10 # options = if "T", 10 dose, else monodose
-                                       , fixed_team_with_ice # options = if "T", ice is used, else, no ice
-                                       , mobile_team_with_dose10 # options = if "T", 10 dose, else monodose
-                                       , mobile_team_with_ice # options = if "T", ice is used, else, no ice
-                                       , team_dispatch #options = "parallel", "asap"
-                                       
-                                       #defaults follow: can do sensitivity analyses on them as well
-                                       
-                                       , site_details 
-                                     #  , site_row #which site to analyse
-                                       , fixed_team_equip_type = 'both' #fixed teams can use one of options = c('rcw25', 'vaxCarr', 'both') for now, we assume fixed teams use both
-                                       , mobile_team_equip_type  # options = c('rcw25', 'vaxCarr', 'both') for now, we assume mobile teams use vaxCarr
-                                       , n_teams_fixed
-                                       , n_teams_mobile
-                                       , mf314 = sc_model_params$mf314_quant
-                                       , rcw25_ice_replacement_days
-                                       , ambient_temperature = sc_model_params$ambient_temp[1]
-                                       , dose10_vial_volume = sc_model_params$dose10_vial_vol[1]
-                                       , monodose_vial_volume = sc_model_params$monodose_vial_vol
-){
-  
-  #' Equipment rules: 1 fixed team will require 1 RCW25 and 1 vaccine carrier, 
+analyse_prep_delay <- function(strategy_name,
+                               fixed_team_with_dose10, 
+                               fixed_team_with_ice, 
+                               mobile_team_with_dose10, 
+                               mobile_team_with_ice, 
+                               team_dispatch,
+                               site_details,
+                               fixed_team_equip_type = "both", 
+                               mobile_team_equip_type, 
+                               n_teams_fixed,
+                               n_teams_mobile,
+                               mf314 = sc_model_params$mf314_quant,
+                               rcw25_ice_replacement_days,
+                               ambient_temperature = sc_model_params$ambient_temp[1],
+                               dose10_vial_volume = sc_model_params$dose10_vial_vol[1],
+                               monodose_vial_volume = sc_model_params$monodose_vial_vol,
+                               res_type = 'detailed' 
+                               ) {
+
+  #' Equipment rules: 1 fixed team will require 1 RCW25 and 1 vaccine carrier,
   #' 2 fixed teams at the same post will require 1 RCW25 and 2 vaccine carriers
-  #' 
+  #'
 
-#fixed team rules  
-fixed_teams_rcw25 <- ifelse(n_teams_fixed%%2 == 0, n_teams_fixed/2, floor(n_teams_fixed/2) + 1)
-fixed_teams_vaxCarr <- n_teams_fixed
+  # fixed team rules
+  fixed_teams_rcw25 <- ifelse(n_teams_fixed %% 2 == 0,
+    n_teams_fixed / 2,
+    floor(n_teams_fixed / 2) + 1
+  )
 
-#mobile team rules
-mobile_teams_rcw25 <- if(mobile_team_equip_type == 'rcw25')
-{1} 
-else if (mobile_team_equip_type == 'both')
-{1} 
-else if (mobile_team_equip_type == 'vaxCarr')
-{0}
-else{stop('unknown fixed team equipment scenario')}
+  fixed_teams_vaxCarr <- n_teams_fixed
 
-mobile_teams_vaxCarr <- if(mobile_team_equip_type == 'vaxCarr')
-{1} 
-else if (mobile_team_equip_type == 'both')
-{1} 
-else if (mobile_team_equip_type == 'rcw25')
-{0}
-else{stop('unknown mobile team equipment scenario')}
+  # mobile team rules
+  mobile_teams_rcw25 <- if (mobile_team_equip_type == "rcw25") {
+    1
+  }
+  else if (mobile_team_equip_type == "both") {
+    1
+  }
+  else if (mobile_team_equip_type == "vaxCarr") {
+    0
+  }
+  else {
+    stop("unknown fixed team equipment scenario")
+  }
 
-  
-  ##Doses and equipment calculations ====
-  
+  mobile_teams_vaxCarr <- if (mobile_team_equip_type == "vaxCarr") {
+    1
+  }
+  else if (mobile_team_equip_type == "both") {
+    1
+  }
+  else if (mobile_team_equip_type == "rcw25") {
+    0
+  }
+  else {
+    stop("unknown mobile team equipment scenario")
+  }
+
+
+  ## Doses and equipment calculations ====
+
   ### Fixed post - number of doses ####
-  n_doses_fixed_team <-  calc_doses_required(df = site_details
-                                           #  , site_rows_selected = site_row
-                                             , is_dose10 = fixed_team_with_dose10
-                                             , pop_type = 'near'
-                                             , ovwastage = ifelse(fixed_team_with_dose10, sc_model_params$dose10_ovw_fixed_team, sc_model_params$monodose_ovw_fixed_team)
-                                             , buffer_size = sc_model_params$buffer_stock
+  n_doses_fixed_team <- calc_doses_required(
+    df = site_details
+    #  , site_rows_selected = site_row
+    , is_dose10 = fixed_team_with_dose10,
+    pop_type = "near",
+    ovwastage = ifelse(fixed_team_with_dose10,
+      sc_model_params$dose10_ovw_fixed_team,
+      sc_model_params$monodose_ovw_fixed_team
+    ), buffer_size = sc_model_params$buffer_stock
   )
-  
+
   ### Fixed post - passive cold chain ####
-  #Here, I am assuming that vaccine carriers are transported with ice but without vaccines to the site.
-  #'The RCW25s are used to transport the vaccines to the site and then transferred into the vax carrier for 
-  #'for administration.
-  #'
-  #'
-  
-  RCW25_required_fixed_team <- 1*fixed_teams_rcw25
-  
-  vaxCarr_required_fixed_team <- 1*fixed_teams_vaxCarr
-  
-  
+  #' Here, I am assuming that vaccine carriers are transported with ice but
+  #' without vaccines to the site.
+  #' The RCW25s are used to transport the vaccines to the site and then transferred
+  #' into the vax carrier for for administration.
+
+  RCW25_required_fixed_team <- 1 * fixed_teams_rcw25
+
+  vaxCarr_required_fixed_team <- 1 * fixed_teams_vaxCarr
+
+
   ### Mobile teams - number of doses ####
-  n_doses_mobile_team <-  calc_doses_required(df = site_details
-                                            #  , site_rows_selected = site_row
-                                              , is_dose10 = mobile_team_with_dose10
-                                              , pop_type = 'far'
-                                              , ovwastage = ifelse(mobile_team_with_dose10, sc_model_params$dose10_ovw_mobile_team, sc_model_params$monodose_ovw_mobile_team)
-                                              , buffer_size = sc_model_params$buffer_stock
+  n_doses_mobile_team <- calc_doses_required(
+    df = site_details
+    #  , site_rows_selected = site_row
+    , is_dose10 = mobile_team_with_dose10,
+    pop_type = "far",
+    ovwastage = ifelse(mobile_team_with_dose10,
+      sc_model_params$dose10_ovw_mobile_team,
+      sc_model_params$monodose_ovw_mobile_team
+    ),
+    buffer_size = sc_model_params$buffer_stock
   )
-  
-  ###Mobile teams - passive cold chain needs ####
-  
-  #Here, I am assuming that mobile teams only need a vaccine carrier. 
+
+  ### Mobile teams - passive cold chain needs ####
+
+  # Here, I am assuming that mobile teams only need a vaccine carrier.
   #' vaccine carriers are transported with ice and vaccines to the site.
-  RCW25_required_mobile_team <- n_teams_mobile*mobile_teams_rcw25
-  
-  vaxCarr_required_mobile_team <- n_teams_mobile*mobile_teams_vaxCarr
-  
-  
-  
+  RCW25_required_mobile_team <- n_teams_mobile * mobile_teams_rcw25
+
+  vaxCarr_required_mobile_team <- n_teams_mobile * mobile_teams_vaxCarr
+
+
+
   ## Ice pack needs calculations ====
-  # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
-  
+  #' total number of 0.6L ice packs = number of RCW25 needed * number of ice packs
+  #' needed per RCW25
+
   ### RCW25 and vaccince carrier needs ####
-  #ice packs needed for each equipment type, based on the ambient temperature
-  RCW25_icepack_needs <-  compute_rcw25_icepacks(sc_model_params$ambient_temp[1], replacement_days = rcw25_ice_replacement_days)
-  
+  # ice packs needed for each equipment type, based on the ambient temperature
+  RCW25_icepack_needs <- compute_rcw25_icepacks(sc_model_params$ambient_temp[1],
+    replacement_days = rcw25_ice_replacement_days
+  )
+
   vaxCarr_icepack_needs <- compute_vaxCarr_icepacks(sc_model_params$ambient_temp[1])
-  
+
   #### Fixed post - Ice packs required ####
-  RCW25_icepack_needs_fixed_team <- calc_icepack_tot_quant(equipment_quantity = ifelse(fixed_team_with_ice, RCW25_required_fixed_team, 0)
-                                                           , icepacks_per_equipment = RCW25_icepack_needs
-  ) # total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
-  vaxCarr_icepack_needs_fixed_team <- calc_icepack_tot_quant(equipment_quantity = ifelse(fixed_team_with_ice, vaxCarr_required_fixed_team, 0)
-                                                             , icepacks_per_equipment = vaxCarr_icepack_needs
-  ) 
-  
+  #' total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
+  RCW25_icepack_needs_fixed_team <- calc_icepack_tot_quant(
+    equipment_quantity = ifelse(fixed_team_with_ice,
+      RCW25_required_fixed_team,
+      0
+    ),
+    icepacks_per_equipment = RCW25_icepack_needs
+  )
+  vaxCarr_icepack_needs_fixed_team <- calc_icepack_tot_quant(
+    equipment_quantity = ifelse(fixed_team_with_ice,
+      vaxCarr_required_fixed_team,
+      0
+    ),
+    icepacks_per_equipment = vaxCarr_icepack_needs
+  )
+
   ### Mobile team - Ice packs required ####
-  RCW25_icepack_needs_mobile_team <- calc_icepack_tot_quant(equipment_quantity = ifelse(mobile_team_with_ice, RCW25_required_mobile_team, 0)
-                                                            , icepacks_per_equipment = RCW25_icepack_needs
+  RCW25_icepack_needs_mobile_team <- calc_icepack_tot_quant(
+    equipment_quantity = ifelse(mobile_team_with_ice,
+      RCW25_required_mobile_team,
+      0
+    ),
+    icepacks_per_equipment = RCW25_icepack_needs
   )
-  vaxCarr_icepack_needs_mobile_team <- calc_icepack_tot_quant(equipment_quantity = ifelse(mobile_team_with_ice, vaxCarr_required_mobile_team, 0)
-                                                              , icepacks_per_equipment = vaxCarr_icepack_needs
+  vaxCarr_icepack_needs_mobile_team <- calc_icepack_tot_quant(
+    equipment_quantity = ifelse(mobile_team_with_ice,
+      vaxCarr_required_mobile_team,
+      0
+    ),
+    icepacks_per_equipment = vaxCarr_icepack_needs
   )
-  
-  
-  #dose10_FCC_RCW25_icepack_vol <- dose10_FCC_RCW25_icepack_needs_total * 0.6 # total volume of ice packs needed is simply the above calculation * 0.6L
-  
-  
-  
-  # Initial number of icepacks required
-  #dose10_FCC_init_icepack_quant <- dose10_FCC_RCW25_icepack_needs_total + dose10_FCC_vaxCarr_icepack_needs_total
-  
-  
-  
+
   ## Freezing time calculations ====
-  # Time it takes to freeze depends on how many freezers are available and their capacity. I currently assume that we only use the MF314 freezer, which is the largest, and I specify the quantity at the beginning of this script
-  
-  
+  #' Time it takes to freeze depends on how many freezers are available and their
+  #' capacity. I currently assume that we only use the MF314 freezer, which is the
+  #' largest, and I specify the quantity at the beginning of this script
+
+
   ### Fixed post team  - freezing time ####
-  freezing_time_fixed_team <- calc_freezing_time(mf314_available = mf314
-                                                 , large_icepacks_quantity = ifelse(fixed_team_with_ice, RCW25_icepack_needs_fixed_team, 0) 
-                                                 , small_icepacks_quantity = ifelse(fixed_team_with_ice, vaxCarr_icepack_needs_fixed_team, 0)
+  freezing_time_fixed_team <- calc_freezing_time(
+    mf314_available = mf314,
+    large_icepacks_quantity = ifelse(fixed_team_with_ice,
+      RCW25_icepack_needs_fixed_team,
+      0
+    ),
+    small_icepacks_quantity = ifelse(fixed_team_with_ice,
+      vaxCarr_icepack_needs_fixed_team,
+      0
+    )
   )
-  
-  
+
+
   ### Mobile team  - freezing time ####
-  freezing_time_mobile_team <- calc_freezing_time(mf314_available = mf314
-                                                  , large_icepacks_quantity = ifelse(mobile_team_with_ice, RCW25_icepack_needs_mobile_team, 0)
-                                                  , small_icepacks_quantity = ifelse(mobile_team_with_ice, vaxCarr_icepack_needs_mobile_team, 0)
+  freezing_time_mobile_team <- calc_freezing_time(
+    mf314_available = mf314,
+    large_icepacks_quantity = ifelse(mobile_team_with_ice,
+      RCW25_icepack_needs_mobile_team,
+      0
+    ),
+    small_icepacks_quantity = ifelse(mobile_team_with_ice,
+      vaxCarr_icepack_needs_mobile_team,
+      0
+    )
   )
-  
-  
+
+
   ## Campaign delay calculation ====
-  #'this function uses the results of mobile and fixed post team freezing times and more importantly, the routing 
-  #' decision to determine how long a strategy will be delayed before a campaign can start 
-  campaign_delay <- calc_campaign_start(ft_freeze_time = freezing_time_fixed_team
-                                        , mt_freeze_time = freezing_time_mobile_team
-                                        , team_routing = team_dispatch
+  #' this function uses the results of mobile and fixed post team freezing times
+  #' and more importantly, the routing decision to determine how long a strategy
+  #' will be delayed before a campaign can start
+  campaign_delay <- calc_campaign_start(
+    ft_freeze_time = freezing_time_fixed_team,
+    mt_freeze_time = freezing_time_mobile_team,
+    team_routing = team_dispatch
   )
-  
-  
+
+
   ## Results - Campaign delays ====
-  res <- data.frame(strategy = strategy_name
-                    , location_id = site_details$location_id
-                    , near_pop = site_details$near_pop
-                    , far_pop = site_details$far_pop
-                    , mt_equip_type = mobile_team_equip_type
-                    , ft_equip_type = fixed_team_equip_type
-                    , ft_vial_type = ifelse(fixed_team_with_dose10, 'dose10', 'monodose')
-                    , ft_doses_required = n_doses_fixed_team
-                    , mt_vial_type = ifelse(mobile_team_with_dose10, 'dose10', 'monodose')
-                    , mt_doses_required = n_doses_mobile_team
-                    , ft_RCW25 = RCW25_required_fixed_team
-                    , mt_RCW25 = RCW25_required_mobile_team
-                    , ft_vaxCarr = vaxCarr_required_fixed_team
-                    , mt_vaxCarr = vaxCarr_required_mobile_team
-                    , ft_icepacks_large = RCW25_icepack_needs_fixed_team
-                    , mt_icepacks_large = RCW25_icepack_needs_mobile_team
-                    , ft_icepacks_small = vaxCarr_icepack_needs_fixed_team
-                    , mt_icepacks_small = vaxCarr_icepack_needs_mobile_team
-                    , ft_freezing_time = freezing_time_fixed_team
-                    , mt_freezing_time = freezing_time_mobile_team
-                    , campaign_start = campaign_delay$start_day
-                    , team_leaving_first = campaign_delay$which_team_first
+  
+  if(res_type == 'detailed'){
+  res <- data.frame(
+    strategy = strategy_name,
+    location_id = site_details$location_id,
+    near_pop = site_details$near_pop,
+    far_pop = site_details$far_pop,
+    mt_equip_type = mobile_team_equip_type,
+    ft_equip_type = fixed_team_equip_type,
+    ft_vial_type = ifelse(fixed_team_with_dose10, "dose10", "monodose"),
+    ft_doses_required = n_doses_fixed_team,
+    mt_vial_type = ifelse(mobile_team_with_dose10, "dose10", "monodose"),
+    mt_doses_required = n_doses_mobile_team,
+    ft_RCW25 = RCW25_required_fixed_team,
+    mt_RCW25 = RCW25_required_mobile_team,
+    ft_vaxCarr = vaxCarr_required_fixed_team,
+    mt_vaxCarr = vaxCarr_required_mobile_team,
+    ft_icepacks_large = RCW25_icepack_needs_fixed_team,
+    mt_icepacks_large = RCW25_icepack_needs_mobile_team,
+    ft_icepacks_small = vaxCarr_icepack_needs_fixed_team,
+    mt_icepacks_small = vaxCarr_icepack_needs_mobile_team,
+    ft_freezing_time = freezing_time_fixed_team,
+    mt_freezing_time = freezing_time_mobile_team,
+    campaign_start = campaign_delay$start_day,
+    team_leaving_first = campaign_delay$which_team_first
   )
-  
+  }else if (res_type == 'simple'){
+  res <- data.frame(
+    strategy = strategy_name,
+    ft_freezing_time = freezing_time_fixed_team,
+    mt_freezing_time = freezing_time_mobile_team
+  )
+  } else{
+    stop('Please specify the correct type of output in c(simple, detailed)')
+  }
   return(res)
-  
 }
 
 
