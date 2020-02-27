@@ -23,7 +23,7 @@ dose10_occ_parallel_prep_delay <- analyse_prep_delay(
 )
 
 
-dose10_occ_campaign_metrics <- estim_team_metrics(
+dose10_occ_campaign_metrics <- estim_campaign_metrics(
   strategy_name = "dose10_occ_parallel",
   fixed_team_with_dose10 = T,
   fixed_team_with_ice = F,

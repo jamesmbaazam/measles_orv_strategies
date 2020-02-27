@@ -610,13 +610,13 @@ analyse_team_days <- function(strategy_name,
 #' @export
 #'
 #' @examples
-estim_team_metrics <- function(strategy_name,
+estim_campaign_metrics <- function(strategy_name,
                                fixed_team_with_dose10,
                                fixed_team_with_ice,
                                mobile_team_with_dose10,
                                mobile_team_with_ice,
                                site_details,
-                               site_campaign_dur,
+                               site_campaign_dur_constraint,
                                site_campaign_mt_delay,
                                site_campaign_ft_delay,
                                n_teams_fixed,
@@ -678,30 +678,53 @@ estim_team_metrics <- function(strategy_name,
     )
   }
 
-
-  #' campaign duration per team
-
-  per_ft_campaign_dur <- (team_days_fixed_team - site_campaign_ft_delay)/n_teams_fixed
+  #' assuming one team type can start immediately e.g., using occ
+  #' BUT I need to think hard about this: is it plus or minus in the numerator?
+  per_ft_campaign_dur <- team_days_fixed_team/n_teams_fixed
   
-  per_mt_campaign_dur <- (team_days_mobile_team - site_campaign_mt_delay)/n_teams_mobile
+  per_mt_campaign_dur <- team_days_mobile_team/n_teams_mobile
 
-  site_ft_campaign_dur <- ifelse(per_ft_campaign_dur <= site_campaign_dur, 
+  ft_campaign_dur_constrained <- ifelse(per_ft_campaign_dur <= site_campaign_dur_constraint, 
                             per_ft_campaign_dur, 
-                            site_campaign_dur
+                            site_campaign_dur_constraint
                             )
-  site_mt_campaign_dur <- ifelse(per_mt_campaign_dur <= site_campaign_dur, 
+  mt_campaign_dur_constrained <- ifelse(per_mt_campaign_dur <= site_campaign_dur_constraint, 
                             per_mt_campaign_dur, 
-                            site_campaign_dur
+                            site_campaign_dur_constraint
                             )
-
-  ## Results - Team days  ====
+  
+  #assuming the team types move dependently
+  campaign_dur_constrained <- max(ft_campaign_dur_constrained, 
+                                         mt_campaign_dur_constrained
+                                         )
+  campaign_dur_uncontrained <- max(per_ft_campaign_dur, per_mt_campaign_dur)
+  
+  #' calculate campaign_dur_deficit for tracking coverage
+  dur_diff <- site_campaign_dur_constraint - campaign_dur_constrained
+  if(dur_diff <= 0){
+    dur_deficit <- abs(dur_diff)
+    dur_gain <- 0
+  }else{
+    dur_gain <- abs(dur_diff)
+    dur_deficit <- 0
+  }
+  
+  campaign_dur_deficit <- site_campaign_dur_constraint - campaign_dur_constrained 
+  
+  campaign_dur_gain <- site_campaign_dur_constraint - campaign_dur_constrained
+  
+  
+  ## Results 
   out <- data.frame(
     strategy = strategy_name,
     location_id = site_details$location_id,
     near_pop = site_details$near_pop,
     far_pop = site_details$far_pop,
     mt_equip_type = mobile_team_equip_type,
-    campaign_duration= max(site_mt_campaign_dur, site_ft_campaign_dur)
+    site_campaign_dur_constrained = campaign_dur_constrained,
+    site_campaign_dur_unconstrained = campaign_dur_uncontrained,
+    site_campaign_dur_gain = dur_gain,
+    site_campaign_dur_deficit = dur_deficit
   )
 
   return(out)
