@@ -709,17 +709,14 @@ estim_campaign_metrics <- function(strategy_name,
     dur_deficit <- 0
   }
   
-  campaign_dur_deficit <- site_campaign_dur_constraint - campaign_dur_constrained 
-  
-  campaign_dur_gain <- site_campaign_dur_constraint - campaign_dur_constrained
-  
-  
   ## Results 
   out <- data.frame(
     strategy = strategy_name,
     location_id = site_details$location_id,
     near_pop = site_details$near_pop,
     far_pop = site_details$far_pop,
+    fixed_teams = n_teams_fixed,
+    mobile_teams = n_teams_mobile,
     mt_equip_type = mobile_team_equip_type,
     site_campaign_dur_constrained = campaign_dur_constrained,
     site_campaign_dur_unconstrained = campaign_dur_uncontrained,
