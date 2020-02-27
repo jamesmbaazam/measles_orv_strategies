@@ -617,8 +617,6 @@ estim_campaign_metrics <- function(strategy_name,
                                mobile_team_with_ice,
                                site_details,
                                site_campaign_dur_constraint,
-                               site_campaign_mt_delay,
-                               site_campaign_ft_delay,
                                n_teams_fixed,
                                ft_team_performance,
                                n_teams_mobile,
@@ -699,8 +697,9 @@ estim_campaign_metrics <- function(strategy_name,
                                          )
   campaign_dur_uncontrained <- max(per_ft_campaign_dur, per_mt_campaign_dur)
   
-  #' calculate campaign_dur_deficit for tracking coverage
-  dur_diff <- site_campaign_dur_constraint - campaign_dur_constrained
+  #' calculate campaign duration gains or deficits to track coverage especially
+  #' for the deficit case. Gains can be harnessed in the next campaign
+  dur_diff <- site_campaign_dur_constraint - campaign_dur_uncontrained
   if(dur_diff <= 0){
     dur_deficit <- abs(dur_diff)
     dur_gain <- 0
@@ -718,10 +717,10 @@ estim_campaign_metrics <- function(strategy_name,
     fixed_teams = n_teams_fixed,
     mobile_teams = n_teams_mobile,
     mt_equip_type = mobile_team_equip_type,
-    site_campaign_dur_constrained = campaign_dur_constrained,
-    site_campaign_dur_unconstrained = campaign_dur_uncontrained,
-    site_campaign_dur_gain = dur_gain,
-    site_campaign_dur_deficit = dur_deficit
+    site_campaign_dur_constrained = round(campaign_dur_constrained, 1),
+    site_campaign_dur_unconstrained = round(campaign_dur_uncontrained, 1),
+    site_campaign_dur_gain = round(dur_gain, 1),
+    site_campaign_dur_deficit = round(dur_deficit, 1)
   )
 
   return(out)
