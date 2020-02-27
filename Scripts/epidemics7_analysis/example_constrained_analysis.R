@@ -45,7 +45,7 @@ dose10_occ_campaign_metrics <- estim_campaign_metrics(
   n_teams_mobile = teams$mt,
   dose10_vial_volume = sc_model_params$dose10_vial_vol[1],
   monodose_vial_volume = sc_model_params$monodose_vial_vol,
-  site_campaign_dur = 10,
+  site_campaign_dur_constraint = 10,
   ft_team_performance = 450,
   mt_team_performance = 250,
   browse = F
