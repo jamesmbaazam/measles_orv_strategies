@@ -31,7 +31,8 @@ source('./scripts/supply_chain_functions.R')
 #' @param ambient_temperature 
 #' @param dose10_vial_volume 
 #' @param monodose_vial_volume 
-#' @example estimate_prior_logistical_needs(strategy_name = 'bla', fixed_team_with_dose10 = T, 
+#' @example estimate_prior_logistical_needs(strategy_name = 'bla', 
+#' fixed_team_with_dose10 = T, 
 #' fixed_team_with_ice = T, mobile_team_with_dose10 = T, mobile_team_with_ice = T, 
 #' site_details = make_site_data(near_pop_size = 1000, far_pop_size = 1000), 
 #' mf314 = 1, rcw25_ice_replacement_days = 2, ambient_temperature = sc_model_params$ambient_temp[1], 
@@ -146,8 +147,8 @@ estimate_prior_logistical_needs <- function(strategy_name,
   )
 
   ## Ice pack needs calculations ====
-  #' total number of 0.6L ice packs = number of RCW25 needed * number of ice packs
-  #' needed per RCW25
+  #' total number of 0.6L ice packs = number of RCW25 needed * number of ice 
+  #' packs needed per RCW25
 
   ### RCW25 and vaccine carrier needs ####
   # ice packs needed for each equipment type, based on the ambient temperature
@@ -158,7 +159,8 @@ estimate_prior_logistical_needs <- function(strategy_name,
   vaxCarr_icepack_needs <- compute_vaxCarr_icepacks(ambient_temperature)
 
   #### Fixed post - Ice packs required ####
-  #' total number of 0.6L ice packs = number of RCW25 needed * number of ice packs needed per RCW25
+  #' total number of 0.6L ice packs = number of RCW25 needed * number of ice 
+  #' packs needed per RCW25
   RCW25_icepack_needs_fixed_team <- calc_icepack_tot_quant(
     equipment_quantity = ifelse(fixed_team_with_ice,
       RCW25_required_fixed_team,
@@ -237,16 +239,20 @@ estimate_prior_logistical_needs <- function(strategy_name,
 #' @param mobile_team_with_ice #' options = if "T", ice is used, else, no ice
 #' @param team_dispatch #' options = "parallel", "asap"
 #' @param site_details 
-#' @param fixed_team_equip_type # fixed teams can use one of options = c('rcw25', 'vaxCarr', 'both') for now, we assume fixed teams use both
-#' @param mobile_team_equip_type # options = c('rcw25', 'vaxCarr', 'both') for now, we assume mobile teams use vaxCarr
+#' @param fixed_team_equip_type # fixed teams can use one of 
+#' options = c('rcw25', 'vaxCarr', 'both') for now, we assume fixed teams use both
+#' @param mobile_team_equip_type # options = c('rcw25', 'vaxCarr', 'both') for 
+#' now, we assume mobile teams use vaxCarr
 #' @param n_teams_fixed 
 #' @param n_teams_mobile 
 #' @param mf314 
 #' @param rcw25_ice_replacement_days 
 #' @param ambient_temperature 
 #' @param dose10_vial_volume 
-#' @param res_type #c('simple', 'detailed'): 'simple' returns only the team days per team type. 'detailed' returns a detailed output
-#' @param monodose_vial_volume 
+#' @param res_type #c('simple', 'detailed'): 'simple' returns only the team days 
+#' per team type. 'detailed' returns a detailed output
+#' @param monodose_vial_volume
+#' @example analyse_prep_delay(strategy_name = 'dose10_occ_parallel', fixed_team_with_dose10 = T, fixed_team_with_ice = F, mobile_team_with_dose10 = T, mobile_team_with_ice = F, team_dispatch = 'parallel', site_details = data.frame(location_id = 1, near_pop = 10000, far_pop = 20000), fixed_team_equip_type = 'both', mobile_team_equip_type = 'vaxCarr', n_teams_fixed = 20, n_teams_mobile = 20, mf314 = 1, rcw25_ice_replacement_days = 2, ambient_temperature = sc_model_params$ambient_temp[1], dose10_vial_volume = sc_model_params$dose10_vial_vol[1], monodose_vial_volume = sc_model_params$monodose_vial_vol, res_type = 'simple') 
 
 analyse_prep_delay <- function(strategy_name,
                                fixed_team_with_dose10, 
@@ -503,66 +509,81 @@ analyse_prep_delay <- function(strategy_name,
 #' @param browse 
 
 analyse_team_days <- function(strategy_name,
-                              fixed_team_with_dose10, 
-                              fixed_team_with_ice, 
-                              mobile_team_with_dose10, 
-                              mobile_team_with_ice, 
+                              fixed_team_with_dose10,
+                              fixed_team_with_ice,
+                              mobile_team_with_dose10,
+                              mobile_team_with_ice,
                               site_details,
                               dose10_vial_volume = sc_model_params$dose10_vial_vol[1],
                               monodose_vial_volume = sc_model_params$monodose_vial_vol,
                               mobile_team_equip_type,
-                              browse = F
-                              
-){
-    
-    if (browse) browser() 
-    
-    ##Fixed post team days ====
-    #team days needed by fixed teams, NOT CONSTRAINED by volume/space - we assume they can transport all they need per trip
-    team_days_fixed_team <- round(site_details$near_pop / tp_fixed, 1) #computationally, we see the number doses as the number of expected people. The "final number of doses" here have already accounted for the buffer
-    
-    
-    
-    ##Mobile teams team days ====
-    #Mobile teams only use a vaccine carrier, hence, are contrained by how much they can transport
-    mobile_team_vol_capacity <- calc_dose_capacity(vial_type = ifelse(mobile_team_with_dose10, 'dose10', 'monodose')
-                                                   , vax_vol = ifelse(mobile_team_with_dose10, dose10_vial_volume, monodose_vial_volume)
-                                                   , equip_type = mobile_team_equip_type #we assume a mobile team uses one vaccine carrier
-                                                   , with_ice = mobile_team_with_ice
-    )
-    
+                              browse = F) {
+  if (browse) browser()
 
-    
-    #team days needed by mobile teams, CONSTRAINED by volume/space - we assume per trip, they can only transport as much as the vaccine carrier allows; furthermore, for the 10-dose, due to open vial wastage, they end up wasting a percentage of the doses, hence they have to make more trips to account for that
-    #10-dose mobile campaign team days are affected by the effective doses, which is the the total capacity they can carry less of how many are expected to be wasted.
-    team_days_mobile_team <- if(mobile_team_with_dose10){
-        calc_dose10_team_days(target_pop = site_details$far_pop
-                              , dose10_wastage = sc_model_params$dose10_ovw_mobile_team
-                              , team_performance = tp_mobile
-                              , vaxCarr_capacity = mobile_team_vol_capacity
-        )
-    }else{
-        calc_monodose_team_days(target_pop = site_details$far_pop
-                                , team_performance = min(mobile_team_vol_capacity, tp_mobile)
-                                , carrier_vol_capacity = mobile_team_vol_capacity
-        )
-    }
-    
-    ## Results - Team days  ====
-    out <- data.frame(strategy = strategy_name
-                      , location_id = site_details$location_id
-                      , near_pop = site_details$near_pop
-                      , far_pop = site_details$far_pop
-                      , mt_equip_type = mobile_team_equip_type
-                      , ft_vial_type = ifelse(fixed_team_with_dose10, 'dose10', 'monodose')
-                      , ft_with_ice = ifelse(fixed_team_with_ice, 'yes', 'no')
-                      , ft_team_days = team_days_fixed_team
-                      , mt_vial_type = ifelse(mobile_team_with_dose10, 'dose10', 'monodose')
-                      , mt_with_ice = ifelse(mobile_team_with_ice, 'yes', 'no')
-                      , mt_team_days = team_days_mobile_team
+  ## Fixed post team days ====
+  #' team days needed by fixed teams, NOT CONSTRAINED by volume/space - we assume
+  #' they can transport all they need per trip
+  #' #computationally, we see the number doses as the number of expected people.
+  #' The "final number of doses" here have already accounted for the buffer
+  team_days_fixed_team <- round(site_details$near_pop / tp_fixed, 1)
+
+
+
+  ## Mobile teams team days ====
+  # Mobile teams only use a vaccine carrier, hence, are contrained by how much they can transport
+  mobile_team_vol_capacity <- calc_dose_capacity(
+    vial_type = ifelse(mobile_team_with_dose10,
+      "dose10",
+      "monodose"
+    ),
+    vax_vol = ifelse(mobile_team_with_dose10,
+      dose10_vial_volume,
+      monodose_vial_volume
+    ),
+    equip_type = mobile_team_equip_type,
+    with_ice = mobile_team_with_ice
+  )
+
+
+
+  #' team days needed by mobile teams, CONSTRAINED by volume/space - we assume
+  #' per trip, they can only transport as much as the vaccine carrier allows;
+  #' furthermore, for the 10-dose, due to open vial wastage, they end up wasting
+  #' a percentage of the doses, hence they have to make more trips to account
+  #' for that 10-dose mobile campaign team days are affected by the effective doses,
+  #' which is the the total capacity they can carry less of how many are
+  #' expected to be wasted.
+  team_days_mobile_team <- if (mobile_team_with_dose10) {
+    calc_dose10_team_days(
+      target_pop = site_details$far_pop,
+      dose10_wastage = sc_model_params$dose10_ovw_mobile_team,
+      team_performance = tp_mobile,
+      vaxCarr_capacity = mobile_team_vol_capacity
     )
-    
-    return(out)   
+  } else {
+    calc_monodose_team_days(
+      target_pop = site_details$far_pop,
+      team_performance = min(mobile_team_vol_capacity, tp_mobile),
+      carrier_vol_capacity = mobile_team_vol_capacity
+    )
+  }
+
+  ## Results - Team days  ====
+  out <- data.frame(
+    strategy = strategy_name,
+    location_id = site_details$location_id,
+    near_pop = site_details$near_pop,
+    far_pop = site_details$far_pop,
+    mt_equip_type = mobile_team_equip_type,
+    ft_vial_type = ifelse(fixed_team_with_dose10, "dose10", "monodose"),
+    ft_with_ice = ifelse(fixed_team_with_ice, "yes", "no"),
+    ft_team_days = team_days_fixed_team,
+    mt_vial_type = ifelse(mobile_team_with_dose10, "dose10", "monodose"),
+    mt_with_ice = ifelse(mobile_team_with_ice, "yes", "no"),
+    mt_team_days = team_days_mobile_team
+  )
+
+  return(out)
 }
 
 
@@ -596,6 +617,8 @@ estim_team_metrics <- function(strategy_name,
                                mobile_team_with_ice,
                                site_details,
                                site_campaign_dur,
+                               site_campaign_mt_delay,
+                               site_campaign_ft_delay,
                                n_teams_fixed,
                                ft_team_performance,
                                n_teams_mobile,
@@ -633,8 +656,13 @@ estim_team_metrics <- function(strategy_name,
 
 
 
-  # team days needed by mobile teams, CONSTRAINED by volume/space - we assume per trip, they can only transport as much as the vaccine carrier allows; furthermore, for the 10-dose, due to open vial wastage, they end up wasting a percentage of the doses, hence they have to make more trips to account for that
-  # 10-dose mobile campaign team days are affected by the effective doses, which is the the total capacity they can carry less of how many are expected to be wasted.
+  #' team days needed by mobile teams, CONSTRAINED by volume/space - we assume 
+  #' per trip, they can only transport as much as the vaccine carrier allows; 
+  #' furthermore, for the 10-dose, due to open vial wastage, they end up wasting 
+  #' a percentage of the doses, hence they have to make more trips to account 
+  #' for that 10-dose mobile campaign team days are affected by the effective 
+  #' doses, which is the the total capacity they can carry less of how many 
+  #' are expected to be wasted.
   team_days_mobile_team <- if (mobile_team_with_dose10) {
     calc_dose10_team_days(
       target_pop = site_details$far_pop,
@@ -651,7 +679,20 @@ estim_team_metrics <- function(strategy_name,
   }
 
 
+  #' campaign duration per team
 
+  per_ft_campaign_dur <- (team_days_fixed_team - site_campaign_ft_delay)/n_teams_fixed
+  
+  per_mt_campaign_dur <- (team_days_mobile_team - site_campaign_mt_delay)/n_teams_mobile
+
+  site_ft_campaign_dur <- ifelse(per_ft_campaign_dur <= site_campaign_dur, 
+                            per_ft_campaign_dur, 
+                            site_campaign_dur
+                            )
+  site_mt_campaign_dur <- ifelse(per_mt_campaign_dur <= site_campaign_dur, 
+                            per_mt_campaign_dur, 
+                            site_campaign_dur
+                            )
 
   ## Results - Team days  ====
   out <- data.frame(
@@ -660,24 +701,7 @@ estim_team_metrics <- function(strategy_name,
     near_pop = site_details$near_pop,
     far_pop = site_details$far_pop,
     mt_equip_type = mobile_team_equip_type,
-    ft_vial_type = ifelse(fixed_team_with_dose10,
-      "dose10",
-      "monodose"
-    ),
-    ft_with_ice = ifelse(fixed_team_with_ice,
-      "yes",
-      "no"
-    ),
-    ft_team_days = team_days_fixed_team,
-    mt_vial_type = ifelse(mobile_team_with_dose10,
-      "dose10",
-      "monodose"
-    ),
-    mt_with_ice = ifelse(mobile_team_with_ice,
-      "yes",
-      "no"
-    ),
-    mt_team_days = team_days_mobile_team
+    campaign_duration= max(site_mt_campaign_dur, site_ft_campaign_dur)
   )
 
   return(out)
