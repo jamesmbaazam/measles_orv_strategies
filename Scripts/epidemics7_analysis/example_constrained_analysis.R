@@ -1,3 +1,5 @@
+source('./scripts/wrappers_supply_chain.R')
+
 dose10_occ_parallel_prep_delay <- analyse_prep_delay(
   strategy_name = "dose10_occ_parallel",
   fixed_team_with_dose10 = T,
@@ -7,8 +9,8 @@ dose10_occ_parallel_prep_delay <- analyse_prep_delay(
   team_dispatch = "parallel",
   site_details = data.frame(
     location_id = 1,
-    near_pop = 10000,
-    far_pop = 20000
+    near_pop = 100000,
+    far_pop = 50000
   ),
   fixed_team_equip_type = "both",
   mobile_team_equip_type = "vaxCarr",
@@ -31,8 +33,8 @@ dose10_occ_campaign_metrics <- estim_campaign_metrics(
   mobile_team_with_ice = F,
   site_details = data.frame(
     location_id = 1,
-    near_pop = 10000,
-    far_pop = 20000
+    near_pop = 100000,
+    far_pop = 50000
   ),
   mobile_team_equip_type = "vaxCarr",
   n_teams_fixed = 1,
