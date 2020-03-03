@@ -159,7 +159,7 @@ runSimulations <- function(R0 # transmission coeficient
                            , orv_duration
                            , strategy_name
                            , vax_eff
-                           , n_team_type = 1
+                           , n_team_type
                           # , team_type
                            , team_performance
                            , time_to_immunity
