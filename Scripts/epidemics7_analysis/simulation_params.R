@@ -31,8 +31,8 @@ strategy_subset_config <- filter(strategies, strategy %in% strategy_subset)
 
 
 #Location characteristics
-far_pop_sizes <- c(50000, 100000)
-near_pop_sizes <- c(50000, 100000)
+far_pop_sizes <- c(100000, 100000)
+near_pop_sizes <- c(50000, 50000)
 
 teams <- expand.grid(n_ft = seq(30, 50, 10), n_mt = seq(30, 50, 10))
 
