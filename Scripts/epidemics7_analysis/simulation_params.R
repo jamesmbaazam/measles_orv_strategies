@@ -29,9 +29,23 @@ strategy_subset <- c("dose10_fcc_parallel",
 
 strategy_subset_config <- filter(strategies, strategy %in% strategy_subset)
 
+
+#Location characteristics
+far_pop_sizes <- c(50000, 100000)
+near_pop_sizes <- c(50000, 100000)
+
+teams <- expand.grid(n_ft = seq(30, 50, 10), n_mt = seq(30, 50, 10))
+
+site_pop_dist <- expand.grid(near_pop = near_pop_sizes, far_pop = far_pop_sizes)
+
+site_pops_df <- make_site_data(site_pop_dist$near_pop, site_pop_dist$far_pop)
+
+
 #key table
 key_table <- expand.grid(location_id = site_pops_df$location_id,
                          equip_type = scenario_subset$equip_type,
+                         n_ft = teams$n_ft,
+                         n_mt = teams$n_mt,
                          strategy = strategy_subset_config$strategy
                          )
 
