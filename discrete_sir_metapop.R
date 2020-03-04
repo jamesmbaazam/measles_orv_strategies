@@ -37,12 +37,11 @@ meta_sim <- function(n_patches,
                      time_to_immunity,
                      browse = FALSE
 ) {
-    
+    patch_dynamics <- list()
     time <- 0
     simResults <- data.frame(time = 0, pop) #at time 0 we have the initial population specified
     if (browse) browser()
-    time <- time + 1
-    #while (simResults[time, 'Sus1'] > 0) {
+
     for (time in 1:run_time) {
         for (patch in 1: n_patches) {
         if (!is.na(vaxDay) & time < vaxDay + 1  | time > vaxDay + 1 + (orv_duration/n_team_type)) {
