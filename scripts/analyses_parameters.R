@@ -8,7 +8,7 @@ library(dplyr)
 # pre-requisite scripts
 #######################################
 
-source('./scripts/Supply_chain_functions.R')
+source('./scripts/supply_chain_functions.R')
 
 
 
