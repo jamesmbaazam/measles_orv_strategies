@@ -691,6 +691,16 @@ estim_campaign_metrics <- function(strategy_name,
                             site_campaign_dur_constraint
                             )
   
+  #Fixed post vaccination coverage
+  fixed_team_coverage <- (ft_campaign_dur_constrained*n_teams_fixed*ft_team_performance)/site_details$near_pop
+  
+  #Mobile team vaccination coverage
+  mobile_team_coverage <- (mt_campaign_dur_constrained*n_teams_mobile*min(mobile_team_vol_capacity, tp_mobile))/site_details$far_pop 
+  
+  
+  total_site_coverage <- (fixed_team_coverage * site_details$near_pop + 
+                            mobile_team_coverage * site_details$far_pop)/ 
+    (site_details$near_pop + site_details$far_pop)
   #assuming the team types move dependently
   campaign_dur_constrained <- max(ft_campaign_dur_constrained, 
                                          mt_campaign_dur_constrained
