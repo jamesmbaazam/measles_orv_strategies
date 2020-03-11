@@ -44,7 +44,12 @@ campaign_delay_results <- sim_params_table %>%
         mobile_team_equip_type = equip_type,
         n_teams_fixed = 1,
         n_teams_mobile = 1,
-        rcw25_ice_replacement_days = 2
+        rcw25_ice_replacement_days = 2,
+        mf314 = 1, 
+        ambient_temperature = sc_model_params$ambient_temp[1], 
+        dose10_vial_volume = sc_model_params$dose10_vial_vol[1], 
+        monodose_vial_volume = sc_model_params$monodose_vial_vol[1], 
+        res_type = 'detailed'
       )
     )
   })
@@ -101,7 +106,7 @@ sc_results_full <- sc_analysis %>%
     map_df(function(dat){mutate(dat, mt_compounded_delay = calc_compounded_delays(campaign_start, mt_team_days))}) 
 
 
-saveRDS(sc_results_full, file = './model_output/sc_results_full.rds')
+#saveRDS(sc_results_full, file = './model_output/sc_results_full.rds')
 
 
 
