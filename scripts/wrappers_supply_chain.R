@@ -265,12 +265,12 @@ analyse_prep_delay <- function(strategy_name,
                                mobile_team_equip_type, 
                                n_teams_fixed,
                                n_teams_mobile,
-                               mf314 = sc_model_params$mf314_quant,
+                               mf314,
                                rcw25_ice_replacement_days,
-                               ambient_temperature = sc_model_params$ambient_temp[1],
-                               dose10_vial_volume = sc_model_params$dose10_vial_vol[1],
-                               monodose_vial_volume = sc_model_params$monodose_vial_vol,
-                               res_type = 'detailed' 
+                               ambient_temperature, 
+                               dose10_vial_volume, 
+                               monodose_vial_volume,
+                               res_type 
                                ) {
 
   #' Equipment rules: 1 fixed team will require 1 RCW25 and 1 vaccine carrier,
