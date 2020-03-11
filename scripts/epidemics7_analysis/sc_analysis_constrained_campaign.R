@@ -21,8 +21,8 @@ campaign_delay_results <- sim_params_table %>%
                                   ),
         fixed_team_equip_type = "both",
         mobile_team_equip_type = equip_type,
-        n_teams_fixed = 1,
-        n_teams_mobile = 1,
+        n_teams_fixed = n_ft,
+        n_teams_mobile = n_mt,
         rcw25_ice_replacement_days = 2,
         mf314 = 1, 
         ambient_temperature = sc_model_params$ambient_temp[1], 
@@ -80,8 +80,14 @@ View(campaign_metrics)
 #library(xlsx)
 #write.xlsx(x = campaign_metrics, file = './model_output/campaign_metrics.xlsx')
 
-sc_analysis_full <- left_join(campaign_delay_results_actual, 
-                         campaign_metrics)
+sc_analysis_full <- left_join(campaign_metrics,
+                              campaign_delay_results_actual
+                              )
 
+dim(campaign_metrics)
+dim(campaign_delay_results_actual)
+
+dim(sc_analysis_full)
+View(sc_analysis_full)
 
 # visualisations
