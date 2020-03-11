@@ -31,12 +31,13 @@ strategy_subset_config <- filter(strategies, strategy %in% strategy_subset)
 
 
 #Location characteristics
-far_pop_sizes <- c(100000, 100000)
-near_pop_sizes <- c(50000, 50000)
+#far_pop_sizes <- c(100000, 100000)
+#near_pop_sizes <- c(50000, 50000)
+#site_pop_dist <- expand.grid(near_pop = near_pop_sizes, far_pop = far_pop_sizes)
 
-teams <- expand.grid(n_ft = seq(30, 50, 10), n_mt = seq(30, 50, 10))
+teams <- expand.grid(n_ft = seq(10, 30, 10), n_mt = seq(10, 30, 10))
 
-site_pop_dist <- expand.grid(near_pop = near_pop_sizes, far_pop = far_pop_sizes)
+site_pop_dist <- data.frame(near_pop = rep(50000, 5), far_pop = rep(50000, 5))
 
 site_pops_df <- make_site_data(site_pop_dist$near_pop, site_pop_dist$far_pop)
 
