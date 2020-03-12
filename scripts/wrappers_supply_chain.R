@@ -49,10 +49,11 @@ estimate_prior_logistical_needs <- function(strategy_name,
                                       rcw25_ice_replacement_days,
                                       ambient_temperature,
                                       dose10_vial_volume,
-                                      monodose_vial_volume
+                                      monodose_vial_volume,
+                                      browse = F
                                       ) {
 
-
+  if (browse) browser()
   ## Doses and equipment calculations ====
 
   ### Fixed post - number of doses ####
@@ -270,13 +271,14 @@ analyse_prep_delay <- function(strategy_name,
                                ambient_temperature, 
                                dose10_vial_volume, 
                                monodose_vial_volume,
-                               res_type 
+                               res_type,
+                               browse = F
                                ) {
 
   #' Equipment rules: 1 fixed team will require 1 RCW25 and 1 vaccine carrier,
   #' 2 fixed teams at the same post will require 1 RCW25 and 2 vaccine carriers
   #'
-
+if(browse) browser()
   # fixed team rules
   fixed_teams_rcw25 <- ifelse(n_teams_fixed %% 2 == 0,
     n_teams_fixed / 2,
