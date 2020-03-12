@@ -28,7 +28,8 @@ campaign_delay_results <- sim_params_table %>%
         ambient_temperature = sc_model_params$ambient_temp[1], 
         dose10_vial_volume = sc_model_params$dose10_vial_vol[1], 
         monodose_vial_volume = sc_model_params$monodose_vial_vol[1], 
-        res_type = 'detailed' 
+        res_type = 'detailed',
+        browse = F
       )
     )
   })
@@ -80,9 +81,11 @@ View(campaign_metrics)
 #library(xlsx)
 #write.xlsx(x = campaign_metrics, file = './model_output/campaign_metrics.xlsx')
 
-sc_analysis_full <- left_join(campaign_metrics,
-                              campaign_delay_results_actual
-                              )
+sc_analysis_merged <- bind_cols(campaign_delay_results_actual, campaign_metrics) %>% 
+  select(-c(strategy1, location_id1, mt_equip_type1))
+
+sc_analysis_full <- sc_analysis_merged %>% 
+  mutate(total_op_time = sum(campaign_start, site_campaign_dur_constrained))
 
 dim(campaign_metrics)
 dim(campaign_delay_results_actual)
