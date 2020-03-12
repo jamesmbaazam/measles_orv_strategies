@@ -78,8 +78,7 @@ campaign_metrics <- sim_params_table %>%
   })
 
 View(campaign_metrics)
-#library(xlsx)
-#write.xlsx(x = campaign_metrics, file = './model_output/campaign_metrics.xlsx')
+
 
 sc_analysis_merged <- bind_cols(campaign_delay_results_actual, campaign_metrics) %>% 
   select(-c(strategy1, location_id1, mt_equip_type1))
@@ -93,4 +92,6 @@ dim(campaign_delay_results_actual)
 dim(sc_analysis_full)
 View(sc_analysis_full)
 
+library(xlsx)
+write.xlsx(x = sc_analysis_full, file = './model_output/sc_analysis_full.xlsx')
 # visualisations
