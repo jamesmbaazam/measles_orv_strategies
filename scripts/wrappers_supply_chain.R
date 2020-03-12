@@ -731,13 +731,13 @@ estim_campaign_metrics <- function(strategy_name,
     mt_equip_type = mobile_team_equip_type,
     ft_dur_constrained = round(ft_campaign_dur_constrained, 1),
     mt_dur_constrained = round(mt_campaign_dur_constrained, 1),
-    ft_cov = round(fixed_team_coverage, 1),
-    mt_cov = round(mobile_team_coverage, 1),
-    site_cov_total = round(total_site_coverage, 1),
     site_campaign_dur_constrained = round(campaign_dur_constrained, 1),
     site_campaign_dur_unconstrained = round(campaign_dur_uncontrained, 1),
     site_campaign_dur_gain = round(dur_gain, 1),
-    site_campaign_dur_deficit = round(dur_deficit, 1)
+    site_campaign_dur_deficit = round(dur_deficit, 1),
+    ft_cov = round(fixed_team_coverage, 1),
+    mt_cov = round(mobile_team_coverage, 1),
+    site_cov_total = round(total_site_coverage, 1)
   )
 
   return(out)
