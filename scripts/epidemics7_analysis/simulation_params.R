@@ -9,12 +9,11 @@ source('./scripts/analyses_parameters.R')
 source('./scripts/strategy_list_complete.R')
 
 #resolve conflicts
-conflict_prefer('mutate', 'dplyr')
 conflict_prefer('filter', 'dplyr')
 
 
-##we're only interested in a subset of scenarios and strategies for now
-##subset the scenarios 
+## we're only interested in a subset of scenarios and strategies for now
+## subset the scenarios 
 scenario_subset <- scenarios %>% 
     filter((equip_type == 'rcw25'| equip_type == 'vaxCarr') & 
                dispatch == 'parallel'
