@@ -1,6 +1,7 @@
 #packages
 library(conflicted)
 library(dplyr)
+library(forcats)
 
 
 #load pre-requisite scripts
@@ -45,14 +46,18 @@ site_pops_df <- make_site_data(site_pop_dist$near_pop, site_pop_dist$far_pop)
 key_table <- expand.grid(location_id = site_pops_df$location_id,
                          equip_type = scenario_subset$equip_type,
                          strategy = strategy_subset_config$strategy
-                         )
+                         ) %>% as_tibble()
 
+
+key_table
 
 
 ## simulation data
 
 sim_params_tmp <- left_join(key_table, strategy_subset_config, by = 'strategy')
 
-sim_params_table <- left_join(sim_params_tmp, site_pops_df, by = "location_id")
+sim_params_table <- left_join(sim_params_tmp, site_pops_df, by = "location_id") %>% 
+    mutate(location_id = as_factor(location_id)) %>% 
+    as_tibble()
 
 sim_params_table
