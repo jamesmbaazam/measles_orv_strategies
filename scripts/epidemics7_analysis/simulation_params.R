@@ -45,8 +45,6 @@ site_pops_df <- make_site_data(site_pop_dist$near_pop, site_pop_dist$far_pop)
 #key table
 key_table <- expand.grid(location_id = site_pops_df$location_id,
                          equip_type = scenario_subset$equip_type,
-                         n_ft = teams$n_ft,
-                         n_mt = teams$n_mt,
                          strategy = strategy_subset_config$strategy
                          )
 
