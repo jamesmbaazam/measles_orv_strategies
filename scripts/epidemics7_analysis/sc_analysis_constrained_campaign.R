@@ -2,8 +2,13 @@ source("./scripts/wrappers_supply_chain.R")
 source("./scripts/epidemics7_analysis/simulation_params.R")
 
 
+#packages
+library(xlsx)
+library(patchwork)
+library(purrr)
+
 #calculate delays prior to campaign start
-campaign_delay_results <- sim_params_table %>%
+campaign_delay_results_10_teams <- sim_params_table %>%
   rowwise() %>%
   do({
     with(
@@ -21,8 +26,8 @@ campaign_delay_results <- sim_params_table %>%
                                   ),
         fixed_team_equip_type = "both",
         mobile_team_equip_type = equip_type,
-        n_teams_fixed = n_ft,
-        n_teams_mobile = n_mt,
+        n_teams_fixed = teams$n_ft[1],
+        n_teams_mobile = teams$n_mt[1],
         rcw25_ice_replacement_days = 2,
         mf314 = 1, 
         ambient_temperature = sc_model_params$ambient_temp[1], 
@@ -34,9 +39,8 @@ campaign_delay_results <- sim_params_table %>%
     )
   })
 
-
 ## Remove some columns ==== 
-campaign_delay_results_actual <- campaign_delay_results %>% 
+campaign_delay_results_cropped_10_teams <- campaign_delay_results_10_teams %>% 
   select(-c(near_pop, far_pop, ft_vial_type, ft_equip_type, 
             mt_vial_type, ft_doses_required, mt_doses_required, 
             ft_RCW25, mt_RCW25, ft_vaxCarr, 
@@ -46,9 +50,9 @@ campaign_delay_results_actual <- campaign_delay_results %>%
          )
 
 
-View(campaign_delay_results_actual)
+#View(campaign_delay_results_cropped_10_teams)
 
-campaign_metrics <- sim_params_table %>%
+campaign_metrics_10_teams <- sim_params_table %>%
   rowwise() %>%
   do({
     with(
@@ -65,8 +69,8 @@ campaign_metrics <- sim_params_table %>%
           far_pop = far_pop
         ),
         mobile_team_equip_type = equip_type,
-        n_teams_fixed = n_ft,
-        n_teams_mobile = n_mt,
+        n_teams_fixed = teams$n_ft[1],
+        n_teams_mobile = teams$n_mt[1],
         dose10_vial_volume = sc_model_params$dose10_vial_vol[1],
         monodose_vial_volume = sc_model_params$monodose_vial_vol,
         site_campaign_dur_constraint = 10,
@@ -77,21 +81,51 @@ campaign_metrics <- sim_params_table %>%
     )
   })
 
-View(campaign_metrics)
+#View(campaign_metrics_10_teams)
 
 
-sc_analysis_merged <- bind_cols(campaign_delay_results_actual, campaign_metrics) %>% 
+sc_analysis_10_teams_merged <- bind_cols(campaign_delay_results_cropped_10_teams, 
+                                         campaign_metrics_10_teams
+                                         ) %>% 
   select(-c(strategy1, location_id1, mt_equip_type1))
 
-sc_analysis_full <- sc_analysis_merged %>% 
-  mutate(total_op_time = sum(campaign_start, site_campaign_dur_constrained))
+sc_analysis_full_10_teams <- sc_analysis_10_teams_merged %>% 
+  mutate(total_op_time = sum(campaign_start, site_campaign_dur_constrained)) %>% 
+  as_tibble()
 
-dim(campaign_metrics)
-dim(campaign_delay_results_actual)
+#View(sc_analysis_full_10_teams)
 
-dim(sc_analysis_full)
-View(sc_analysis_full)
 
-library(xlsx)
-write.xlsx(x = sc_analysis_full, file = './model_output/sc_analysis_full.xlsx')
-# visualisations
+sc_results_summary_10_teams <- sc_analysis_full_10_teams %>% 
+  group_split(strategy, mt_equip_type) %>% 
+  map_df(function(dat){summarise_campaign_metrics(dat)}) 
+
+View(sc_results_summary_10_teams)
+
+#' write the results to file
+#' full supply chain analysis
+write.xlsx(x = sc_analysis_full_10_teams, file = './model_output/sc_analysis_full_10_teams_iid_pops.xlsx')
+
+#' summary of the full supply chain analysis
+write.xlsx(x = sc_results_summary_10_teams, file = './model_output/sc_results_summary_10_teams_iid_pops.xlsx')
+
+
+#' visualisations
+coverage_plot <- ggplot(data = sc_results_summary_10_teams) + 
+  geom_bar(aes(x = strategy, y = average_coverage, 
+               fill = mt_equip), 
+           stat = 'identity',
+           position = 'dodge'
+           ) + theme(legend.position = 'none')
+
+duration_plot <- ggplot(data = sc_results_summary_10_teams) + 
+  geom_bar(aes(x = strategy, y = campaign_duration, 
+               fill = mt_equip), 
+           stat = 'identity',
+           position = 'dodge'
+  )
+
+
+plot(coverage_plot/duration_plot) #syntax from patchwork package
+
+
