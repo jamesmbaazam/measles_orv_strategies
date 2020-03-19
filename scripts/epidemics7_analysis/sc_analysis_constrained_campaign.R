@@ -104,28 +104,29 @@ View(sc_results_summary_10_teams)
 
 #' write the results to file
 #' full supply chain analysis
-write.xlsx(x = sc_analysis_full_10_teams, file = './model_output/sc_analysis_full_10_teams_iid_pops.xlsx')
-
-#' summary of the full supply chain analysis
-write.xlsx(x = sc_results_summary_10_teams, file = './model_output/sc_results_summary_10_teams_iid_pops.xlsx')
-
+#' write.xlsx(x = sc_analysis_full_10_teams, 
+#'            file = './model_output/sc_analysis_full_10_teams_iid_pops.xlsx'
+#'            )
+#' 
+#' #' summary of the full supply chain analysis
+#' write.xlsx(x = sc_results_summary_10_teams, 
+#'            file = './model_output/sc_results_summary_10_teams_iid_pops.xlsx'
+#'            )
+#' 
 
 #' visualisations
-coverage_plot <- ggplot(data = sc_results_summary_10_teams) + 
-  geom_bar(aes(x = strategy, y = average_coverage, 
-               fill = mt_equip), 
-           stat = 'identity',
-           position = 'dodge'
-           ) + theme(legend.position = 'none')
+ggplot(data = sc_results_summary_10_teams) + 
+  geom_jitter(aes(x = campaign_duration, 
+                  y = average_coverage, 
+                  color = mt_equip,
+                  shape = strategy), 
+              width = 0.15, 
+              height = 0.015
+              ) +
+  labs(title = 'Campaign duration and average vaccination \n coverage for 10 fixed post and 10 mobile teams',
+       x = 'Campaign duration', 
+       y = 'Overall vaccination coverage'
+       )
 
-duration_plot <- ggplot(data = sc_results_summary_10_teams) + 
-  geom_bar(aes(x = strategy, y = campaign_duration, 
-               fill = mt_equip), 
-           stat = 'identity',
-           position = 'dodge'
-  )
-
-
-plot(coverage_plot/duration_plot) #syntax from patchwork package
 
 
