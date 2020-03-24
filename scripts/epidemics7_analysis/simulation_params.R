@@ -24,7 +24,8 @@ scenario_subset <- scenarios %>%
 strategy_subset <- c("dose10_fcc_parallel", 
                      "dose10_occ_parallel", 
                      "monodose_fcc_parallel", 
-                     "monodose_occ_parallel"
+                     "monodose_occ_parallel",
+                     "mixed_pcc_parallel"
                      )
 
 strategy_subset_config <- filter(strategies, strategy %in% strategy_subset)
