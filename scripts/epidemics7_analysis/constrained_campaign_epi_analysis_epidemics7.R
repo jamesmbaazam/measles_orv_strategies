@@ -163,6 +163,7 @@ for (site_row in 1: nrow(site_pops_df)) {
         vaxDay = 1, #' NB: this is a trick to bypass some conditions but it does no harm to the output
         orv_duration = 1, #' NB: this is a trick to bypass some conditions but it does no harm to the output
         n_team_type = 1, #' NB: this is a trick to bypass some conditions but it does no harm to the output
+        site = as.numeric(sc_results_full[sc_result_row, 'location_id']),
         vax_eff = 0,
         team_performance = 0,
         time_to_immunity = 0,
@@ -200,6 +201,7 @@ for (site_row in 1: nrow(site_pops_df)) {
         vaxDay = 1, #' NB: this is a trick to bypass some conditions but it does no harm to the output
         orv_duration = 1, #' NB: this is a trick to bypass some conditions but it does no harm to the output
         n_team_type = 1, #' NB: this is a trick to bypass some conditions but it does no harm to the output
+        site = as.numeric(sc_results_full[sc_result_row, 'location_id']),
         vax_eff = 0,
         team_performance = 0,
         time_to_immunity = 0,
