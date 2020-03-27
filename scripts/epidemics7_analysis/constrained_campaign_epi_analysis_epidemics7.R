@@ -1,4 +1,6 @@
 
+options(nwarnings = 10000) #print this many messages if they exist or occur
+
 ## Transmission dynamics ####
 
 ## Packages ####
