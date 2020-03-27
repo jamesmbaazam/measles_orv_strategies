@@ -114,7 +114,7 @@ vaccinate <- function(pop, tp, v, n_team_type, browse = FALSE) {
   totalPop <- sum(pop)
   
   #calculate the vaccination "rate" from the team performance
-  vax_rate <-  ifelse(pop$Sus1 > n_team_type*tp, (n_team_type*tp)/totalPop, pop$Sus1/totalPop)
+  vax_rate <- ifelse(pop$Sus1 > n_team_type*tp, (n_team_type*tp)/totalPop, pop$Sus1/totalPop)
   # vax_rate <-  ifelse(pop$Sus1 > tp, tp, pop$Sus1)
   #calculate the proportions of individuals who'll be immunised and those who'll fail immunisation
   newly_immunised_batch <- v * vax_rate * pop$Sus1
@@ -160,7 +160,7 @@ runSimulations <- function(R0 # transmission coefficient
                            , strategy_name
                            , vax_eff
                            , n_team_type
-                          # , team_type
+                           , site
                            , team_performance
                            , time_to_immunity
                            , browse = FALSE
@@ -179,17 +179,12 @@ runSimulations <- function(R0 # transmission coefficient
       simResults <- rbind(simResults, data.frame(time, step(pop = vaccinate(simResults[time, -1], 
                                                                             v = vax_eff, 
                                                                             n_team_type = n_team_type, 
-                                                                            tp = team_performance), 
-                                                            R0 = R0)
-                                                 )
-                          )
+                                                                            tp = team_performance),
+                                                            R0 = R0)))
     }else if (is.na(vaxDay)){
       simResults <- rbind(simResults, data.frame(time, step(pop = simResults[time, -1], 
-                                                            R0 = R0
-                                                            )
-                                                 )
-                          )
-    }
+                                                            R0 = R0)))
+      }
     epiDur <- time
     time <- time + 1
   }
@@ -216,6 +211,7 @@ runSimulations <- function(R0 # transmission coefficient
     )
     , epiTotal = sum(simResults$Inf5)
     , strategy = strategy_name
+    , location = site
   )
   return(epi_out)
 }
