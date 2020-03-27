@@ -85,27 +85,6 @@ for (sc_result_row in 1: nrow(sc_results_full)) {
     
     }
 
-#alternative more compact version of the above
-# sc_results %>% 
-#     group_split(strategy, mt_equip_type) %>% 
-#     rowwise() %>% 
-#     do({with(., 
-#              runSimulations(
-#                  R0 = orv_model_params$far_pop_R0 # transmission coeficient
-#                  , run_time = orv_model_params$model_time # 1 yr!
-#                  , pop = initializePop(N = far_pop, init_prop_immune = 0.25, I0 = 1)
-#                  , strategy_name = strategy
-#                  , vaxDay = mt_compounded_delay
-#                  , orv_duration = mt_dur_constrained
-#                  , n_team_type = teams$n_mt[1]
-#                  , vax_eff = orv_model_params$vaccine_efficacy
-#                  , team_performance = as.numeric(sc_model_params$vax_rate['mobile_team'])
-#                  , time_to_immunity = orv_model_params$immune_response_timing
-#                  , browse = F
-#              )  
-#              )
-#         })
-# 
 
 #' near/urban locations ----
 
