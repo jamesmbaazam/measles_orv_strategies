@@ -18,8 +18,10 @@ fig4a_cases_averted <- ggplot(data = cases_averted_df) +
          y = 'Vaccination coverage') +
     theme_minimal()
 
-ggsave(filename = './figures/fig4a_cases_averted.pdf', 
-       plot = fig4a_cases_averted, 
-       device = 'pdf'
-       )
+plot(fig4a_cases_averted)
+
+# ggsave(filename = './figures/fig4a_cases_averted.pdf', 
+#        plot = fig4a_cases_averted, 
+#        device = 'pdf'
+#        )
 
