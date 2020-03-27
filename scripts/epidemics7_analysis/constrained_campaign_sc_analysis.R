@@ -84,24 +84,27 @@ campaign_metrics_10_teams <- sim_params_table %>%
 #View(campaign_metrics_10_teams)
 
 
-sc_analysis_10_teams_merged <- bind_cols(campaign_delay_results_cropped_10_teams, 
-                                         campaign_metrics_10_teams
-                                         ) %>% 
+sc_analysis_10_teams_merged <- bind_cols(
+  campaign_delay_results_cropped_10_teams,
+  campaign_metrics_10_teams
+) %>%
   select(-c(strategy1, location_id1, mt_equip_type1))
 
-sc_analysis_full_10_teams <- sc_analysis_10_teams_merged %>% 
-  mutate(total_op_time = sum(campaign_start, site_campaign_dur_constrained)) %>% 
+sc_analysis_full_10_teams <- sc_analysis_10_teams_merged %>%
+  mutate(total_op_time = sum(campaign_start, site_campaign_dur_constrained)) %>%
   as_tibble()
 
-#View(sc_analysis_full_10_teams)
+View(sc_analysis_full_10_teams)
+saveRDS(sc_analysis_full_10_teams, file = "./model_output/sc_analysis_full_10_teams.rds")
 
-
-sc_results_summary_10_teams <- sc_analysis_full_10_teams %>% 
-  group_split(strategy, mt_equip_type) %>% 
-  map_df(function(dat){summarise_campaign_metrics(dat)}) 
+sc_results_summary_10_teams <- sc_analysis_full_10_teams %>%
+  group_split(strategy, mt_equip_type) %>%
+  map_df(function(dat) {
+    summarise_campaign_metrics(dat)
+  })
 
 View(sc_results_summary_10_teams)
-
+saveRDS(sc_results_summary_10_teams, file = "./model_output/sc_results_summary_10_teams.rds")
 #' write the results to file
 #' full supply chain analysis
 #' write.xlsx(x = sc_analysis_full_10_teams, 
@@ -113,20 +116,4 @@ View(sc_results_summary_10_teams)
 #'            file = './model_output/sc_results_summary_10_teams_iid_pops.xlsx'
 #'            )
 #' 
-
-#' visualisations
-ggplot(data = sc_results_summary_10_teams) + 
-  geom_jitter(aes(x = campaign_duration, 
-                  y = average_coverage, 
-                  color = mt_equip,
-                  shape = strategy), 
-              width = 0.15, 
-              height = 0.015
-              ) +
-  labs(title = 'Campaign duration and average vaccination \n coverage for 10 fixed post and 10 mobile teams',
-       x = 'Campaign duration', 
-       y = 'Overall vaccination coverage'
-       )
-
-
 
