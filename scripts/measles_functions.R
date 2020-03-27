@@ -108,7 +108,7 @@ step <- function(pop, R0, browse = FALSE) {
 #'1. tp = team performance/expected number of vaccinations per day
 #'2. v = vaccine efficacy between 0 and 1
 #'
-vaccinate <- function(pop, tp, v, n_team_type = 1, browse = FALSE) {
+vaccinate <- function(pop, tp, v, n_team_type, browse = FALSE) {
   if (browse) browser()
   
   totalPop <- sum(pop)
