@@ -22,8 +22,26 @@ source('./scripts/epidemics7_analysis/simulation_params.R')
 
 
 ## Supply chain data ----
-sc_results <- readRDS('./model_output/sc_results_full.rds')
+sc_results <- readRDS('./model_output/sc_analysis_full_10_teams.rds')
 
+#' create a new column with the compounded delays
+
+sc_results_full <- sc_results%>%
+    group_split(strategy, mt_equip_type) %>%
+    map_df(function(dat) {
+        mutate(dat,
+               mt_compounded_delay = calc_compounded_delays(
+                   campaign_start,
+                   mt_dur_constrained
+               ),
+               ft_compounded_delay = calc_compounded_delays(
+                   campaign_start,
+                   ft_dur_constrained
+               )
+        )
+    })
+
+View(sc_results_full)
 ###############################################################################
 #Running the simulations for each strategy
 ###############################################################################
