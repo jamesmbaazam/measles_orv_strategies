@@ -64,7 +64,7 @@ orv_far_pop_dynamics_epi_total <- tibble()
 for (sc_result_row in 1: nrow(sc_results_full)) {
     tp <- as.numeric(sc_model_params$vax_rate['mobile_team']) #if all mobile teams can exceed the doses needed to achieve the average daily performance, then it's safe to assume all teams can hit the average team performance
     orv_far_pop_dynamics <- runSimulations(
-        R0 = orv_model_params$far_pop_R0[1], # transmission coeficient
+        R0 = orv_model_params$far_pop_R0[21], # transmission coeficient
         run_time = orv_model_params$model_time, # 1 yr!
         pop = initializePop(N = as.numeric(
             sc_results_full[sc_result_row, 'far_pop']), 
@@ -104,7 +104,7 @@ orv_near_pop_dynamics_epi_total <- tibble()
 for (sc_result_row in 1: nrow(sc_results_full)) {
     tp <- as.numeric(sc_model_params$vax_rate['fixed_team']) 
     orv_near_pop_dynamics <- runSimulations(
-        R0 = orv_model_params$near_pop_R0[1], # transmission coeficient
+        R0 = orv_model_params$near_pop_R0[21], # transmission coeficient
         run_time = orv_model_params$model_time, # 1 yr!
         pop = initializePop(N = as.numeric(
             sc_results_full[sc_result_row, 'near_pop']), 
@@ -167,7 +167,7 @@ no_vax_near_dynamics_epi_total <- tibble()
 
 for (site_row in 1: nrow(site_pops_df)) {
     no_vax_near_dynamics <- runSimulations(
-        R0 = orv_model_params$near_pop_R0, 
+        R0 = orv_model_params$near_pop_R0[21], 
         run_time = orv_model_params$model_time, # 1 yr!
         pop = initializePop(N = as.numeric(site_pops_df[site_row, 'near_pop']), 
                               init_prop_immune = 0.25, I0 = 1
@@ -205,7 +205,7 @@ no_vax_far_dynamics_epi_total <- tibble()
 
 for (site_row in 1: nrow(site_pops_df)) {
     no_vax_far_dynamics <- runSimulations(
-        R0 = orv_model_params$far_pop_R0, 
+        R0 = orv_model_params$far_pop_R0[21], 
         run_time = orv_model_params$model_time, # 1 yr!
         pop = initializePop(N = as.numeric(site_pops_df[site_row, 'far_pop']), 
                             init_prop_immune = 0.25, I0 = 1
