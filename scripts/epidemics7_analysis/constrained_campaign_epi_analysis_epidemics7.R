@@ -45,7 +45,11 @@ sc_results_full <- sc_results %>%
         )
     })
 
-View(sc_results_full)
+#View(sc_results_full)
+
+
+
+
 ###############################################################################
 #Running the simulations for each strategy
 ###############################################################################
