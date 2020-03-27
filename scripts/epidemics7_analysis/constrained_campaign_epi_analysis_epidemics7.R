@@ -58,18 +58,21 @@ orv_far_pop_dynamics_epi_total <- tibble()
 for (sc_result_row in 1: nrow(sc_results_full)) {
     tp <- as.numeric(sc_model_params$vax_rate['mobile_team']) #if all mobile teams can exceed the doses needed to achieve the average daily performance, then it's safe to assume all teams can hit the average team performance
     orv_far_pop_dynamics <- runSimulations(
-        R0 = orv_model_params$far_pop_R0[1] # transmission coeficient
-        , run_time = orv_model_params$model_time # 1 yr!
-        , pop = initializePop(N = as.numeric(sc_results_full[sc_result_row, 'far_pop']), 
-                              init_prop_immune = 0.25, I0 = 1)
-        , strategy_name = sc_results_full[sc_result_row, 'strategy']
-        , vaxDay = as.numeric(sc_results_full[sc_result_row, 'mt_compounded_delay'])
-        , orv_duration = as.numeric(sc_results_full[sc_result_row ,'mt_dur_constrained']) #for now we're only looking at the far campaigns 
-        , n_team_type = teams$n_mt[1]
-        , vax_eff = orv_model_params$vaccine_efficacy
-        , team_performance = tp
-        , time_to_immunity = orv_model_params$immune_response_timing
-        , browse = F
+        R0 = orv_model_params$far_pop_R0[1], # transmission coeficient
+        run_time = orv_model_params$model_time, # 1 yr!
+        pop = initializePop(N = as.numeric(
+            sc_results_full[sc_result_row, 'far_pop']), 
+            init_prop_immune = 0.25, 
+            I0 = 1),
+        strategy_name = sc_results_full[sc_result_row, 'strategy'],
+        vaxDay = as.numeric(sc_results_full[sc_result_row, 'mt_compounded_delay']),
+        orv_duration = as.numeric(sc_results_full[sc_result_row ,'mt_dur_constrained']), #for now we're only looking at the far campaigns 
+        n_team_type = teams$n_mt[1],
+        site = as.numeric(sc_results_full[sc_result_row, 'location_id']),
+        vax_eff = orv_model_params$vaccine_efficacy,
+        team_performance = tp,
+        time_to_immunity = orv_model_params$immune_response_timing,
+        browse = F
     ) 
     
     orv_far_pop_dynamics_detailed <- rbind(orv_far_pop_dynamics_detailed, 
@@ -95,18 +98,22 @@ orv_near_pop_dynamics_epi_total <- tibble()
 for (sc_result_row in 1: nrow(sc_results_full)) {
     tp <- as.numeric(sc_model_params$vax_rate['fixed_team']) 
     orv_near_pop_dynamics <- runSimulations(
-        R0 = orv_model_params$near_pop_R0[1] # transmission coeficient
-        , run_time = orv_model_params$model_time # 1 yr!
-        , pop = initializePop(N = as.numeric(sc_results_full[sc_result_row, 'near_pop']), 
-                              init_prop_immune = 0.25, I0 = 1)
-        , strategy_name = sc_results_full[sc_result_row, 'strategy']
-        , vaxDay = as.numeric(sc_results_full[sc_result_row, 'ft_compounded_delay'])
-        , orv_duration = as.numeric(sc_results_full[sc_result_row ,'ft_dur_constrained']) 
-        , n_team_type = teams$n_ft[1]
-        , vax_eff = orv_model_params$vaccine_efficacy
-        , team_performance = tp
-        , time_to_immunity = orv_model_params$immune_response_timing
-        , browse = F
+        R0 = orv_model_params$near_pop_R0[1], # transmission coeficient
+        run_time = orv_model_params$model_time, # 1 yr!
+        pop = initializePop(N = as.numeric(
+            sc_results_full[sc_result_row, 'near_pop']), 
+            init_prop_immune = 0.25, 
+            I0 = 1
+            ),
+        strategy_name = sc_results_full[sc_result_row, 'strategy'],
+        vaxDay = as.numeric(sc_results_full[sc_result_row, 'ft_compounded_delay']),
+        orv_duration = as.numeric(sc_results_full[sc_result_row ,'ft_dur_constrained']) ,
+        n_team_type = teams$n_ft[1],
+        site = as.numeric(sc_results_full[sc_result_row, 'location_id']),
+        vax_eff = orv_model_params$vaccine_efficacy,
+        team_performance = tp,
+        time_to_immunity = orv_model_params$immune_response_timing,
+        browse = F
     ) 
     
     orv_near_pop_dynamics_detailed <- rbind(orv_near_pop_dynamics_detailed, 
