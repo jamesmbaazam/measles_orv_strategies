@@ -152,7 +152,7 @@ vaccinate <- function(pop, tp, v, n_team_type = 1, browse = FALSE) {
 #' (and "collapsed" classes) for each simulation of the scenario.
 ##################################################################################
 
-runSimulations <- function(R0 # transmission coeficient
+runSimulations <- function(R0 # transmission coefficient
                            , run_time 
                            , pop 
                            , vaxDay = NA
@@ -176,9 +176,19 @@ runSimulations <- function(R0 # transmission coeficient
     if (!is.na(vaxDay) & time < vaxDay + 1  | time > vaxDay + 1 + (orv_duration/n_team_type)) {
       simResults <- rbind(simResults, data.frame(time, step(pop = simResults[time, -1], R0 = R0)))
     }else if (!is.na(vaxDay) & time >= vaxDay + 1  & time <= vaxDay + 1 + (orv_duration/n_team_type)){
-      simResults <- rbind(simResults, data.frame(time, step(pop = vaccinate(simResults[time, -1], v = vax_eff, n_team_type = n_team_type, tp = team_performance), R0 = R0)))
+      simResults <- rbind(simResults, data.frame(time, step(pop = vaccinate(simResults[time, -1], 
+                                                                            v = vax_eff, 
+                                                                            n_team_type = n_team_type, 
+                                                                            tp = team_performance), 
+                                                            R0 = R0)
+                                                 )
+                          )
     }else if (is.na(vaxDay)){
-      simResults <- rbind(simResults, data.frame(time, step(pop = simResults[time, -1], R0 = R0)))
+      simResults <- rbind(simResults, data.frame(time, step(pop = simResults[time, -1], 
+                                                            R0 = R0
+                                                            )
+                                                 )
+                          )
     }
     epiDur <- time
     time <- time + 1
