@@ -71,6 +71,7 @@ for (sc_result_row in 1: nrow(sc_results_full)) {
             init_prop_immune = 0.25, 
             I0 = 1),
         strategy_name = sc_results_full[sc_result_row, 'strategy'],
+        mt_equip = sc_results_full[[sc_result_row, 'mt_equip_type']],
         vaxDay = as.numeric(sc_results_full[sc_result_row, 'mt_compounded_delay']),
         orv_duration = as.numeric(sc_results_full[sc_result_row ,'mt_dur_constrained']), #for now we're only looking at the far campaigns 
         n_team_type = teams$n_mt[1],
@@ -81,16 +82,36 @@ for (sc_result_row in 1: nrow(sc_results_full)) {
         browse = F
     ) 
     
+    detailed_with_loc <- mutate(orv_far_pop_dynamics$Detailed,
+                                location_id = rep(orv_far_pop_dynamics$location_id, 
+                                                  times = nrow(orv_far_pop_dynamics$Detailed)),
+                                mt_equip_type = rep(orv_far_pop_dynamics$mt_equip_type,
+                                                    times = nrow(orv_far_pop_dynamics$Detailed))
+    )
+    
     orv_far_pop_dynamics_detailed <- rbind(orv_far_pop_dynamics_detailed, 
-                                           orv_far_pop_dynamics$Detailed)
+                                            detailed_with_loc
+    )
+    
+    collapsed_with_loc <- mutate(orv_far_pop_dynamics$Collapsed,
+                                 location_id = rep(orv_far_pop_dynamics$location_id, 
+                                                   times = nrow(orv_far_pop_dynamics$Collapsed)
+                                 ), 
+                                 mt_equip_type = rep(orv_far_pop_dynamics$mt_equip_type, 
+                                                     times = nrow(orv_far_pop_dynamics$Collapsed)
+                                 )
+    )
     
     orv_far_pop_dynamics_collapsed <- rbind(orv_far_pop_dynamics_collapsed, 
-                                           orv_far_pop_dynamics$Collapsed)
+                                             collapsed_with_loc
+    )
     
     orv_far_pop_dynamics_epi_total <- rbind(orv_far_pop_dynamics_epi_total, 
-                                            orv_far_pop_dynamics$epiTotal)
-    
-    colnames(orv_far_pop_dynamics_epi_total) <- 'far_pop_epi_total'
+                                             data.frame(far_pop_epi_total = orv_far_pop_dynamics$epiTotal,
+                                                        location_id = orv_far_pop_dynamics$location_id,
+                                                        mt_equip_type = orv_far_pop_dynamics$mt_equip_type
+                                             )
+    )
     
     }
 
@@ -112,6 +133,7 @@ for (sc_result_row in 1: nrow(sc_results_full)) {
             I0 = 1
             ),
         strategy_name = sc_results_full[sc_result_row, 'strategy'],
+        mt_equip = sc_results_full[[sc_result_row, 'mt_equip_type']],
         vaxDay = as.numeric(sc_results_full[sc_result_row, 'ft_compounded_delay']),
         orv_duration = as.numeric(sc_results_full[sc_result_row ,'ft_dur_constrained']) ,
         n_team_type = teams$n_ft[1],
@@ -120,19 +142,39 @@ for (sc_result_row in 1: nrow(sc_results_full)) {
         team_performance = tp,
         time_to_immunity = orv_model_params$immune_response_timing,
         browse = F
-    ) 
+        ) 
+    
+    detailed_with_loc <- mutate(orv_near_pop_dynamics$Detailed,
+                                location_id = rep(orv_near_pop_dynamics$location_id, 
+                                               times = nrow(orv_near_pop_dynamics$Detailed)),
+                                mt_equip_type = rep(orv_near_pop_dynamics$mt_equip_type,
+                                                    times = nrow(orv_near_pop_dynamics$Detailed))
+                                )
     
     orv_near_pop_dynamics_detailed <- rbind(orv_near_pop_dynamics_detailed, 
-                                           orv_near_pop_dynamics$Detailed)
+                                            detailed_with_loc
+                                            )
+    
+    collapsed_with_loc <- mutate(orv_near_pop_dynamics$Collapsed,
+                                location_id = rep(orv_near_pop_dynamics$location_id, 
+                                               times = nrow(orv_near_pop_dynamics$Collapsed)
+                                               ), 
+                                mt_equip_type = rep(orv_near_pop_dynamics$mt_equip_type, 
+                                                    times = nrow(orv_near_pop_dynamics$Collapsed)
+                                                    )
+                                )
     
     orv_near_pop_dynamics_collapsed <- rbind(orv_near_pop_dynamics_collapsed, 
-                                            orv_near_pop_dynamics$Collapsed)
+                                             collapsed_with_loc
+                                             )
     
     orv_near_pop_dynamics_epi_total <- rbind(orv_near_pop_dynamics_epi_total, 
-                                            orv_near_pop_dynamics$epiTotal)
-    
-    colnames(orv_near_pop_dynamics_epi_total) <- 'near_pop_epi_total'
-}
+                                             data.frame(near_pop_epi_total = orv_near_pop_dynamics$epiTotal,
+                                                        location_id = orv_near_pop_dynamics$location_id,
+                                                        mt_equip_type = orv_near_pop_dynamics$mt_equip_type
+                                                        )
+                                             )
+    }
 
 
 
@@ -173,26 +215,44 @@ for (site_row in 1: nrow(site_pops_df)) {
                               init_prop_immune = 0.25, I0 = 1
                             ),
         strategy_name = 'no_vax_baseline',
+        mt_equip = 'none',
         vaxDay = 1, #' NB: this is a trick to bypass some conditions but it does no harm to the output
         orv_duration = 1, #' NB: this is a trick to bypass some conditions but it does no harm to the output
         n_team_type = 1, #' NB: this is a trick to bypass some conditions but it does no harm to the output
-        site = as.numeric(sc_results_full[sc_result_row, 'location_id']),
+        site = as.numeric(sc_results_full[site_row, 'location_id']),
         vax_eff = 0,
         team_performance = 0,
         time_to_immunity = 0,
         browse = F
     ) 
     
+    detailed_with_loc <- mutate(no_vax_near_dynamics$Detailed,
+                                location_id = rep(no_vax_near_dynamics$location_id, 
+                                                  times = nrow(no_vax_near_dynamics$Detailed)),
+                                mt_equip_type = rep(no_vax_near_dynamics$mt_equip_type,
+                                                    times = nrow(no_vax_near_dynamics$Detailed))
+                                )
+    
     no_vax_near_dynamics_detailed <- rbind(no_vax_near_dynamics_detailed, 
-                                           no_vax_near_dynamics$Detailed)
+                                          detailed_with_loc
+                                          )
+    
+    collapsed_with_loc <- mutate(no_vax_near_dynamics$Collapsed,
+                                 location_id = rep(no_vax_near_dynamics$location_id, 
+                                                   times = nrow(no_vax_near_dynamics$Collapsed)), 
+                                 mt_equip_type = rep(no_vax_near_dynamics$mt_equip_type, 
+                                                     times = nrow(no_vax_near_dynamics$Collapsed))
+                                 )
     
     no_vax_near_dynamics_collapsed <- rbind(no_vax_near_dynamics_collapsed, 
-                                            no_vax_near_dynamics$Collapsed)
+                                           collapsed_with_loc)
     
     no_vax_near_dynamics_epi_total <- rbind(no_vax_near_dynamics_epi_total, 
-                                            no_vax_near_dynamics$epiTotal)
-    
-    colnames(no_vax_near_dynamics_epi_total) <- 'near_no_vax_epi_total'
+                                           data.frame(near_pop_epi_total = no_vax_near_dynamics$epiTotal,
+                                                      location_id = no_vax_near_dynamics$location_id,
+                                                      mt_equip_type = no_vax_near_dynamics$mt_equip_type
+                                           )
+                                           )
 }
 
 
@@ -211,26 +271,47 @@ for (site_row in 1: nrow(site_pops_df)) {
                             init_prop_immune = 0.25, I0 = 1
         ),
         strategy_name = 'no_vax_baseline',
+        mt_equip = 'none',
         vaxDay = 1, #' NB: this is a trick to bypass some conditions but it does no harm to the output
         orv_duration = 1, #' NB: this is a trick to bypass some conditions but it does no harm to the output
         n_team_type = 1, #' NB: this is a trick to bypass some conditions but it does no harm to the output
-        site = as.numeric(sc_results_full[sc_result_row, 'location_id']),
+        site = as.numeric(sc_results_full[site_row, 'location_id']),
         vax_eff = 0,
         team_performance = 0,
         time_to_immunity = 0,
         browse = F
     ) 
     
+    detailed_with_loc <- mutate(no_vax_far_dynamics$Detailed,
+                                location_id = rep(no_vax_far_dynamics$location_id, 
+                                                  times = nrow(no_vax_far_dynamics$Detailed)),
+                                mt_equip_type = rep(no_vax_far_dynamics$mt_equip_type,
+                                                    times = nrow(no_vax_far_dynamics$Detailed))
+    )
+    
     no_vax_far_dynamics_detailed <- rbind(no_vax_far_dynamics_detailed, 
-                                           no_vax_far_dynamics$Detailed)
+                                           detailed_with_loc
+    )
+    
+    collapsed_with_loc <- mutate(no_vax_far_dynamics$Collapsed,
+                                 location_id = rep(no_vax_far_dynamics$location_id, 
+                                                   times = nrow(no_vax_far_dynamics$Collapsed)
+                                 ), 
+                                 mt_equip_type = rep(no_vax_far_dynamics$mt_equip_type, 
+                                                     times = nrow(no_vax_far_dynamics$Collapsed)
+                                 )
+    )
     
     no_vax_far_dynamics_collapsed <- rbind(no_vax_far_dynamics_collapsed, 
-                                            no_vax_far_dynamics$Collapsed)
+                                            collapsed_with_loc
+    )
     
     no_vax_far_dynamics_epi_total <- rbind(no_vax_far_dynamics_epi_total, 
-                                            no_vax_far_dynamics$epiTotal)
-    
-    colnames(no_vax_far_dynamics_epi_total) <- 'far_no_vax_epi_total'
+                                            data.frame(far_pop_epi_total = no_vax_far_dynamics$epiTotal,
+                                                       location_id = no_vax_far_dynamics$location_id,
+                                                       mt_equip_type = no_vax_far_dynamics$mt_equip_type
+                                            )
+    )
 }
 
 
@@ -242,7 +323,7 @@ no_vax_per_site_epi_total <- data.frame(no_vax_near_dynamics_epi_total,
     mutate(strategy = rep('no_vax_baseline', 
                           times = nrow(no_vax_near_dynamics_epi_total)
                           ),
-           no_vax_site_total_cases = near_no_vax_epi_total + far_no_vax_epi_total
+           no_vax_site_total_cases = near_pop_epi_total + far_pop_epi_total
            ) 
 
 
