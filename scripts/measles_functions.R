@@ -27,9 +27,9 @@
 # INITIALIZEPOP() is a function that initializes the school population, using the first 2 generations of cases as inputs
 
 initializePop <- function(N, init_prop_immune, I0) {
-  immune <- floor(N * init_prop_immune)
-  data.frame(
-    Sus1 = N - immune,
+  immune <- floor((N - I0) * init_prop_immune)
+  init_pop <- data.frame(
+    Sus1 = N - immune - I0,
     Sus2 = 0,
     Exp1 = 0,
     Exp2 = 0,
@@ -49,6 +49,12 @@ initializePop <- function(N, init_prop_immune, I0) {
     Inf6 = 0,
     Rec = immune
   )
+  
+  if(any(init_pop < 0)){
+    stop('Check your inputs; one of the states is negative')
+  }else{
+      return(init_pop)
+    }
 }
 
 
