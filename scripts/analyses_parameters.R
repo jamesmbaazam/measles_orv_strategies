@@ -28,8 +28,8 @@ sc_model_params <- list(ambient_temp = c("below 40", "above 40")
                 )
 
 
-orv_model_params <- list(near_pop_R0 = 12
-                         , far_pop_R0 = 12
+orv_model_params <- list(near_pop_R0 = seq(2, 18, 0.5)
+                         , far_pop_R0 = seq(2, 18, 0.5)
                          , vaccine_efficacy = 0.95
                          , model_time = 365 #run model for a year
                          , LP = 7 #LP = Latent period
