@@ -164,6 +164,7 @@ runSimulations <- function(R0 # transmission coefficient
                            , vaxDay = NA
                            , orv_duration
                            , strategy_name
+                           , mt_equip
                            , vax_eff
                            , n_team_type
                            , site
@@ -217,7 +218,8 @@ runSimulations <- function(R0 # transmission coefficient
     )
     , epiTotal = sum(simResults$Inf5)
     , strategy = strategy_name
-    , location = site
+    , location_id = site
+    , mt_equip_type = mt_equip
   )
   return(epi_out)
 }
