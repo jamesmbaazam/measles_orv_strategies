@@ -68,7 +68,7 @@ for (sc_result_row in 1: nrow(sc_results_full)) {
         run_time = orv_model_params$model_time, # 1 yr!
         pop = initializePop(N = as.numeric(
             sc_results_full[sc_result_row, 'far_pop']), 
-            init_prop_immune = 0.25, 
+            init_prop_immune = 0, 
             I0 = 1),
         strategy_name = sc_results_full[sc_result_row, 'strategy'],
         mt_equip = sc_results_full[[sc_result_row, 'mt_equip_type']],
@@ -129,7 +129,7 @@ for (sc_result_row in 1: nrow(sc_results_full)) {
         run_time = orv_model_params$model_time, # 1 yr!
         pop = initializePop(N = as.numeric(
             sc_results_full[sc_result_row, 'near_pop']), 
-            init_prop_immune = 0.25, 
+            init_prop_immune = 0, 
             I0 = 1
             ),
         strategy_name = sc_results_full[sc_result_row, 'strategy'],
@@ -212,7 +212,8 @@ for (site_row in 1: nrow(site_pops_df)) {
         R0 = orv_model_params$near_pop_R0[21], 
         run_time = orv_model_params$model_time, # 1 yr!
         pop = initializePop(N = as.numeric(site_pops_df[site_row, 'near_pop']), 
-                              init_prop_immune = 0.25, I0 = 1
+                              init_prop_immune = 0, 
+                            I0 = 1
                             ),
         strategy_name = 'no_vax_baseline',
         mt_equip = 'none',
@@ -268,7 +269,8 @@ for (site_row in 1: nrow(site_pops_df)) {
         R0 = orv_model_params$far_pop_R0[21], 
         run_time = orv_model_params$model_time, # 1 yr!
         pop = initializePop(N = as.numeric(site_pops_df[site_row, 'far_pop']), 
-                            init_prop_immune = 0.25, I0 = 1
+                            init_prop_immune = 0, 
+                            I0 = 1
         ),
         strategy_name = 'no_vax_baseline',
         mt_equip = 'none',
@@ -333,8 +335,6 @@ saveRDS(no_vax_per_site_epi_total, file = './model_output/no_vax_per_site_epi_to
 no_vax_outbreak_size <- no_vax_per_site_epi_total %>% 
     summarise(no_vax_total_cases = sum(no_vax_site_total_cases)) %>% 
     as.numeric()
-
-
 
 #' Combine all simulations into a FINAL data.frame for post-processing
 
