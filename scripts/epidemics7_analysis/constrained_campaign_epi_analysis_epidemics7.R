@@ -115,6 +115,16 @@ for (sc_result_row in 1: nrow(sc_results_full)) {
     
     }
 
+#save output
+#save output
+saveRDS(orv_far_pop_dynamics_detailed, file = './model_output/orv_far_pop_dynamics_detailed.rds')
+saveRDS(orv_far_pop_dynamics_collapsed, file = './model_output/orv_far_pop_dynamics_collapsed.rds') 
+saveRDS(orv_far_pop_dynamics_epi_total, file = './model_output/orv_far_pop_dynamics_epi_total.rds') 
+
+
+
+
+
 
 #' near/urban locations ----
 
@@ -175,6 +185,13 @@ for (sc_result_row in 1: nrow(sc_results_full)) {
                                                         )
                                              )
     }
+
+#save output
+saveRDS(orv_near_pop_dynamics_detailed, file = './model_output/orv_near_pop_dynamics_detailed.rds')
+saveRDS(orv_near_pop_dynamics_collapsed, file = './model_output/orv_near_pop_dynamics_collapsed.rds') 
+saveRDS(orv_near_pop_dynamics_epi_total, file = './model_output/orv_near_pop_dynamics_epi_total.rds') 
+
+
 
 
 
@@ -256,6 +273,14 @@ for (site_row in 1: nrow(site_pops_df)) {
                                            )
 }
 
+#save output
+saveRDS(no_vax_near_dynamics_detailed, file = './model_output/no_vax_near_dynamics_detailed.rds')
+saveRDS(no_vax_near_dynamics_collapsed, file = './model_output/no_vax_near_dynamics_collapsed.rds')
+saveRDS(no_vax_near_dynamics_epi_total, file = './model_output/no_vax_near_dynamics_epi_total')
+
+
+
+
 
 
 #' baseline far/remote location - No vaccination ----
@@ -316,11 +341,20 @@ for (site_row in 1: nrow(site_pops_df)) {
     )
 }
 
+#save output
+saveRDS(no_vax_far_dynamics_detailed, file = './model_output/no_vax_far_dynamics_detailed.rds')
+saveRDS(no_vax_far_dynamics_collapsed, file = './model_output/no_vax_far_dynamics_collapsed.rds')
+saveRDS(no_vax_far_dynamics_epi_total, file = './model_output/no_vax_far_dynamics_epi_total')
+
+
+
+
 
 #' Combine the no vaccination counterfactual total cases from the near and far 
 #' simulations from the 5 sites into 1 data frame
 no_vax_per_site_epi_total <- data.frame(no_vax_near_dynamics_epi_total, 
-                                no_vax_far_dynamics_epi_total
+                                no_vax_far_dynamics_epi_total %>% 
+                                    select(-location_id)
                                 ) %>%
     mutate(strategy = rep('no_vax_baseline', 
                           times = nrow(no_vax_near_dynamics_epi_total)
