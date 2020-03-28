@@ -339,12 +339,22 @@ no_vax_outbreak_size <- no_vax_per_site_epi_total %>%
 #' Combine all simulations into a FINAL data.frame for post-processing
 
 full_analysis_10_teams <- bind_cols(sc_results_full,
-                                    orv_far_pop_dynamics_epi_total,
-                                    orv_near_pop_dynamics_epi_total
+                                    orv_far_pop_dynamics_epi_total %>% 
+                                        select(-c(location_id, mt_equip_type)),
+                                    orv_near_pop_dynamics_epi_total %>% 
+                                        select(-c(location_id, mt_equip_type))
                                     )
 
 
-View(full_analysis_10_teams)
+View(full_analysis_10_teams %>% 
+         select(-c(ft_freezing_time, 
+                   mt_freezing_time, 
+                   near_pop, 
+                   far_pop)
+                )
+#      %>% filter(location_id == 1)
+     )
+
 
 saveRDS(full_analysis_10_teams, file = './model_output/full_analysis_10_teams.rds')
 
