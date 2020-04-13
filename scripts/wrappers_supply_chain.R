@@ -457,15 +457,15 @@ if(browse) browser()
   
   if(res_type == 'detailed'){
   res <- data.frame(
-    strategy = strategy_name,
+    strategy = as_factor(strategy_name),
     location_id = site_details$location_id,
     near_pop = site_details$near_pop,
     far_pop = site_details$far_pop,
-    mt_equip_type = mobile_team_equip_type,
-    ft_equip_type = fixed_team_equip_type,
-    ft_vial_type = ifelse(fixed_team_with_dose10, "dose10", "monodose"),
+    mt_equip_type = as_factor(mobile_team_equip_type),
+    ft_equip_type = as_factor(fixed_team_equip_type),
+    ft_vial_type = as_factor(ifelse(fixed_team_with_dose10, "dose10", "monodose")),
     ft_doses_required = n_doses_fixed_team,
-    mt_vial_type = ifelse(mobile_team_with_dose10, "dose10", "monodose"),
+    mt_vial_type = as_factor(ifelse(mobile_team_with_dose10, "dose10", "monodose")),
     mt_doses_required = n_doses_mobile_team,
     ft_RCW25 = RCW25_required_fixed_team,
     mt_RCW25 = RCW25_required_mobile_team,
@@ -482,7 +482,7 @@ if(browse) browser()
   )
   }else if (res_type == 'simple'){
   res <- data.frame(
-    strategy = strategy_name,
+    strategy = as_factor(strategy_name),
     ft_freezing_time = freezing_time_fixed_team,
     mt_freezing_time = freezing_time_mobile_team
   )
