@@ -25,6 +25,7 @@ sc_model_params <- list(ambient_temp = c("below 40", "above 40")
                 , monodose_ovw_fixed_team = 0 #ovw = Open Vial Wastage: value between 0 and 100;
                 , monodose_ovw_mobile_team = 0 #ovw = Open Vial Wastage: value between 0 and 100; I'm assuming far campaigns have twice the near campaign wastage
                 , vax_rate = c(fixed_team = 450, mobile_team = 250)
+                , site_campaign_dur_constraint = 10
                 )
 
 
