@@ -1,3 +1,6 @@
+options(nwarnings = 10000) #print this many messages if they exist or occur
+
+#helper scripts
 source("./scripts/wrappers_supply_chain.R")
 source("./scripts/epidemics7_analysis/simulation_params.R")
 
@@ -28,8 +31,8 @@ campaign_delay_results_10_teams <- sim_params_table %>%
         mobile_team_equip_type = equip_type,
         n_teams_fixed = teams$n_ft[1],
         n_teams_mobile = teams$n_mt[1],
-        rcw25_ice_replacement_days = 2,
-        mf314 = 1, 
+        rcw25_ice_replacement_days = sc_model_params$rcw25_ice_replacement_days[1],
+        mf314 = sc_model_params$mf314_quant, 
         ambient_temperature = sc_model_params$ambient_temp[1], 
         dose10_vial_volume = sc_model_params$dose10_vial_vol[1], 
         monodose_vial_volume = sc_model_params$monodose_vial_vol[1], 
@@ -37,7 +40,9 @@ campaign_delay_results_10_teams <- sim_params_table %>%
         browse = F
       )
     )
-  })
+  }) %>% 
+  ungroup() %>% 
+  as_tibble()
 
 ## Remove some columns ==== 
 campaign_delay_results_cropped_10_teams <- campaign_delay_results_10_teams %>% 
@@ -72,29 +77,35 @@ campaign_metrics_10_teams <- sim_params_table %>%
         n_teams_fixed = teams$n_ft[1],
         n_teams_mobile = teams$n_mt[1],
         dose10_vial_volume = sc_model_params$dose10_vial_vol[1],
-        monodose_vial_volume = sc_model_params$monodose_vial_vol,
-        site_campaign_dur_constraint = 10,
-        ft_team_performance = 450,
-        mt_team_performance = 250,
+        monodose_vial_volume = sc_model_params$monodose_vial_vol[1],
+        site_campaign_dur_constraint = sc_model_params$site_campaign_dur_constraint,
+        ft_team_performance = sc_model_params$vax_rate[['fixed_team']],
+        mt_team_performance = sc_model_params$vax_rate[['mobile_team']],
         browse = F
       )
     )
-  })
+  }) %>% 
+  ungroup() %>% 
+  as_tibble()
 
 #View(campaign_metrics_10_teams)
 
 
-sc_analysis_10_teams_merged <- bind_cols(
+sc_analysis_10_teams_merged <- left_join(
   campaign_delay_results_cropped_10_teams,
   campaign_metrics_10_teams
-) %>%
-  select(-c(strategy1, location_id1, mt_equip_type1))
+) 
 
+
+#' calculate the total operational time per strategy = time to start a strategy +
+#' time to complete a strategy across all locations
+#' 
 sc_analysis_full_10_teams <- sc_analysis_10_teams_merged %>%
-  mutate(total_op_time = sum(campaign_start, site_campaign_dur_constrained)) %>%
-  as_tibble()
+  mutate(total_op_time = campaign_start + site_campaign_dur_constrained) %>%
+  as_tibble() 
 
-View(sc_analysis_full_10_teams)
+#View(sc_analysis_full_10_teams)
+
 saveRDS(sc_analysis_full_10_teams, file = "./model_output/sc_analysis_full_10_teams.rds")
 
 sc_results_summary_10_teams <- sc_analysis_full_10_teams %>%
