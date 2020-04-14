@@ -378,7 +378,7 @@ analyse_team_days <- function(strategy_name,
 
 
 
-#' Title
+#' estim_campaign_metrics
 #'
 #' @param strategy_name 
 #' @param fixed_team_with_dose10 #' options = if "T", 10 dose, else monodose
@@ -411,8 +411,8 @@ estim_campaign_metrics <- function(strategy_name,
                                ft_team_performance,
                                n_teams_mobile,
                                mt_team_performance,
-                               dose10_vial_volume = sc_model_params$dose10_vial_vol[1],
-                               monodose_vial_volume = sc_model_params$monodose_vial_vol,
+                               dose10_vial_volume,
+                               monodose_vial_volume,
                                mobile_team_equip_type,
                                browse = F) {
   if (browse) browse
