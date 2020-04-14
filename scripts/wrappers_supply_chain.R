@@ -414,21 +414,20 @@ estim_campaign_metrics <- function(strategy_name,
                                dose10_vial_volume,
                                monodose_vial_volume,
                                mobile_team_equip_type,
+                               dose10_ovwr_mt,
                                browse = F) {
   if (browse) browse
 
   ## Fixed post team days ====
   #' Team days needed by fixed teams, NOT CONSTRAINED by volume/space - we assume
   #' they can transport all they need per trip
-  #' #computationally, we equate the number doses to the number of expected people.
-  #' The "final number of doses" here have already accounted for the buffer
+
   team_days_fixed_team <- round(site_details$near_pop / ft_team_performance, 1)
 
 
 
   ## Mobile teams team days ====
-  #' Mobile teams only use a vaccine carrier, hence, are constrained by how much
-  #' they can transport.
+  #' Mobile teams are constrained by how much they can transport, hence, the equipment scenario at play
   mobile_team_vol_capacity <- calc_dose_capacity(
     vial_type = ifelse(mobile_team_with_dose10,
       "dose10",
@@ -454,9 +453,9 @@ estim_campaign_metrics <- function(strategy_name,
   team_days_mobile_team <- if (mobile_team_with_dose10) {
     calc_dose10_team_days(
       target_pop = site_details$far_pop,
-      dose10_wastage = sc_model_params$dose10_ovw_mobile_team,
+      dose10_wastage = dose10_ovwr_mt,
       team_performance = tp_mobile,
-      vaxCarr_capacity = mobile_team_vol_capacity
+      carrier_vol_capacity = mobile_team_vol_capacity
     )
   } else {
     calc_monodose_team_days(
