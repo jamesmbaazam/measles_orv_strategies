@@ -200,12 +200,12 @@ calc_monodose_team_days <- function(target_pop,
 
 calc_dose10_team_days <- function(target_pop,
                                   dose10_wastage,
-                                  vaxCarr_capacity,
+                                  carrier_vol_capacity,
                                   team_performance,
                                   browse = F) # how many you are expected to vaccinate on average per day
 {
   if (browse) browser()
-  effective_doses <- ceiling(vaxCarr_capacity * (1 - dose10_wastage / 100)) # effectively, how many vaccinations is a mobile team actually undertaking?
+  effective_doses <- ceiling(carrier_vol_capacity * (1 - dose10_wastage / 100)) # effectively, how many vaccinations is a mobile team actually undertaking?
   if ((effective_doses >= target_pop) & (target_pop <= team_performance)) {
     return(1) # we can carry more doses than the target population size and are within the maximum kids we are expected to vaccinate, so it'll take us 1 day
   }
