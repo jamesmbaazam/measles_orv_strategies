@@ -24,7 +24,7 @@ source('./scripts/epidemics7_analysis/simulation_params.R')
 source('./scripts/measles_deterministic_seir_model.R')
 
 ## Supply chain data ----
-sc_results <- readRDS('./model_output/sc_analysis_full_10_teams.rds')
+sc_results <- readRDS('./model_output/deterministic_framework_analysis_output/sc_analysis_full_10_teams.rds')
 
 #' create a new column with the compounded delays
 sc_results_full <- sc_results %>%
@@ -84,7 +84,7 @@ for (sc_result_row in 1: nrow(orv_model_inputs)) {
     orv_near_dynamics <- rbind(orv_near_dynamics, near_orv_sim)
 }
 
-saveRDS(orv_near_dynamics, './model_output/ottar_seir_model_output/orv_near_dynamics.rds')
+saveRDS(orv_near_dynamics, './model_output/deterministic_framework_analysis_output/orv_near_dynamics.rds')
 
 #Plot of transmission dynamics for near pop
 orv_near_dynamics_plot <- ggplot(data = orv_near_dynamics %>% filter(time <= 120)) + 
@@ -129,7 +129,7 @@ for (sc_result_row in 1: nrow(orv_model_inputs)) {
     orv_far_dynamics <- rbind(orv_far_dynamics, far_orv_sim)
 }
 
-saveRDS(orv_far_dynamics, './model_output/ottar_seir_model_output/orv_far_dynamics.rds')
+saveRDS(orv_far_dynamics, './model_output/deterministic_framework_analysis_output/ottar_seir_model_output/orv_far_dynamics.rds')
 
 #Plot of transmission dynamics for far pops ---
 orv_far_dynamics_plot <- ggplot(data = orv_far_dynamics) + 
@@ -355,7 +355,7 @@ cases_averted_df <- orv_outbreak_sizes_aggregated %>%
 
 cases_averted_df
 
-saveRDS(cases_averted_df, './model_output/cases_averted_deterministic_seir.rds')
+saveRDS(cases_averted_df, './model_output/deterministic_framework_analysis_output/cases_averted_deterministic_seir.rds')
 
 
 
@@ -374,5 +374,5 @@ sc_epi_analysis_summary_10_teams <- left_join(sc_results_summary_10_teams ,
                                               )
                                               )
 
-saveRDS(sc_epi_analysis_summary_10_teams, file = './model_output/sc_epi_analysis_summary_10_teams.rds')
+saveRDS(sc_epi_analysis_summary_10_teams, file = './model_output/deterministic_framework_analysis_output/sc_epi_analysis_summary_10_teams.rds')
 View(sc_epi_analysis_summary_10_teams)
