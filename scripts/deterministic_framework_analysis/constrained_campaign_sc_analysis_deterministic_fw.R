@@ -44,6 +44,10 @@ campaign_delay_results_10_teams <- sim_params_table %>%
   ungroup() %>% 
   as_tibble()
 
+#' save the results
+saveRDS(campaign_delay_results_10_teams, file = './model_output/deterministic_framework_analysis_output/campaign_delay_results_10_teams.rds')
+
+
 ## Remove some columns ==== 
 campaign_delay_results_cropped_10_teams <- campaign_delay_results_10_teams %>% 
   select(-c(near_pop, far_pop, ft_vial_type, ft_equip_type, 
@@ -81,6 +85,7 @@ campaign_metrics_10_teams <- sim_params_table %>%
         site_campaign_dur_constraint = sc_model_params$site_campaign_dur_constraint,
         ft_team_performance = sc_model_params$vax_rate[['fixed_team']],
         mt_team_performance = sc_model_params$vax_rate[['mobile_team']],
+        dose10_ovwr_mt = sc_model_params$dose10_ovw_mobile_team,
         browse = F
       )
     )
@@ -88,6 +93,9 @@ campaign_metrics_10_teams <- sim_params_table %>%
   ungroup() %>% 
   as_tibble()
 
+
+#' save the results
+saveRDS(campaign_metrics_10_teams, file = './model_output/deterministic_framework_analysis_output/campaign_metrics_10_teams.rds')
 #View(campaign_metrics_10_teams)
 
 
@@ -106,7 +114,7 @@ sc_analysis_full_10_teams <- sc_analysis_10_teams_merged %>%
 
 #View(sc_analysis_full_10_teams)
 
-saveRDS(sc_analysis_full_10_teams, file = "./model_output/sc_analysis_full_10_teams.rds")
+saveRDS(sc_analysis_full_10_teams, file = "./model_output/deterministic_framework_analysis_output/sc_analysis_full_10_teams.rds")
 
 sc_results_summary_10_teams <- sc_analysis_full_10_teams %>%
   group_split(strategy, mt_equip_type) %>%
@@ -115,7 +123,7 @@ sc_results_summary_10_teams <- sc_analysis_full_10_teams %>%
   })
 
 View(sc_results_summary_10_teams)
-saveRDS(sc_results_summary_10_teams, file = "./model_output/sc_results_summary_10_teams.rds")
+saveRDS(sc_results_summary_10_teams, file = "./model_output/deterministic_framework_analysis_output/sc_results_summary_10_teams.rds")
 #' write the results to file
 #' full supply chain analysis
 #' write.xlsx(x = sc_analysis_full_10_teams, 
