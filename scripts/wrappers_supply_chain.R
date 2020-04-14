@@ -420,7 +420,8 @@ estim_campaign_metrics <- function(strategy_name,
 
   ## Fixed post team days ====
   #' Team days needed by fixed teams, NOT CONSTRAINED by volume/space - we assume
-  #' they can transport all they need per trip
+  #' they can transport all they need per trip and they use both an RCW25 and vaccine
+  #' carrier at the vaccination site
 
   team_days_fixed_team <- round(site_details$near_pop / ft_team_performance, 1)
 
@@ -474,20 +475,23 @@ estim_campaign_metrics <- function(strategy_name,
   ft_campaign_dur_constrained <- min(per_ft_campaign_dur, site_campaign_dur_constraint)
   mt_campaign_dur_constrained <- min(per_mt_campaign_dur, site_campaign_dur_constraint)
   
-  #Fixed post vaccination coverage
+  #' Fixed post vaccination coverage
   fixed_team_coverage <- (ft_campaign_dur_constrained*n_teams_fixed*ft_team_performance)/site_details$near_pop
   
-  #Mobile team vaccination coverage
+  #' Mobile team vaccination coverage
   mobile_team_coverage <- (mt_campaign_dur_constrained*n_teams_mobile*min(mobile_team_vol_capacity, mt_team_performance))/site_details$far_pop 
   
   
   total_site_coverage <- (fixed_team_coverage * site_details$near_pop + 
                             mobile_team_coverage * site_details$far_pop)/ 
     (site_details$near_pop + site_details$far_pop)
-  #assuming the team types move dependently
-  campaign_dur_constrained <- max(ft_campaign_dur_constrained, 
-                                         mt_campaign_dur_constrained
-                                         )
+  
+  #' campaign duration calculations
+  #' 1. The constrained campaign duration calculation assumes the two team types move to new sites together so that
+  #' the total duration depends on the slower team type
+  campaign_dur_constrained <- max(ft_campaign_dur_constrained, mt_campaign_dur_constrained)
+  
+  #' 2. The unconstrained assumes that they two team types move to new sites independently
   campaign_dur_uncontrained <- max(per_ft_campaign_dur, per_mt_campaign_dur)
   
   #' calculate campaign duration gains or deficits to track coverage especially
