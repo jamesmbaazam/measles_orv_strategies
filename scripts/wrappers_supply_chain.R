@@ -347,13 +347,13 @@ analyse_team_days <- function(strategy_name,
     calc_dose10_team_days(
       target_pop = site_details$far_pop,
       dose10_wastage = sc_model_params$dose10_ovw_mobile_team,
-      team_performance = tp_mobile,
+      team_performance = mt_team_performance,
       vaxCarr_capacity = mobile_team_vol_capacity
     )
   } else {
     calc_monodose_team_days(
       target_pop = site_details$far_pop,
-      team_performance = min(mobile_team_vol_capacity, tp_mobile),
+      team_performance = min(mobile_team_vol_capacity, mt_team_performance),
       carrier_vol_capacity = mobile_team_vol_capacity
     )
   }
@@ -454,13 +454,13 @@ estim_campaign_metrics <- function(strategy_name,
     calc_dose10_team_days(
       target_pop = site_details$far_pop,
       dose10_wastage = dose10_ovwr_mt,
-      team_performance = tp_mobile,
+      team_performance = mt_team_performance,
       carrier_vol_capacity = mobile_team_vol_capacity
     )
   } else {
     calc_monodose_team_days(
       target_pop = site_details$far_pop,
-      team_performance = min(mobile_team_vol_capacity, tp_mobile),
+      team_performance = min(mobile_team_vol_capacity, mt_team_performance),
       carrier_vol_capacity = mobile_team_vol_capacity
     )
   }
@@ -478,7 +478,7 @@ estim_campaign_metrics <- function(strategy_name,
   fixed_team_coverage <- (ft_campaign_dur_constrained*n_teams_fixed*ft_team_performance)/site_details$near_pop
   
   #Mobile team vaccination coverage
-  mobile_team_coverage <- (mt_campaign_dur_constrained*n_teams_mobile*min(mobile_team_vol_capacity, tp_mobile))/site_details$far_pop 
+  mobile_team_coverage <- (mt_campaign_dur_constrained*n_teams_mobile*min(mobile_team_vol_capacity, mt_team_performance))/site_details$far_pop 
   
   
   total_site_coverage <- (fixed_team_coverage * site_details$near_pop + 
