@@ -471,14 +471,8 @@ estim_campaign_metrics <- function(strategy_name,
   
   per_mt_campaign_dur <- team_days_mobile_team/n_teams_mobile
 
-  ft_campaign_dur_constrained <- ifelse(per_ft_campaign_dur <= site_campaign_dur_constraint, 
-                            per_ft_campaign_dur, 
-                            site_campaign_dur_constraint
-                            )
-  mt_campaign_dur_constrained <- ifelse(per_mt_campaign_dur <= site_campaign_dur_constraint, 
-                            per_mt_campaign_dur, 
-                            site_campaign_dur_constraint
-                            )
+  ft_campaign_dur_constrained <- min(per_ft_campaign_dur, site_campaign_dur_constraint)
+  mt_campaign_dur_constrained <- min(per_mt_campaign_dur, site_campaign_dur_constraint)
   
   #Fixed post vaccination coverage
   fixed_team_coverage <- (ft_campaign_dur_constrained*n_teams_fixed*ft_team_performance)/site_details$near_pop
