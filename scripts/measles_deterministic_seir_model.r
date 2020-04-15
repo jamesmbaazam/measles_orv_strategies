@@ -12,17 +12,17 @@ require(deSolve)
 # q = vaccine efficacy
 #
 # P = target coverage
-# Dt = length of vaccination campaign
+# campaign_duration = length of vaccination campaign
 # vax_day = Day of campaign start
 # USAGE:
 # times<-1:100
 # xstrt<-c(S=.999,E=0,I=.001,R=0,K=0)
-# par<-c(B=.5, r=1/7, g = 1/7, q = .8, P = 0, Dt = 10, vax_day = 80)
+# par<-c(B=.5, r=1/7, g = 1/7, q = .8, P = 0, campaign_duration = 10, vax_day = 80)
 # out<-as.data.frame(lsoda(xstrt,times,simod,par))
 # plot(out$time,out$I,type="l")
 #
 #
-# par<-c(B=.5, r=1/7, g = 1/7, q = .8, P = .99, Dt = 10, vax_day = 50)
+# par<-c(B=.5, r=1/7, g = 1/7, q = .8, P = .99, campaign_duration = 10, vax_day = 50)
 # out<-as.data.frame(lsoda(xstrt,times,simod,par))
 # lines(out$time,out$I,col="red")
 simod <- function(t, x, parms, browse = F) {
@@ -34,7 +34,7 @@ simod <- function(t, x, parms, browse = F) {
   K <- x[5]
   #
   with(as.list(parms), {
-    Q <- ifelse(t < vax_day | t > vax_day + Dt, 0, (-log(1 - P) / Dt))
+    Q <- ifelse(t < vax_day | t > vax_day + campaign_duration, 0, (-log(1 - P) / campaign_duration))
     dS <- -B * S * I - q * Q * S
     dE <- B * S * I - r * E
     dI <- r * E - g * I
@@ -86,7 +86,7 @@ run_orv_model <- function(strategy,
     
   if(browse) browser()
   
-  #initial popualtion
+  #initial population
   pop_init <- c(S = target_pop_size -I0, 
                 E = 0, 
                 I = I0, 
@@ -103,7 +103,7 @@ run_orv_model <- function(strategy,
                   g = 1/infectious_period, 
                   q = vax_efficacy, 
                   P = scenario_coverage, 
-                  Dt = scenario_campaign_duration, 
+                  campaign_duration = scenario_campaign_duration, 
                   vax_day = vax_day
                   )
   
