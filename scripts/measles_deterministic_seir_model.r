@@ -55,13 +55,15 @@ simod <- function(t, x, parms, browse = F) {
 #' @param mt_equip_type 
 #' @param target_pop_size 
 #' @param infectious_period 
-#' @param recovery_period 
 #' @param vax_efficacy 
 #' @param scenario_coverage 
 #' @param vax_day 
 #' @param scenario_campaign_duration 
 #' @param R0 
 #' @param browse 
+#' @param latent_period 
+#' @param I0 
+#' @param max_time 
 #'
 #' @return
 #' @export
@@ -73,6 +75,7 @@ run_orv_model <- function(strategy,
                           target_pop_size,
                           latent_period,
                           infectious_period,
+                          I0,
                           R0,
                           vax_efficacy,
                           scenario_coverage,
@@ -80,13 +83,13 @@ run_orv_model <- function(strategy,
                           scenario_campaign_duration,
                           max_time,
                           browse = F){
-  
+    
   if(browse) browser()
   
   #initial popualtion
-  pop_init <- c(S = 1-1/target_pop_size, 
+  pop_init <- c(S = target_pop_size -I0, 
                 E = 0, 
-                I = 1/target_pop_size, 
+                I = I0, 
                 R = 0, 
                 K = 0
                 )
