@@ -69,6 +69,7 @@ for (sc_result_row in 1: nrow(orv_model_inputs)) {
     near_orv_sim <- run_orv_model(
         strategy = orv_model_inputs[[sc_result_row, 'strategy']],
         R0 = orv_model_params$near_pop_R0[21], # transmission coefficient
+        I0 = 1,
         max_time = orv_model_params$model_time, 
         target_pop_size = orv_model_inputs[[sc_result_row, 'near_pop']],
         mt_equip_type = orv_model_inputs[[sc_result_row, 'mt_equip_type']],
@@ -114,6 +115,7 @@ for (sc_result_row in 1: nrow(orv_model_inputs)) {
     far_orv_sim <- run_orv_model(
         strategy = orv_model_inputs[[sc_result_row, 'strategy']],
         R0 = orv_model_params$far_pop_R0[21], # transmission coefficient
+        I0 = 1,
         max_time = orv_model_params$model_time, 
         target_pop_size = orv_model_inputs[[sc_result_row, 'far_pop']],
         mt_equip_type = orv_model_inputs[[sc_result_row, 'mt_equip_type']],
