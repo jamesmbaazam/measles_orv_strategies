@@ -19,8 +19,8 @@ conflict_prefer('summarise', 'dplyr')
 #helper functions and parameters
 source('./scripts/parameters.R') #global parameter list
 source('./scripts/analyses_parameters.R') #specific parameter list for this analysis
-source('./scripts/epidemics7_analysis/scenarios.R') 
-source('./scripts/epidemics7_analysis/simulation_params.R')
+source('./scripts/deterministic_framework_analysis/scenarios.R') 
+source('./scripts/deterministic_framework_analysis/simulation_params.R')
 source('./scripts/measles_deterministic_seir_model.R')
 
 ## Supply chain data ----
