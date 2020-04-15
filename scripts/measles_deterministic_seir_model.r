@@ -9,20 +9,20 @@ require(deSolve)
 # B = transmission rate
 # 1/r = latent period
 # 1/g = infectious period
-# q = vaccine efficacy
+# vax_efficacy = vaccine efficacy
 #
-# P = target coverage
+# coverage = target coverage
 # campaign_duration = length of vaccination campaign
 # vax_day = Day of campaign start
 # USAGE:
 # times<-1:100
 # xstrt<-c(S=.999,E=0,I=.001,R=0,K=0)
-# par<-c(B=.5, r=1/7, g = 1/7, q = .8, P = 0, campaign_duration = 10, vax_day = 80)
+# par<-c(B=.5, r=1/7, g = 1/7, vax_efficacy = .8, coverage = 0, campaign_duration = 10, vax_day = 80)
 # out<-as.data.frame(lsoda(xstrt,times,simod,par))
 # plot(out$time,out$I,type="l")
 #
 #
-# par<-c(B=.5, r=1/7, g = 1/7, q = .8, P = .99, campaign_duration = 10, vax_day = 50)
+# par<-c(B=.5, r=1/7, g = 1/7, vax_efficacy = .8, coverage = .99, campaign_duration = 10, vax_day = 50)
 # out<-as.data.frame(lsoda(xstrt,times,simod,par))
 # lines(out$time,out$I,col="red")
 simod <- function(t, x, parms, browse = F) {
@@ -34,11 +34,11 @@ simod <- function(t, x, parms, browse = F) {
   K <- x[5]
   #
   with(as.list(parms), {
-    Q <- ifelse(t < vax_day | t > vax_day + campaign_duration, 0, (-log(1 - P) / campaign_duration))
-    dS <- -B * S * I - q * Q * S
+    Q <- ifelse(t < vax_day | t > vax_day + campaign_duration, 0, (-log(1 - coverage) / campaign_duration))
+    dS <- -B * S * I - vax_efficacy * Q * S
     dE <- B * S * I - r * E
     dI <- r * E - g * I
-    dR <- g * I + q * Q * S
+    dR <- g * I + vax_efficacy * Q * S
     dK <- r * E
     res <- c(dS, dE, dI, dR, dK)
     list(res)
@@ -87,9 +87,9 @@ run_orv_model <- function(strategy,
   if(browse) browser()
   
   #initial population
-  pop_init <- c(S = target_pop_size -I0, 
+  pop_init <- c(S = 1 - I0/target_pop_size, 
                 E = 0, 
-                I = I0, 
+                I = I0/target_pop_size, 
                 R = 0, 
                 K = 0
                 )
@@ -101,8 +101,8 @@ run_orv_model <- function(strategy,
   orv_params <- c(B = beta, 
                   r = 1/latent_period, 
                   g = 1/infectious_period, 
-                  q = vax_efficacy, 
-                  P = scenario_coverage, 
+                  vax_efficacy = vax_efficacy, 
+                  coverage = scenario_coverage, 
                   campaign_duration = scenario_campaign_duration, 
                   vax_day = vax_day
                   )
