@@ -26,7 +26,7 @@ cases_averted_df <- readRDS("./model_output/deterministic_framework_analysis_out
 #' visualisations
 cases_averted_plot <- ggplot(data = cases_averted_df,
                              aes(x = cold_chain,
-                                 y = cases_averted
+                                 y = cases_averted/1000
                                  )
                              ) + 
     geom_col(aes(fill = cold_chain,
