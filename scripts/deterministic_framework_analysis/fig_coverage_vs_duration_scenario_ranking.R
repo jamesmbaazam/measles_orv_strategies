@@ -35,7 +35,7 @@ coverage_duration_plot <- ggplot(data = results_summary_df,
                     ),
                 size = 5,
                 stroke = 2,
-                height = 0.005,
+                height = 0.0085,
                 width = 0.25) +
   scale_shape_manual(values = c(21, 24)) + 
   scale_fill_brewer(palette = 'Set3') + 
