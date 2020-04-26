@@ -53,7 +53,7 @@ orv_near_dynamics_final_size_plot <- ggplot(data = orv_near_dynamics_final_size,
              position = 'dodge') +
     facet_grid( ~ strategy) + 
     scale_fill_brewer(palette = 'Set2') +
-    labs(title = 'Outbreak size by scenario', 
+    labs(title = 'Outbreak size of near locations by scenario', 
          x = 'Location', 
          y = 'Number of individuals (thousands)')
 
@@ -69,7 +69,7 @@ orv_far_dynamics_final_size_plot <- ggplot(data = orv_far_dynamics_final_size,
              position = 'dodge') +
     facet_grid( ~ strategy) + 
     scale_fill_brewer(palette = 'Set2') +
-    labs(title = 'Outbreak size by scenario', 
+    labs(title = 'Outbreak size of far locations by scenario', 
          x = 'Location', 
          y = 'Number of individuals (thousands)')
 
