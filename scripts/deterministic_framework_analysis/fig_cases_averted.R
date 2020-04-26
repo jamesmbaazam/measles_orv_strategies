@@ -3,6 +3,7 @@ library(ggthemes)
 library(stringr)
 library(forcats)
 library(dplyr)
+library(tidyr)
 
 #load plotting data
 cases_averted_df <- readRDS("./model_output/deterministic_framework_analysis_output/sc_epi_analysis_summary_10_teams.rds") %>%
@@ -187,6 +188,53 @@ cases_averted_plot_option2b <- ggplot(data = cases_averted_df_mod,
 plot(cases_averted_plot_option2b)
 
 
+#' option 3: Group by cold chain choice, sort the cases averted within each group from
+#' lowest to highest. Identify each bar by cold chain, vial type, and mobile team
+#' equipment type
 
+
+#' modify the cold chain factor level order
+cases_averted_df_mod_cc <- cases_averted_df_mod
+
+cases_averted_df_mod_cc$cold_chain <- factor(cases_averted_df_mod$cold_chain, levels = c('cc', 'part_cc', 'no_cc'))
+  
+cases_averted_plot_option3 <- ggplot(data = cases_averted_df_mod_cc %>% 
+                                       group_by(cold_chain) %>% 
+                                       arrange(cases_averted, .by_group = T),
+                                      aes(x = cold_chain,
+                                          y = cases_averted/1000,
+                                          group = cold_chain
+                                      )) + 
+  geom_col(aes(fill = cold_chain,
+               linetype = mt_equip_type,
+               color = vial_type),
+           size = 1,
+           position = position_dodge2(preserve = 'single')
+  ) + 
+  scale_linetype_manual(name = 'Mobile team equipment',
+                        values = c('solid', 'twodash')) +
+  scale_fill_brewer(palette = 'Set3', 
+                    name = 'Cold chain use', 
+                    breaks = c('cc', 
+                               'no_cc', 
+                               'part_cc'),
+                    labels = c('Cold chain' , 
+                               'Out of Cold Chain', 
+                               'Part Cold Chain' )) + 
+  scale_color_brewer(name = 'Vial type', 
+                     palette = 'Dark2') + 
+  scale_x_discrete(breaks = cases_averted_df_mod$cold_chain, 
+                   labels = ifelse(cases_averted_df_mod$cold_chain == 'cc', 
+                                   'Full cold chain',
+                                   ifelse(cases_averted_df_mod$cold_chain == 'part_cc',
+                                          'Part cold chain', 'Outside cold chain'))) +
+  guides(linetype = guide_legend(override.aes = list(fill = NA, col = 'black')),
+         color = guide_legend(override.aes = list(fill = NA))) +
+  labs(title = 'Cases averted by mobile team equipment, vial type, and cold chain decision',
+       x = 'Scenario', 
+       y = 'Cases averted (thousands)') +
+  theme_minimal() 
+
+plot(cases_averted_plot_option3)
 
 
