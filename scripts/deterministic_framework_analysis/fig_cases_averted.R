@@ -245,3 +245,47 @@ cases_averted_plot_option3 <- ggplot(data = cases_averted_df_mod_cc %>%
 plot(cases_averted_plot_option3)
 
 
+
+#' lollipop plot
+cases_averted_lollipop_plot <- ggplot(data = cases_averted_df_mod_cc %>% 
+                                       group_by(cold_chain) %>% 
+                                       arrange(cases_averted, .by_group = T),
+                                     aes(group = cold_chain
+                                     )) + 
+  geom_point(aes(x = reorder(strategy, cases_averted),
+                 y = cases_averted/1000, 
+                 shape = mt_equip_type), 
+             size = 10) + 
+  geom_segment(aes(x = strategy, 
+                   xend = strategy, 
+                   y = 0, 
+                   yend = cases_averted/1000,
+                   color = cold_chain),
+               size = 3.5
+               ) +
+  scale_shape_manual(values = c(21, 24)) + 
+  scale_color_manual(name = 'Cold chain use', 
+                    breaks = c('cc', 
+                               'no_cc', 
+                               'part_cc'),
+                    labels = c('Cold chain' , 
+                               'Out of Cold Chain', 
+                               'Part Cold Chain' ),
+                    values = c('cc' = 'seagreen1', 
+                               'no_cc' = 'dodgerblue', 
+                               'part_cc' = 'plum1')) + 
+  scale_x_discrete(breaks = cases_averted_df_mod$cold_chain, 
+                   labels = ifelse(cases_averted_df_mod$cold_chain == 'cc', 
+                                   'Full cold chain',
+                                   ifelse(cases_averted_df_mod$cold_chain == 'part_cc',
+                                          'Part cold chain', 'Outside cold chain'))) +
+  guides(shape = guide_legend(override.aes = list(size = 5))) +
+  labs(title = 'Cases averted by mobile team equipment, vial type, and cold chain decision',
+       x = 'Scenario', 
+       y = 'Cases averted (thousands)') +
+  theme_minimal() 
+
+plot(cases_averted_lollipop_plot)
+
+
+
