@@ -53,7 +53,29 @@ coverage_duration_plot <- ggplot(data = results_summary_df,
 
 plot(coverage_duration_plot)
 
-# ggsave(filename = './figures/coverage_duration_plot.pdf', 
-#        plot = coverage_duration_plot, 
-#        device = 'pdf'
-#        )
+
+#' version 2 - plain shapes
+coverage_duration_plot_version2 <- ggplot(data = results_summary_df, 
+                                 aes(x = campaign_duration, 
+                                     y = average_coverage)
+) + 
+  geom_jitter(aes(shape = mt_equip_type),
+  size = 6.5,
+  stroke = 2,
+  height = 0.006,
+  width = 0.25) +
+  scale_shape_manual(values = c(21, 24)) + 
+#  scale_fill_manual(values = c('dose10' = 'palegreen4', 'monodose' = NA, 'dose10 + monodose' = 'medium purple1')) + 
+ # scale_color_manual(values = c('cc' = 'palegreen4', 'part_cc' = 'mediumpurple4', 'no_cc' = 'palegreen4')) + 
+#  guides(fill = guide_legend(override.aes = list(shape = c(21), col = NA)),
+#         colour = guide_legend(override.aes = list(shape = c(22), fill = NA))) +
+  labs(#title = 'Ranking of scenarios by vaccination coverage and campaign duration',
+       x = 'Campaign duration', 
+       y = 'Vaccination coverage', 
+       shape = 'Mobile team equipment'#,
+   #    color = 'Vial type',
+   #    fill = 'Cold chain use'
+  ) +
+  theme_minimal()
+
+plot(coverage_duration_plot_version2)
