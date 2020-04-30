@@ -206,23 +206,30 @@ cases_averted_plot_option3 <- ggplot(data = cases_averted_df_mod_cc %>%
                                           group = cold_chain
                                       )) + 
   geom_col(aes(fill = cold_chain,
-               linetype = mt_equip_type,
+               linetype = mt_equip_type, 
                color = vial_type),
            size = 1,
            position = position_dodge2(preserve = 'single')
   ) + 
   scale_linetype_manual(name = 'Mobile team equipment',
                         values = c('solid', 'twodash')) +
-  scale_fill_brewer(palette = 'Set3', 
-                    name = 'Cold chain use', 
+  scale_fill_manual(name = 'Cold chain use', 
                     breaks = c('cc', 
                                'no_cc', 
                                'part_cc'),
                     labels = c('Cold chain' , 
                                'Out of Cold Chain', 
-                               'Part Cold Chain' )) + 
-  scale_color_brewer(name = 'Vial type', 
-                     palette = 'Dark2') + 
+                               'Part Cold Chain' ),
+                    values = c('cc' = 'seagreen1', 
+                               'no_cc' = 'dodgerblue', 
+                               'part_cc' = 'plum1')) + 
+  scale_color_manual(name = 'Vial type', 
+                     breaks = c('dose10', 
+                                 'monodose', 
+                                 'dose10 + monodose'),
+                      values = c('dose10' = 'seagreen4', 
+                                'monodose' = 'dodgerblue4', 
+                                'dose10 + monodose' = 'plum4')) +
   scale_x_discrete(breaks = cases_averted_df_mod$cold_chain, 
                    labels = ifelse(cases_averted_df_mod$cold_chain == 'cc', 
                                    'Full cold chain',
