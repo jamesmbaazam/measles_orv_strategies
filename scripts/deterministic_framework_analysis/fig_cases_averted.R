@@ -4,10 +4,18 @@ library(stringr)
 library(forcats)
 library(dplyr)
 library(tidyr)
+library(conflicted)
+
+
+#resolve conflicts
+conflict_prefer('select', 'dplyr')
 
 #load plotting data
-cases_averted_df <- readRDS("./model_output/deterministic_framework_analysis_output/sc_epi_analysis_summary_10_teams.rds") %>%
-    mutate(
+cases_averted_results <- readRDS("./model_output/deterministic_framework_analysis_output/sc_epi_analysis_summary_10_teams.rds") 
+
+
+#create new columns and remove the old ones we don't need
+cases_averted_df <- cases_averted_results %>% mutate(
         cold_chain = as_factor(ifelse(str_detect(strategy, "_fcc"),
                                       "cc",
                                       ifelse(str_detect(strategy, "mixed_"),
@@ -22,7 +30,8 @@ cases_averted_df <- readRDS("./model_output/deterministic_framework_analysis_out
                                             "monodose"
                                      )
         ))
-    )
+    ) %>% 
+  select(strategy, mt_equip_type, cold_chain, vial_type, cases_averted)  
 
 
 #' I want to rearrange the bars so I have to reduce the dimensions
