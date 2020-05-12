@@ -1,11 +1,29 @@
 library(ggplot2)
+library(scales)
 library(ggthemes)
+library(ggpubr)
 library(stringr)
 library(forcats)
 library(dplyr)
+library(extrafont)
+library(conflicted)
 
-#load plotting data
-results_summary_df <- readRDS("./model_output/deterministic_framework_analysis_output/sc_epi_analysis_summary_10_teams.rds") %>%
+# resolve conflicts
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+
+# set up for publication-ready plots
+# font_import() only do this one time - it takes a while
+loadfonts(device = "win")
+windowsFonts(Arial = windowsFont("Arial"))
+
+# save plots to this directory
+plot_path <- "./figures/deterministic_framework_analysis_figures/"
+
+# load plotting data
+results_summary_model_output <- readRDS("./model_output/deterministic_framework_analysis_output/sc_epi_analysis_summary_10_teams.rds")
+
+results_summary_df <- results_summary_model_output %>%
   mutate(
     cold_chain = as_factor(ifelse(str_detect(strategy, "_fcc"),
       "cc",
@@ -24,58 +42,121 @@ results_summary_df <- readRDS("./model_output/deterministic_framework_analysis_o
   )
 
 
-#' visualisations
-coverage_duration_plot <- ggplot(data = results_summary_df, 
-                                 aes(x = campaign_duration, 
-                                     y = average_coverage)
-                                 ) + 
-    geom_jitter(aes(fill = cold_chain,
-                    shape = mt_equip_type, 
-                    color = vial_type
-                    ),
-                size = 5,
-                stroke = 2,
-                height = 0.0085,
-                width = 0.25) +
-  scale_shape_manual(values = c(21, 24)) + 
-  scale_fill_brewer(palette = 'Set3') + 
-  scale_color_brewer(palette = 'Dark2') + 
-  guides(fill = guide_legend(override.aes = list(shape = c(21), col = NA)),
-         colour = guide_legend(override.aes = list(shape = c(22), fill = NA))) +
-    labs(title = 'Ranking of scenarios by vaccination coverage and campaign duration',
-         x = 'Campaign duration', 
-         y = 'Vaccination coverage', 
-         shape = 'Mobile team equipment',
-         color = 'Vial type',
-         fill = 'Cold chain use'
-         ) +
-    theme_minimal()
 
-plot(coverage_duration_plot)
-
-
-#' version 2 - plain shapes
-coverage_duration_plot_version2 <- ggplot(data = results_summary_df, 
-                                 aes(x = campaign_duration, 
-                                     y = average_coverage)
-) + 
-  geom_jitter(aes(shape = mt_equip_type),
-  size = 6.5,
-  stroke = 2,
-  height = 0.006,
-  width = 0.25) +
-  scale_shape_manual(values = c(21, 24)) + 
-#  scale_fill_manual(values = c('dose10' = 'palegreen4', 'monodose' = NA, 'dose10 + monodose' = 'medium purple1')) + 
- # scale_color_manual(values = c('cc' = 'palegreen4', 'part_cc' = 'mediumpurple4', 'no_cc' = 'palegreen4')) + 
-#  guides(fill = guide_legend(override.aes = list(shape = c(21), col = NA)),
-#         colour = guide_legend(override.aes = list(shape = c(22), fill = NA))) +
-  labs(#title = 'Ranking of scenarios by vaccination coverage and campaign duration',
-       x = 'Campaign duration', 
-       y = 'Vaccination coverage', 
-       shape = 'Mobile team equipment'#,
-   #    color = 'Vial type',
-   #    fill = 'Cold chain use'
+#' Illustrator version - plain shapes
+coverage_duration_plot_plain_shapes <- ggplot(data = results_summary_df, 
+                                          aes(x = campaign_duration, 
+                                              y = average_coverage
+                                              )
+                                          ) + 
+  geom_jitter(aes(shape = mt_equip_type, 
+                  fill = vial_type,
+                  color = cold_chain
+                  ), 
+              size = 6.5, 
+              stroke = 2, 
+              height = 0.006, 
+              width = 0.25
+              ) +
+  scale_y_continuous(breaks = seq(0.5, 0.75, 0.025),
+                     labels = percent(seq(0.5, 0.75, 0.025))
+                     ) +
+  scale_shape_manual(name = 'Mobile team equipment', 
+                     values = c(21, 24), 
+                     labels = c('rcw25' = 'RCW25', 
+                                'vaxCarr' = 'Vaccine carrier')
+                     ) +
+  scale_color_manual(name = 'Cold chain option', 
+                     breaks = c('cc', 
+                                'no_cc', 
+                                'part_cc'),
+                     labels = c('Cold chain' , 
+                                'Outside cold chain', 
+                                'Partial cold chain' ),
+                     values = c('cc' = '#00AFBB', 
+                                'no_cc' = '#FC4E07', 
+                                'part_cc' = '#E7B800')
   ) +
-  theme_minimal()
+  scale_fill_manual(name = 'Vial type',
+                    breaks = c('dose10', 
+                               'monodose',
+                               'dose10 + monodose'),
+                    values = c('dose10' = NA, 
+                               'monodose' = NA,
+                               'dose10 + monodose' = NA),
+                    labels = c('dose10' = '10-dose', 
+                               'monodose' = 'Monodose',
+                               'dose10 + monodose' = '10-dose & Monodose')
+                    ) +
+  guides(shape = guide_legend(override.aes = list(size = 6, 
+                                                  stroke = 1.2
+                                                  ), 
+                              order = 1
+                              ), 
+         fill = guide_legend(override.aes = list(size = 6, 
+                                          color = 'black', 
+                                          fill = 'white', 
+                                          shape = 22)
+                             )
+         ) +
+  labs( # title = 'Ranking of scenarios by vaccination coverage and campaign duration',
+    x = "Campaign duration (days)",
+    y = "Vaccination coverage"
+    ) +
+  ggpubr::font('xy.text', face = 'plain') +
+  ggpubr::font('xy.title', face = 'plain') +
+  ggpubr::theme_pubr(legend = 'right', 
+                     base_size = 16,
+                     border = T) +
+  NULL
 
-plot(coverage_duration_plot_version2)
+plot(coverage_duration_plot_plain_shapes)
+
+# ggsave(filename = './final_plots/coverage_duration_plot_plain_shapes.eps', 
+#        plot = coverage_duration_plot_plain_shapes, 
+#        device = "eps", 
+#        path = plot_path,
+#        width = 25,
+#        height = 18.54,
+#        units = 'cm',
+#        dpi = 300
+# )
+# 
+# ggsave(filename = './final_plots/coverage_duration_plot_plain_shapes.tiff', 
+#        plot = coverage_duration_plot_plain_shapes, 
+#        device = "tiff", 
+#        path = plot_path,
+#        width = 25,
+#        height = 18.54,
+#        units = 'cm',
+#        dpi = 300
+# )
+
+#' visualisations
+# coverage_duration_plot <- ggplot(data = results_summary_df,
+#                                  aes(x = campaign_duration,
+#                                      y = average_coverage)
+# ) +
+#   geom_jitter(aes(fill = cold_chain,
+#                   shape = mt_equip_type,
+#                   color = vial_type
+#   ),
+#   size = 5,
+#   stroke = 2,
+#   height = 0.0085,
+#   width = 0.25) +
+#   scale_shape_manual(values = c(21, 24)) +
+#   scale_fill_brewer(palette = 'Set3') +
+#   scale_color_brewer(palette = 'Dark2') +
+#   guides(fill = guide_legend(override.aes = list(shape = c(21), col = NA)),
+#          colour = guide_legend(override.aes = list(shape = c(22), fill = NA))) +
+#   labs(title = 'Ranking of scenarios by vaccination coverage and campaign duration',
+#        x = 'Campaign duration',
+#        y = 'Vaccination coverage',
+#        shape = 'Mobile team equipment',
+#        color = 'Vial type',
+#        fill = 'Cold chain use'
+#   ) +
+#   theme_minimal()
+#
+# plot(coverage_duration_plot)
