@@ -132,6 +132,79 @@ plot(coverage_duration_plot_plain_shapes)
 #        dpi = 300
 # )
 
+
+#beeswarm plot, a better option than jitter plots
+library(ggbeeswarm)
+
+coverage_duration_plot_plain_shapes_beeswarm <- ggplot(data = results_summary_df, 
+       aes(x = campaign_duration, 
+           y = average_coverage
+           )
+       ) + geom_beeswarm(groupOnX = T, 
+                  aes(shape = mt_equip_type), 
+                  size = 6.5, 
+                  stroke = 2,
+                  cex = 4 #controls the spacing
+                  ) +
+  scale_y_continuous(breaks = seq(0.5, 0.75, 0.025),
+                     labels = percent(seq(0.5, 0.75, 0.025))
+  ) +
+  scale_x_continuous(breaks = seq(50, 80, 5),
+                     labels = seq(50, 80, 5)
+                     ) +
+  scale_shape_manual(name = 'Mobile team equipment', 
+                     values = c(21, 24), 
+                     labels = c('rcw25' = 'RCW25', 
+                                'vaxCarr' = 'Vaccine carrier')
+  ) +
+  scale_color_manual(name = 'Cold chain option', 
+                     breaks = c('cc', 
+                                'no_cc', 
+                                'part_cc'),
+                     labels = c('Cold chain' , 
+                                'Outside cold chain', 
+                                'Partial cold chain' ),
+                     values = c('cc' = '#00AFBB', 
+                                'no_cc' = '#FC4E07', 
+                                'part_cc' = '#E7B800')
+  ) +
+  scale_fill_manual(name = 'Vial type',
+                    breaks = c('dose10', 
+                               'monodose',
+                               'dose10 + monodose'),
+                    values = c('dose10' = NA, 
+                               'monodose' = NA,
+                               'dose10 + monodose' = NA),
+                    labels = c('dose10' = '10-dose', 
+                               'monodose' = 'Monodose',
+                               'dose10 + monodose' = '10-dose & Monodose')
+  ) +
+  guides(shape = guide_legend(override.aes = list(size = 6, 
+                                                  stroke = 1.2
+  ), 
+  order = 1
+  ), 
+  fill = guide_legend(override.aes = list(size = 6, 
+                                          color = 'black', 
+                                          fill = 'white', 
+                                          shape = 22)
+  )
+  ) +
+  labs( # title = 'Ranking of scenarios by vaccination coverage and campaign duration',
+    x = "Campaign duration (days)",
+    y = "Vaccination coverage"
+  ) +
+  ggpubr::font('xy.text', face = 'plain') +
+  ggpubr::font('xy.title', face = 'plain') +
+  ggpubr::theme_pubr(legend = 'right', 
+                     base_size = 16,
+                     border = T) +
+  NULL
+
+plot(coverage_duration_plot_plain_shapes_beeswarm)
+
+
+
 #' visualisations
 # coverage_duration_plot <- ggplot(data = results_summary_df,
 #                                  aes(x = campaign_duration,
