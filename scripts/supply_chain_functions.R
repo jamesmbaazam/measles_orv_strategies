@@ -127,38 +127,46 @@ calc_dose_capacity <- function(vial_type,
 {
   if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "rcw25" & with_ice == T) {
    # 5000
+   as.numeric(round(rcw25_netVol/dose_10_pvd["2.1"]))
   }
   else if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "rcw25" & with_ice == F) {
     as.numeric(round(rcw25_grossVol / dose_10_pvd["2.1"]))
   }
   else if (vial_type == "dose10" & vax_vol == 3 & equip_type == "rcw25" & with_ice == T) {
-    3300
+   # 3300
+  as.numeric(round(rcw25_netVol/dose_10_pvd["3"]))
   } else if (vial_type == "dose10" & vax_vol == 3 & equip_type == "rcw25" & with_ice == F) {
     as.numeric(round(rcw25_grossVol / dose_10_pvd["3"]))
   }
   else if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "vaxCarr" & with_ice == T) {
-    750
+   # 750
+    as.numeric(round(vax_carrier_netVol / dose_10_pvd["2.1"]))
   }
   else if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "vaxCarr" & with_ice == F) {
     as.numeric(round(vax_carrier_grossVol / dose_10_pvd["2.1"]))
   }
   else if (vial_type == "dose10" & vax_vol == 3 & equip_type == "vaxCarr" & with_ice == T) {
-    500
+    #500
+    as.numeric(round(vax_carrier_netVol / dose_10_pvd["3"]))
   }
   else if (vial_type == "dose10" & vax_vol == 3 & equip_type == "vaxCarr" & with_ice == F) {
     as.numeric(round(vax_carrier_grossVol / dose_10_pvd["3"]))
   }
   else if (vial_type == "monodose" & vax_vol == 21.09 & equip_type == "rcw25" & with_ice == T) {
-    616
+   # 616
+    as.numeric(round(rcw25_netVol / monodose_pvd))
   }
   else if (vial_type == "monodose" & vax_vol == 21.09 & equip_type == "rcw25" & with_ice == F) {
-    1301
+   # 1301
+    as.numeric(round(rcw25_grossVol / monodose_pvd))
   }
   else if (vial_type == "monodose" & vax_vol == 21.09 & equip_type == "vaxCarr" & with_ice == T) {
-    77
+  #  77
+    as.numeric(round(vax_carrier_netVol / monodose_pvd))
   }
   else if (vial_type == "monodose" & vax_vol == 21.09 & equip_type == "vaxCarr" & with_ice == F) {
-    170
+   # 170
+    as.numeric(round(vax_carrier_grossVol / monodose_pvd))
   }
   else {
     stop("Wrong input entered")
