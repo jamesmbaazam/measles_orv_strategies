@@ -176,41 +176,7 @@ calc_dose_capacity <- function(vial_type,
 
 ## calc_transport_equipment_needs ----
 
-calc_transport_equipment_needs <- function(equip_type,
-                                           vial_type,
-                                           vax_vol,
-                                           with_ice,
-                                           doses_to_transport) {
-  # NB: numbers here are doses and are based on the packed volume per dose, i.e, how much volume is required to pack one dose.
-  if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "rcw25" & with_ice == T) {
-    ceiling(doses_to_transport / 5000)
-  }
-  else if (vial_type == "dose10" & vax_vol == 3 & equip_type == "rcw25" & with_ice == T) {
-    ceiling(doses_to_transport / 3300)
-  }
-  else if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "vaxCarr" & with_ice == T) # I've not yet thrown in the numbers for 10 dose OCC because it's not operational and even being considered but might be good for a counterfactual.
-    {
-      ceiling(doses_to_transport / 750)
-    }
-  else if (vial_type == "dose10" & vax_vol == 3 & equip_type == "vaxCarr" & with_ice == T) {
-    ceiling(doses_to_transport / 500)
-  }
-  else if (vial_type == "monodose" & vax_vol == 21.09 & equip_type == "rcw25" & with_ice == T) {
-    ceiling(doses_to_transport / 616)
-  }
-  else if (vial_type == "monodose" & vax_vol == 21.09 & equip_type == "rcw25" & with_ice == F) {
-    ceiling(doses_to_transport / 1301)
-  }
-  else if (vial_type == "monodose" & vax_vol == 21.09 & equip_type == "vaxCarr" & with_ice == T) {
-    ceiling(doses_to_transport / 77)
-  }
-  else if (vial_type == "monodose" & vax_vol == 21.09 & equip_type == "vaxCarr" & with_ice == F) {
-    ceiling(doses_to_transport / 170)
-  }
-  else {
-    stop("Check inputs")
-  }
-}
+
 
 
 # Full Cold Chain (FCC) calculations ----
@@ -227,7 +193,6 @@ calc_transport_equipment_needs <- function(equip_type,
 #' for; and the row numbers of the sites you want to analyse
 
 calc_doses_required <- function(df,
-                                # site_rows_selected = 1,
                                 pop_type,
                                 ovwastage,
                                 buffer_size,
@@ -422,3 +387,141 @@ calc_compounded_delays <- function(delays, team_days){
   }
   return(cpd_delays) 
 } 
+
+## the two functions below will potentially be a better way to do the ice pack
+## lookup
+# icepack_lookup <- array(dim = c(2, 2, 3), 
+#                         dimnames = list(equip_type = c("rcw25","vaxCarr"), 
+#                                         amb_temp = c("below 40", "above 40")
+#                                         )
+#                         )
+# 
+# compute_icepacks <- function(
+#   equipment = c("rcw25", "vaxCarr"),
+#   amb_temp = c("below 40", "above 40"),
+#   replacement_days = 1:3
+# ) {
+#   equipment <- equipment[1]
+#   amb_temp  <- amb_temp[1]
+#   replacement_days <- replacement_days[1]
+#   
+# }
+
+
+
+# calc_dose10_team_days <- function(target_pop,
+#                                   dose10_wastage,
+#                                   carrier_vol_capacity,
+#                                   team_performance,
+#                                   browse = F) # how many you are expected to vaccinate on average per day
+# {
+#   if (browse) browser()
+#   effective_doses <- ceiling(carrier_vol_capacity * (1 - dose10_wastage / 100)) # effectively, how many vaccinations is a team actually undertaking?
+#   if ((target_pop <= team_performance) & (team_performance <= effective_doses)) {
+#     return(1) # we can carry more doses than the target population size and are within the maximum kids we are expected to vaccinate, so it'll take us 1 day
+#   } else if ((team_performance <= effective_doses) & (team_performance <= target_pop)) {
+#     return(round(target_pop / team_performance, 3)) # we can carry more than we are expected to vaccinate but the target population is more than how many kids we are expected to vaccinate, so the team performance becomes the constraint
+#   } else if ((effective_doses <= target_pop) & (effective_doses <= team_performance)) {
+#     return(round(target_pop / effective_doses, 3)) # we can't carry enough doses to even vaccinate the expected number of kids per day, so the volume capacity becomes a constrainst
+#   }
+# }
+
+# calc_transport_equipment_needs <- function(equip_type,
+#                                            vial_type,
+#                                            vax_vol,
+#                                            with_ice,
+#                                            doses_to_transport) {
+#   # NB: numbers here are doses and are based on the packed volume per dose, i.e, how much volume is required to pack one dose.
+#   if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "rcw25" & with_ice == T) {
+#     ceiling(doses_to_transport / 5000)
+#   }
+#   else if (vial_type == "dose10" & vax_vol == 3 & equip_type == "rcw25" & with_ice == T) {
+#     ceiling(doses_to_transport / 3300)
+#   }
+#   else if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "vaxCarr" & with_ice == T) # I've not yet thrown in the numbers for 10 dose OCC because it's not operational and even being considered but might be good for a counterfactual.
+#     {
+#       ceiling(doses_to_transport / 750)
+#     }
+#   else if (vial_type == "dose10" & vax_vol == 3 & equip_type == "vaxCarr" & with_ice == T) {
+#     ceiling(doses_to_transport / 500)
+#   }
+#   else if (vial_type == "monodose" & vax_vol == 21.09 & equip_type == "rcw25" & with_ice == T) {
+#     ceiling(doses_to_transport / 616)
+#   }
+#   else if (vial_type == "monodose" & vax_vol == 21.09 & equip_type == "rcw25" & with_ice == F) {
+#     ceiling(doses_to_transport / 1301)
+#   }
+#   else if (vial_type == "monodose" & vax_vol == 21.09 & equip_type == "vaxCarr" & with_ice == T) {
+#     ceiling(doses_to_transport / 77)
+#   }
+#   else if (vial_type == "monodose" & vax_vol == 21.09 & equip_type == "vaxCarr" & with_ice == F) {
+#     ceiling(doses_to_transport / 170)
+#   }
+#   else {
+#     stop("Check inputs")
+#   }
+# }
+
+#Shiny app functions
+# print_site_team_dur(): ----
+#' Calculates and outputs to the UI how long the allocated teams will spend on a site
+
+# print_site_team_dur <- function(site_team_quant,
+#                                 td_fixed,
+#                                 td_mobile) { # td_fixed = team days for fixed site team, #td_mobile = team days for mobile team
+#   if (site_team_quant == 0) {
+#     renderText(
+#       print("<b> No teams were allocated. </b>")
+#     )
+#   } else if (site_team_quant == 1) {
+#     renderText({
+#       paste(
+#         "Teams will work sequentially.",
+#         "<br>",
+#         "First, the <b> FIXED post </b> team will spend:",
+#         td_fixed,
+#         "day(s).",
+#         "<br>",
+#         "Afterwards, the <b> MOBILE </b> team will spend:",
+#         td_mobile,
+#         "day(s).",
+#         "<br>",
+#         "<b> Total: </b>", td_fixed + td_mobile,
+#         "day(s)."
+#       )
+#     })
+#   } else if (site_team_quant == 2) {
+#     renderText({
+#       paste(
+#         "The <b> Fixed post </b> team will spend",
+#         td_fixed,
+#         "day(s).",
+#         "<br>",
+#         "The <b> Mobile </b> team will spend",
+#         td_mobile,
+#         "day(s).",
+#         "<br>",
+#         "<b> Total: </b>",
+#         td_fixed + td_mobile,
+#         "day(s)."
+#       )
+#     })
+#   } else {
+#     renderText({
+#       paste(
+#         "The",
+#         site_team_quant - 1,
+#         "<b> Fixed post </b> teams will each spend",
+#         round((td_fixed / (site_team_quant - 1)), digits = 1),
+#         "day(s).",
+#         "<br>",
+#         "The <b> Mobile </b> team will spend",
+#         td_mobile, "day(s).",
+#         "<br>",
+#         "<b> Total: </b>", td_fixed + td_mobile,
+#         "day(s)."
+#       )
+#     })
+#   }
+# }
+
