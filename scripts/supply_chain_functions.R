@@ -97,41 +97,26 @@ calc_effective_doses <- function(dose_quantity,
 #' Functions to calculate the team days for strategies using either monodose or
 #' 10-dose vials
 
-calc_monodose_team_days <- function(target_pop,
-                                    carrier_vol_capacity,
-                                    team_performance # how many you are expected to vaccinate on average per day
-) {
-  if ((target_pop <= team_performance) & (team_performance <= carrier_vol_capacity)) {
-    return(1) # we can carry more doses than the target population size and are within the maximum kids we are expected to vaccinate, so it'll take us 1 day
-  }
-  else if ((team_performance <= carrier_vol_capacity) & (team_performance <= target_pop)) {
-    return(round(target_pop / team_performance, 3)) # we can carry more than we are expected to vaccinate but the target population is more than how many kids we are expected to vaccinate, so the team performance becomes the constraint
-  }
-  else if ((carrier_vol_capacity <= target_pop) & (carrier_vol_capacity <= team_performance)) {
-    return(round(target_pop / carrier_vol_capacity, 3)) # we can't carry enough doses to even vaccinate the expected number of kids per day, so the volume capacity becomes a constrainst
-  }
-  # else if (carrier_vol_capacity > team_performance) {
-  #    return(round(target_pop / team_performance, 2)) #We can carry more than we are expected to, so the team performance becomes the constraint
-  # }
-}
-
-
-calc_dose10_team_days <- function(target_pop,
-                                  dose10_wastage,
-                                  carrier_vol_capacity,
-                                  team_performance,
-                                  browse = F) # how many you are expected to vaccinate on average per day
-{
-  if (browse) browser()
-  effective_doses <- ceiling(carrier_vol_capacity * (1 - dose10_wastage / 100)) # effectively, how many vaccinations is a team actually undertaking?
+calc_team_days <- function(target_pop, 
+                           ovwastage, 
+                           carrier_vol_capacity, 
+                           team_performance, # how many you are expected to vaccinate on average per day
+                           browse = F
+                            ) {
+  if(browse) browser()
+  effective_doses <- ceiling(carrier_vol_capacity * (1 - ovwastage / 100)) # effectively, how many vaccinations is a team actually undertaking?
   if ((target_pop <= team_performance) & (team_performance <= effective_doses)) {
     return(1) # we can carry more doses than the target population size and are within the maximum kids we are expected to vaccinate, so it'll take us 1 day
-  } else if ((team_performance <= effective_doses) & (team_performance <= target_pop)) {
+  }
+  else if ((team_performance <= target_pop) & (team_performance <= effective_doses)) {
     return(round(target_pop / team_performance, 3)) # we can carry more than we are expected to vaccinate but the target population is more than how many kids we are expected to vaccinate, so the team performance becomes the constraint
-  } else if ((effective_doses <= target_pop) & (effective_doses <= team_performance)) {
+  }
+  else if ((effective_doses <= target_pop) & (effective_doses <= team_performance)) {
     return(round(target_pop / effective_doses, 3)) # we can't carry enough doses to even vaccinate the expected number of kids per day, so the volume capacity becomes a constrainst
   }
 }
+
+
 
 # calculate passive cold chain dose capacity ----
 
@@ -141,7 +126,7 @@ calc_dose_capacity <- function(vial_type,
                                with_ice) # vial_type = monodose/dose10 and vax_vol depends on monodose_vialVol/dose10_vialVol #equip_type = c('rcw25','vaxCarr')
 {
   if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "rcw25" & with_ice == T) {
-    5000
+   # 5000
   }
   else if (vial_type == "dose10" & vax_vol == 2.1 & equip_type == "rcw25" & with_ice == F) {
     as.numeric(round(rcw25_grossVol / dose_10_pvd["2.1"]))
