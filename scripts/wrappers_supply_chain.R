@@ -344,14 +344,14 @@ analyse_team_days <- function(strategy_name,
   #' which is the the total capacity they can carry less of how many are
   #' expected to be wasted.
   team_days_mobile_team <- if (mobile_team_with_dose10) {
-    calc_dose10_team_days(
+    calc_team_days(
       target_pop = site_details$far_pop,
       dose10_wastage = sc_model_params$dose10_ovw_mobile_team,
       team_performance = mt_team_performance,
       vaxCarr_capacity = mobile_team_vol_capacity
     )
   } else {
-    calc_monodose_team_days(
+    calc_team_days(
       target_pop = site_details$far_pop,
       team_performance = min(mobile_team_vol_capacity, mt_team_performance),
       carrier_vol_capacity = mobile_team_vol_capacity
@@ -452,14 +452,14 @@ estim_campaign_metrics <- function(strategy_name,
   #' doses, which is the the total capacity they can carry less of how many 
   #' are expected to be wasted.
   team_days_mobile_team <- if (mobile_team_with_dose10) {
-    calc_dose10_team_days(
+    calc_team_days(
       target_pop = site_details$far_pop,
       dose10_wastage = dose10_ovwr_mt,
       team_performance = mt_team_performance,
       carrier_vol_capacity = mobile_team_vol_capacity
     )
   } else {
-    calc_monodose_team_days(
+    calc_team_days(
       target_pop = site_details$far_pop,
       team_performance = min(mobile_team_vol_capacity, mt_team_performance),
       carrier_vol_capacity = mobile_team_vol_capacity
