@@ -4,24 +4,6 @@
 #' temperature and number of days to replace ice, which is daily for the 
 #' vaccine carrier ice packs and 1, 2, or 3 days for the RCW25s
 
-## the two functions below will potentially be a better way to do the ice pack
-## lookup
-# icepack_lookup <- array(dim = c(2, 2, 3), 
-#                         dimnames = list(equip_type = c("rcw25","vaxCarr"), 
-#                                         amb_temp = c("below 40", "above 40")
-#                                         )
-#                         )
-# 
-# compute_icepacks <- function(
-#   equipment = c("rcw25", "vaxCarr"),
-#   amb_temp = c("below 40", "above 40"),
-#   replacement_days = 1:3
-# ) {
-#   equipment <- equipment[1]
-#   amb_temp  <- amb_temp[1]
-#   replacement_days <- replacement_days[1]
-#   
-# }
 
 source('./scripts/parameters.R')
 
@@ -109,67 +91,6 @@ calc_effective_doses <- function(dose_quantity,
 }
 
 
-# print_site_team_dur(): ----
-#' Calculates and outputs to the UI how long the allocated teams will spend on a site
-
-print_site_team_dur <- function(site_team_quant,
-                                td_fixed,
-                                td_mobile) { # td_fixed = team days for fixed site team, #td_mobile = team days for mobile team
-  if (site_team_quant == 0) {
-    renderText(
-      print("<b> No teams were allocated. </b>")
-    )
-  } else if (site_team_quant == 1) {
-    renderText({
-      paste(
-        "Teams will work sequentially.",
-        "<br>",
-        "First, the <b> FIXED post </b> team will spend:",
-        td_fixed,
-        "day(s).",
-        "<br>",
-        "Afterwards, the <b> MOBILE </b> team will spend:",
-        td_mobile,
-        "day(s).",
-        "<br>",
-        "<b> Total: </b>", td_fixed + td_mobile,
-        "day(s)."
-      )
-    })
-  } else if (site_team_quant == 2) {
-    renderText({
-      paste(
-        "The <b> Fixed post </b> team will spend",
-        td_fixed,
-        "day(s).",
-        "<br>",
-        "The <b> Mobile </b> team will spend",
-        td_mobile,
-        "day(s).",
-        "<br>",
-        "<b> Total: </b>",
-        td_fixed + td_mobile,
-        "day(s)."
-      )
-    })
-  } else {
-    renderText({
-      paste(
-        "The",
-        site_team_quant - 1,
-        "<b> Fixed post </b> teams will each spend",
-        round((td_fixed / (site_team_quant - 1)), digits = 1),
-        "day(s).",
-        "<br>",
-        "The <b> Mobile </b> team will spend",
-        td_mobile, "day(s).",
-        "<br>",
-        "<b> Total: </b>", td_fixed + td_mobile,
-        "day(s)."
-      )
-    })
-  }
-}
 
 
 # team days calculations ----
