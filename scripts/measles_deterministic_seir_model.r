@@ -25,7 +25,19 @@ require(deSolve)
 # par<-c(B=.5, r=1/7, g = 1/7, vax_efficacy = .8, coverage = .99, campaign_duration = 10, vax_day = 50)
 # out<-as.data.frame(lsoda(xstrt,times,simod,par))
 # lines(out$time,out$I,col="red")
-simod <- function(t, x, parms, browse = F) {
+#' Title
+#'
+#' @param t #model time
+#' @param x #initial population vector
+#' @param parms #list of parameters
+#' @param coverage_correction # this is a parameter to correct the coverage from being a perfectly observed value. It's actual purpose is to check that the hazard rate in the model, the log transformation, does not go to infinity.
+#' @param browse #for debugging
+#'
+#' @return
+#' @export
+#'
+#' @examples
+simod <- function(t, x, parms, coverage_correction = 0.9999, browse = F) {
   if(browse) browser()
   S <- x[1]
   E <- x[2]
@@ -34,7 +46,7 @@ simod <- function(t, x, parms, browse = F) {
   K <- x[5]
   #
   with(as.list(parms), {
-    Q <- ifelse(t < vax_day | t > vax_day + campaign_duration, 0, (-log(1 - coverage + 0.000001) / campaign_duration))
+    Q <- ifelse(t < vax_day | t > vax_day + campaign_duration, 0, (-log(1 - coverage*coverage_correction) / campaign_duration))
     dS <- -B * S * I - vax_efficacy * Q * S
     dE <- B * S * I - r * E
     dI <- r * E - g * I
