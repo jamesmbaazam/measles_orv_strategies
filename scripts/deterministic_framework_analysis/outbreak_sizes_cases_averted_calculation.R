@@ -6,7 +6,7 @@ library(conflicted)
 
 #' source helper scripts
 source('./scripts/analyses_parameters.R')
-
+source('./scripts/deterministic_framework_analysis/simulation_params.R')
 
 #' Resolve package conflicts 
 conflict_prefer('filter', 'dplyr') #anytime I call the function 'filter', I mean dplyr::filter
@@ -17,35 +17,35 @@ conflict_prefer('summarise', 'dplyr')
 
 #'load data and rescale them to the actual numbers
 orv_near_dynamics <- readRDS('./model_output/deterministic_framework_analysis_output/orv_near_dynamics_proportions.rds') %>% 
-    mutate(S = S*50000,
-           E = E*50000,
-           I = I*50000,
-           R = R*50000,
-           K = K*50000
+    mutate(S = S*site_pop_dist$near_pop[1],
+           E = E*site_pop_dist$near_pop[1],
+           I = I*site_pop_dist$near_pop[1],
+           R = R*site_pop_dist$near_pop[1],
+           K = K*site_pop_dist$near_pop[1]
            )
 
 no_orv_near_dynamics <- readRDS('./model_output/deterministic_framework_analysis_output/no_orv_near_dynamics_proportions.rds') %>% 
-    mutate(S = S*50000,
-           E = E*50000,
-           I = I*50000,
-           R = R*50000,
-           K = K*50000
+    mutate(S = S*site_pop_dist$near_pop[1],
+           E = E*site_pop_dist$near_pop[1],
+           I = I*site_pop_dist$near_pop[1],
+           R = R*site_pop_dist$near_pop[1],
+           K = K*site_pop_dist$near_pop[1]
            )
 
 orv_far_dynamics <- readRDS('./model_output/deterministic_framework_analysis_output/orv_far_dynamics_proportions.rds') %>% 
-    mutate(S = S*50000,
-           E = E*50000,
-           I = I*50000,
-           R = R*50000,
-           K = K*50000
+    mutate(S = S*site_pop_dist$far_pop[1],
+           E = E*site_pop_dist$far_pop[1],
+           I = I*site_pop_dist$far_pop[1],
+           R = R*site_pop_dist$far_pop[1],
+           K = K*site_pop_dist$far_pop[1]
            )
 
 no_orv_far_dynamics <- readRDS('./model_output/deterministic_framework_analysis_output/no_orv_far_dynamics_proportions.rds') %>% 
-    mutate(S = S*50000,
-           E = E*50000,
-           I = I*50000,
-           R = R*50000,
-           K = K*50000
+    mutate(S = S*site_pop_dist$far_pop[1],
+           E = E*site_pop_dist$far_pop[1],
+           I = I*site_pop_dist$far_pop[1],
+           R = R*site_pop_dist$far_pop[1],
+           K = K*site_pop_dist$far_pop[1]
            )
 
 
