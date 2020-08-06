@@ -424,6 +424,7 @@ estim_campaign_metrics <- function(strategy_name,
                                monodose_vial_volume,
                                mobile_team_equip_type,
                                dose10_ovwr_mt,
+                               monodose_ovwr_mt,
                                browse = F) {
   if (browse) browse
 
