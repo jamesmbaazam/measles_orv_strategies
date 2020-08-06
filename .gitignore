@@ -44,3 +44,5 @@ C:\\nppdf32Log\\debuglog.txt
 *.png
 *.jpeg
 *.eps
+
+*.rds
