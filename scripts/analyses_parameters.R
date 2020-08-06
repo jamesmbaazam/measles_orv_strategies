@@ -22,8 +22,8 @@ sc_model_params <- list(ambient_temp = c("below 40", "above 40")
                 , dose10_vial_vol = c(2.1, 3)
                 , dose10_ovw_fixed_team = 15 #ovw = Open Vial Wastage: value between 0 and 100;
                 , dose10_ovw_mobile_team = 15 #ovw = Open Vial Wastage: value between 0 and 100; I'm assuming far campaigns have twice the near campaign wastage
-                , monodose_ovw_fixed_team = 0 #ovw = Open Vial Wastage: value between 0 and 100;
-                , monodose_ovw_mobile_team = 0 #ovw = Open Vial Wastage: value between 0 and 100; I'm assuming far campaigns have twice the near campaign wastage
+                , monodose_ovw_fixed_team = 3 #ovw = Open Vial Wastage: value between 0 and 100;
+                , monodose_ovw_mobile_team = 3 #ovw = Open Vial Wastage: value between 0 and 100; I'm assuming far campaigns have twice the near campaign wastage
                 , vax_rate = c(fixed_team = 450, mobile_team = 250)
                 , rcw25_ice_replacement_days = c(2, 3)
                 , site_campaign_dur_constraint = 10
