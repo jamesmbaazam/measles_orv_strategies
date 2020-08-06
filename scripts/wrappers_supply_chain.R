@@ -352,21 +352,23 @@ analyse_team_days <- function(strategy_name,
   #' for that 10-dose mobile campaign team days are affected by the effective doses,
   #' which is the the total capacity they can carry less of how many are
   #' expected to be wasted.
-  team_days_mobile_team <- if (mobile_team_with_dose10) {
-    calc_team_days(
-      target_pop = site_details$far_pop,
-      dose10_wastage = sc_model_params$dose10_ovw_mobile_team,
-      team_performance = mt_team_performance,
-      vaxCarr_capacity = mobile_team_vol_capacity
-    )
-  } else {
-    calc_team_days(
-      target_pop = site_details$far_pop,
-      team_performance = min(mobile_team_vol_capacity, mt_team_performance),
-      carrier_vol_capacity = mobile_team_vol_capacity
-    )
-  }
-
+  
+  mt_ovwr <- ifelse(mobile_team_with_dose10, 
+                    sc_model_params$dose10_ovw_mobile_team, 
+                    sc_model_params$monodose_ovw_mobile_team
+                    )
+  
+ 
+  #this line determines which open vial wastage rate (ovwr) to use for the next line
+  
+  
+  team_days_mobile_team <-  calc_team_days(
+    target_pop = site_details$far_pop,
+    ovwastage = mt_ovwr,
+    team_performance = mt_team_performance,
+    carrier_vol_capacity = mobile_team_vol_capacity
+  )
+  
   ## Results - Team days  ====
   out <- data.frame(
     strategy = strategy_name,
@@ -455,26 +457,24 @@ estim_campaign_metrics <- function(strategy_name,
 
 
   #' team days needed by mobile teams, CONSTRAINED by volume/space - we assume 
-  #' per trip, they can only transport as much as the vaccine carrier allows; 
+  #' per trip, they can only transport as much as the equipment allows; 
   #' furthermore, for the 10-dose, due to open vial wastage, they end up wasting 
   #' a percentage of the doses, hence they have to make more trips to account 
   #' for that 10-dose mobile campaign team days are affected by the effective 
   #' doses, which is the the total capacity they can carry less of how many 
   #' are expected to be wasted.
-  team_days_mobile_team <- if (mobile_team_with_dose10) {
-    calc_team_days(
+ 
+  
+   mt_ovwr <- ifelse(mobile_team_with_dose10, dose10_ovwr_mt, monodose_ovwr_mt) #this line determines which open vial wastage rate (ovwr) to use for the next line
+ 
+  
+  team_days_mobile_team <-  calc_team_days(
       target_pop = site_details$far_pop,
-      dose10_wastage = dose10_ovwr_mt,
+      ovwastage = mt_ovwr,
       team_performance = mt_team_performance,
       carrier_vol_capacity = mobile_team_vol_capacity
-    )
-  } else {
-    calc_team_days(
-      target_pop = site_details$far_pop,
-      team_performance = min(mobile_team_vol_capacity, mt_team_performance),
-      carrier_vol_capacity = mobile_team_vol_capacity
-    )
-  }
+      )
+
 
   #' assuming one team type can start immediately e.g., using occ
   #' BUT I need to think hard about this: is it plus or minus in the numerator?
