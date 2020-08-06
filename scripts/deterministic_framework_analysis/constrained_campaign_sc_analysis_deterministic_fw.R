@@ -31,6 +31,7 @@ campaign_delay_results_10_teams <- sim_params_table %>%
         mobile_team_equip_type = mt_equip_type,
         n_teams_fixed = teams$n_ft[1], #10 fixed teams
         n_teams_mobile = teams$n_mt[1], #10 mobile teams
+        n_fixed_teams_per_site = 2,
         rcw25_ice_replacement_days = sc_model_params$rcw25_ice_replacement_days[1],
         mf314 = sc_model_params$mf314_quant, 
         ambient_temperature = sc_model_params$ambient_temp[1], 
@@ -86,6 +87,7 @@ campaign_metrics_10_teams <- sim_params_table %>%
         ft_team_performance = sc_model_params$vax_rate[['fixed_team']],
         mt_team_performance = sc_model_params$vax_rate[['mobile_team']],
         dose10_ovwr_mt = sc_model_params$dose10_ovw_mobile_team,
+        monodose_ovwr_mt = sc_model_params$monodose_ovw_mobile_team,
         browse = F
       )
     )
