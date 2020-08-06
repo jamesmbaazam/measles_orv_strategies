@@ -38,7 +38,7 @@ strategy_subset_config <- filter(strategies, strategy %in% strategy_subset)
 
 teams <- expand.grid(n_ft = seq(10, 30, 10), n_mt = seq(10, 30, 10))
 
-site_pop_dist <- data.frame(near_pop = rep(50000, 5), far_pop = rep(50000, 5))
+site_pop_dist <- data.frame(near_pop = rep(75000, 5), far_pop = rep(25000, 5))
 
 site_pops_df <- make_site_data(site_pop_dist$near_pop, site_pop_dist$far_pop)
 

@@ -16,7 +16,7 @@ source('./scripts/supply_chain_functions.R')
 #inputs
 ######################################
 sc_model_params <- list(ambient_temp = c("below 40", "above 40")
-                , mf314_quant = 1
+                , mf314_quant = 10
                 , buffer_stock = 0 #value between 0 and 100
                 , monodose_vial_vol = 21.09
                 , dose10_vial_vol = c(2.1, 3)
