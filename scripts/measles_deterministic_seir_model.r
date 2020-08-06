@@ -34,7 +34,7 @@ simod <- function(t, x, parms, browse = F) {
   K <- x[5]
   #
   with(as.list(parms), {
-    Q <- ifelse(t < vax_day | t > vax_day + campaign_duration, 0, (-log(1 - coverage) / campaign_duration))
+    Q <- ifelse(t < vax_day | t > vax_day + campaign_duration, 0, (-log(1 - coverage + 0.000001) / campaign_duration))
     dS <- -B * S * I - vax_efficacy * Q * S
     dE <- B * S * I - r * E
     dI <- r * E - g * I
