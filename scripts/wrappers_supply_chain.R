@@ -40,7 +40,10 @@ source('./scripts/supply_chain_functions.R')
 #' @param dose10_vial_volume 
 #' @param res_type #c('simple', 'detailed'): 'simple' returns only the team days 
 #' per team type. 'detailed' returns a detailed output
+#' @param n_fixed_teams_per_site #number of fixed post teams per vax site (options = 1 or 2 based on MSF policy)
+#' @param browse 
 #' @param monodose_vial_volume
+#'
 #' @example analyse_prep_delay(strategy_name = 'dose10_occ_parallel', fixed_team_with_dose10 = T, fixed_team_with_ice = F, mobile_team_with_dose10 = T, mobile_team_with_ice = F, team_dispatch = 'parallel', site_details = data.frame(location_id = 1, near_pop = 10000, far_pop = 20000), fixed_team_equip_type = 'both', mobile_team_equip_type = 'vaxCarr', n_teams_fixed = 20, n_teams_mobile = 20, mf314 = 1, rcw25_ice_replacement_days = 2, ambient_temperature = sc_model_params$ambient_temp[1], dose10_vial_volume = sc_model_params$dose10_vial_vol[1], monodose_vial_volume = sc_model_params$monodose_vial_vol, res_type = 'simple') 
 
 analyse_prep_delay <- function(strategy_name,
@@ -53,6 +56,7 @@ analyse_prep_delay <- function(strategy_name,
                                fixed_team_equip_type = "both", 
                                mobile_team_equip_type, 
                                n_teams_fixed,
+                               n_fixed_teams_per_site,
                                n_teams_mobile,
                                mf314,
                                rcw25_ice_replacement_days,
@@ -63,15 +67,20 @@ analyse_prep_delay <- function(strategy_name,
                                browse = F
                                ) {
 
-  #' Equipment rules: 1 fixed team will require 1 RCW25 and 1 vaccine carrier,
-  #' 2 fixed teams at the same post will require 1 RCW25 and 2 vaccine carriers
+  #' Equipment rules: if n_fixed_teams_per_site = 1, then each fixed team will require 1 RCW25 and 1 vaccine carrier,
+  #' else, the fixed teams at the same post will require 1 RCW25 and 2 vaccine carriers
   #'
-if(browse) browser()
-  # fixed team rules
-  fixed_teams_rcw25 <- ifelse(n_teams_fixed %% 2 == 0,
-    n_teams_fixed / 2,
+  if(browse) browser()
+    # fixed team rules
+   fixed_teams_rcw25 <- if (n_fixed_teams_per_site == 2 & n_teams_fixed %% 2 == 0) {
+    n_teams_fixed / 2
+  } else if (n_fixed_teams_per_site == 2 & n_teams_fixed %% 2 == 1) {
     floor(n_teams_fixed / 2) + 1
-  )
+  } else if (n_fixed_teams_per_site == 1) {
+    1 * n_teams_fixed
+  } else {
+    stop("Check inputs: n_fixed_teams_per_site must be 1 or 2")
+  }
 
   fixed_teams_vaxCarr <- n_teams_fixed
 
