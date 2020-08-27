@@ -44,6 +44,8 @@ results_summary_df <- results_summary_model_output %>%
 
 
 #' Illustrator version - plain shapes
+
+set.seed(1234)
 coverage_duration_plot_plain_shapes <- ggplot(data = results_summary_df, 
                                           aes(x = campaign_duration, 
                                               y = average_coverage
@@ -58,9 +60,15 @@ coverage_duration_plot_plain_shapes <- ggplot(data = results_summary_df,
               height = 0.006, 
               width = 0.25
               ) +
-  scale_y_continuous(breaks = seq(0.5, 0.75, 0.025),
-                     labels = percent(seq(0.5, 0.75, 0.025))
-                     ) +
+  scale_y_continuous(breaks = seq(min(sc_epi_analysis_summary_10_teams$average_coverage), 
+                                  max(sc_epi_analysis_summary_10_teams$average_coverage), 
+                                  0.02
+  ),
+  labels = percent(seq(min(sc_epi_analysis_summary_10_teams$average_coverage), 
+                       max(sc_epi_analysis_summary_10_teams$average_coverage), 
+                       0.02)
+                   )
+  ) +
   scale_shape_manual(name = 'Mobile team equipment', 
                      values = c(21, 24), 
                      labels = c('rcw25' = 'RCW25', 
