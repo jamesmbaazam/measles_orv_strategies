@@ -428,7 +428,7 @@ estim_campaign_metrics <- function(strategy_name,
                                dose10_ovwr_mt,
                                monodose_ovwr_mt,
                                browse = F) {
-  if (browse) browse
+  if (browse) browser()
 
   ## Fixed post team days ====
   #' Team days needed by fixed teams, NOT CONSTRAINED by volume/space - we assume
