@@ -350,11 +350,9 @@ estim_campaign_metrics <- function(strategy_name,
   if (browse) browser()
 
   ## Fixed post team days ====
-  #' Team days needed by fixed teams, NOT CONSTRAINED by volume/space - we assume
+  team_days_fixed_team <- round(site_details$near_pop / ft_team_performance, 1)   #' Team days needed by fixed teams, NOT CONSTRAINED by volume/space - we assume
   #' they can transport all they need per trip and they use both an RCW25 and vaccine
-  #' carrier at the vaccination site
-
-  team_days_fixed_team <- round(site_details$near_pop / ft_team_performance, 1)
+  #' carrier at the vaccination site. Also, any losses due to wastage can be replenished the same day unlike mobile teams
 
 
 
