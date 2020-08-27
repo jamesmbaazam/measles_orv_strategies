@@ -374,10 +374,43 @@ estim_campaign_metrics <- function(strategy_name,
   if (browse) browser()
 
   ## Fixed post team days ====
-  team_days_fixed_team <- round(site_details$near_pop / ft_team_performance, 1)   #' Team days needed by fixed teams, NOT CONSTRAINED by volume/space - we assume
+#  team_days_fixed_team <- round(site_details$near_pop / ft_team_performance, 1)   #' Team days needed by fixed teams, NOT CONSTRAINED by volume/space - we assume
   #' they can transport all they need per trip and they use both an RCW25 and vaccine
   #' carrier at the vaccination site. Also, any losses due to wastage can be replenished the same day unlike mobile teams
 
+#fixed team vaccine carrier volume  
+fixed_team_vaxCarr_vol <- calc_dose_capacity(
+  ifelse(fixed_team_with_dose10,
+         "dose10",
+         "monodose"
+  ),
+  vax_vol = ifelse(fixed_team_with_dose10,
+                   dose10_vial_volume,
+                   monodose_vial_volume
+  ),
+  equip_type = 'vaxCarr',
+  with_ice = fixed_team_with_ice
+)
+
+#fixed team RCW25 volume
+fixed_team_rcw25_vol <- calc_dose_capacity(
+  ifelse(fixed_team_with_dose10,
+         "dose10",
+         "monodose"
+  ),
+  vax_vol = ifelse(fixed_team_with_dose10,
+                   dose10_vial_volume,
+                   monodose_vial_volume
+  ),
+  equip_type = 'rcw25',
+  with_ice = fixed_team_with_ice
+)
+
+
+#'total transport capacity for fixed teams is the sum of the capacity for the vaccine
+#'carrier and rcw25 because we assume that fixed post teams use both equipment
+
+ft_total_transport_capacity <- fixed_team_vaxCarr_vol + fixed_team_rcw25_vol
 
 
   ## Mobile teams team days ====
@@ -405,17 +438,29 @@ estim_campaign_metrics <- function(strategy_name,
   #' doses, which is the the total capacity they can carry less of how many 
   #' are expected to be wasted.
  
-  
+  #mobile wastage rate  
   mt_ovwr <- ifelse(mobile_team_with_dose10, dose10_ovwr_mt, monodose_ovwr_mt) #this line determines which open vial wastage rate (ovwr) to use for the next line
  
-  
+  #calculate mobile team days with the wastage above
   team_days_mobile_team <-  calc_team_days(
-      target_pop = site_details$far_pop,
-      ovwastage = mt_ovwr,
-      team_performance = mt_team_performance,
-      carrier_vol_capacity = mobile_team_vol_capacity
-      )
-
+    target_pop = site_details$far_pop,
+    ovwastage = mt_ovwr,
+    team_performance = mt_team_performance,
+    carrier_vol_capacity = mobile_team_vol_capacity
+  )
+  
+  
+  
+  #fixed team wastage rate
+  ft_ovwr <- ifelse(fixed_team_with_dose10, dose10_ovwr_mt, monodose_ovwr_mt)
+   
+  #calculate fixed team days with the wastage above
+  team_days_fixed_team <-  calc_team_days(
+    target_pop = site_details$near_pop,
+    ovwastage = ft_ovwr,
+    team_performance = ft_team_performance,
+    carrier_vol_capacity = ft_total_transport_capacity
+  )
 
   #' assuming one team type can start immediately e.g., using occ
   #' BUT I need to think hard about this: is it plus or minus in the numerator?
@@ -427,10 +472,12 @@ estim_campaign_metrics <- function(strategy_name,
   mt_campaign_dur_constrained <- min(per_mt_campaign_dur, site_campaign_dur_constraint)
   
   #' Fixed post vaccination coverage
-  fixed_team_coverage <- (ft_campaign_dur_constrained*n_teams_fixed*ft_team_performance)/site_details$near_pop
+  ft_vax_capacity <- min(ft_total_transport_capacity*(1 - ft_ovwr/100), ft_team_performance) #the vax capacity is the amount of vaccinations possible for fixed teams during a team day. This is either constrained by the effective doses resulting after applying coverage, or the team days
+  
+  fixed_team_coverage <- (ft_campaign_dur_constrained*n_teams_fixed*ft_vax_capacity)/site_details$near_pop
   
   #' Mobile team vaccination coverage
-  mt_vax_capacity <- min(mobile_team_vol_capacity*(1 - mt_ovwr/100), mt_team_performance) #the vax capacity is the amount of vaccinations possible for mobile teams in during a team day. This is either constrained by the effective doses resulting after applying coverage, or the team days
+  mt_vax_capacity <- min(mobile_team_vol_capacity*(1 - mt_ovwr/100), mt_team_performance) #the vax capacity is the amount of vaccinations possible for mobile teams during a team day. This is either constrained by the effective doses resulting after applying coverage, or the team days
   
   mobile_team_coverage <- (mt_campaign_dur_constrained*n_teams_mobile*mt_vax_capacity)/site_details$far_pop 
   
