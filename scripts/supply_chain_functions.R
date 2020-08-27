@@ -104,6 +104,7 @@ calc_team_days <- function(target_pop,
                            browse = F
                             ) {
   if(browse) browser()
+  ovwastage <- ifelse(ovwastage == 100, 99.99999, ovwastage) #this is to prevent division by zero
   effective_doses <- ceiling(carrier_vol_capacity * (1 - ovwastage / 100)) # effectively, how many vaccinations is a team actually undertaking?
   if ((target_pop <= team_performance) & (team_performance <= effective_doses)) {
     return(1) # we can carry more doses than the target population size and are within the maximum kids we are expected to vaccinate, so it'll take us 1 day
