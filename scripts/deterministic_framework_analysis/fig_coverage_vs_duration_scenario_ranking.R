@@ -137,21 +137,34 @@ plot(coverage_duration_plot_plain_shapes)
 library(ggbeeswarm)
 
 coverage_duration_plot_plain_shapes_beeswarm <- ggplot(data = results_summary_df, 
-       aes(x = campaign_duration, 
-           y = average_coverage
-           )
-       ) + geom_beeswarm(groupOnX = T, 
-                  aes(shape = mt_equip_type), 
-                  size = 6.5, 
-                  stroke = 2,
-                  cex = 4 #controls the spacing
-                  ) +
-  scale_y_continuous(breaks = seq(0.5, 0.75, 0.025),
-                     labels = percent(seq(0.5, 0.75, 0.025))
+                                                       aes(x = campaign_duration, 
+                                                           y = average_coverage
+                                                       )) + 
+  geom_beeswarm(groupOnX = F,
+                aes(shape = mt_equip_type, 
+                  fill = vial_type,
+                  color = cold_chain
+                  ),
+                size = 8,
+                cex = 4.5, 
+                stroke = 2
+                ) +
+  scale_y_continuous(breaks = seq(min(sc_epi_analysis_summary_10_teams$average_coverage), 
+                                  max(sc_epi_analysis_summary_10_teams$average_coverage), 
+                                  length.out = 5),
+  labels = percent(seq(min(sc_epi_analysis_summary_10_teams$average_coverage), 
+                       max(sc_epi_analysis_summary_10_teams$average_coverage), 
+                       length.out = 5)
+                   )
   ) +
-  scale_x_continuous(breaks = seq(50, 80, 5),
-                     labels = seq(50, 80, 5)
-                     ) +
+  scale_x_continuous(breaks = seq(min(sc_epi_analysis_summary_10_teams$campaign_duration), 
+                                  max(sc_epi_analysis_summary_10_teams$campaign_duration), 
+                                  5
+  ),
+  labels = seq(min(sc_epi_analysis_summary_10_teams$campaign_duration), 
+                       max(sc_epi_analysis_summary_10_teams$campaign_duration), 
+                       5)
+  ) +
   scale_shape_manual(name = 'Mobile team equipment', 
                      values = c(21, 24), 
                      labels = c('rcw25' = 'RCW25', 
