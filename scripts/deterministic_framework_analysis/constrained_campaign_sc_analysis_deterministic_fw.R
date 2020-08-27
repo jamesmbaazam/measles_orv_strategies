@@ -29,8 +29,8 @@ campaign_delay_results_10_teams <- sim_params_table %>%
                                   ),
         fixed_team_equip_type = "both",
         mobile_team_equip_type = mt_equip_type,
-        n_teams_fixed = teams$n_ft[1], #10 fixed teams
-        n_teams_mobile = teams$n_mt[1], #10 mobile teams
+        n_teams_fixed = 15,#teams$n_ft[1], #10 fixed teams
+        n_teams_mobile = 5, #teams$n_mt[1], #10 mobile teams
         n_fixed_teams_per_site = 2,
         rcw25_ice_replacement_days = sc_model_params$rcw25_ice_replacement_days[1],
         mf314 = sc_model_params$mf314_quant, 
@@ -79,8 +79,8 @@ campaign_metrics_10_teams <- sim_params_table %>%
           far_pop = far_pop
         ),
         mobile_team_equip_type = mt_equip_type,
-        n_teams_fixed = teams$n_ft[1],
-        n_teams_mobile = teams$n_mt[1],
+        n_teams_fixed = 15, #teams$n_ft[1],
+        n_teams_mobile = 5, #teams$n_mt[1],
         dose10_vial_volume = sc_model_params$dose10_vial_vol[1],
         monodose_vial_volume = sc_model_params$monodose_vial_vol[1],
         site_campaign_dur_constraint = sc_model_params$site_campaign_dur_constraint,
