@@ -368,6 +368,8 @@ estim_campaign_metrics <- function(strategy_name,
                                dose10_vial_volume,
                                monodose_vial_volume,
                                mobile_team_equip_type,
+                               dose10_ovwr_ft,
+                               monodose_ovwr_ft,
                                dose10_ovwr_mt,
                                monodose_ovwr_mt,
                                browse = F) {
@@ -452,7 +454,7 @@ ft_total_transport_capacity <- fixed_team_vaxCarr_vol + fixed_team_rcw25_vol
   
   
   #fixed team wastage rate
-  ft_ovwr <- ifelse(fixed_team_with_dose10, dose10_ovwr_mt, monodose_ovwr_mt)
+  ft_ovwr <- ifelse(fixed_team_with_dose10, dose10_ovwr_ft, monodose_ovwr_ft)
    
   #calculate fixed team days with the wastage above
   team_days_fixed_team <-  calc_team_days(
