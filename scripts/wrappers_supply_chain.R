@@ -406,7 +406,9 @@ estim_campaign_metrics <- function(strategy_name,
   fixed_team_coverage <- (ft_campaign_dur_constrained*n_teams_fixed*ft_team_performance)/site_details$near_pop
   
   #' Mobile team vaccination coverage
-  mobile_team_coverage <- (mt_campaign_dur_constrained*n_teams_mobile*min(mobile_team_vol_capacity, mt_team_performance))/site_details$far_pop 
+  mt_vax_capacity <- min(mobile_team_vol_capacity*(1 - mt_ovwr/100), mt_team_performance) #the vax capacity is the amount of vaccinations possible for mobile teams in during a team day. This is either constrained by the effective doses resulting after applying coverage, or the team days
+  
+  mobile_team_coverage <- (mt_campaign_dur_constrained*n_teams_mobile*mt_vax_capacity)/site_details$far_pop 
   
   
   total_site_coverage <- (fixed_team_coverage * site_details$near_pop + 
