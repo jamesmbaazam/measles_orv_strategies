@@ -329,7 +329,31 @@ analyse_prep_delay <- function(strategy_name,
 #' @return
 #' @export
 #'
-#' @examples
+#' @examples estim_campaign_metrics(strategy_name = 'toy_strategy', 
+# fixed_team_with_dose10 = T, 
+# fixed_team_with_ice = T, 
+# mobile_team_with_dose10 = T, 
+# mobile_team_with_ice = T, 
+# site_details = data.frame(
+#   near_pop = 50000,
+#   far_pop =50000,
+#   location_id = 1
+# ), 
+# site_campaign_dur_constraint = 10, 
+# n_teams_fixed = 10, 
+# ft_team_performance = 450, 
+# n_teams_mobile = 10, 
+# mt_team_performance = 250, 
+# dose10_vial_volume = sc_model_params$dose10_vial_vol[1], 
+# monodose_vial_volume = sc_model_params$monodose_vial_vol[1], 
+# mobile_team_equip_type = 'vaxCarr', 
+# dose10_ovwr_mt = 100, 
+# monodose_ovwr_mt = 100, 
+# browse = F
+# )
+
+
+ 
 estim_campaign_metrics <- function(strategy_name,
                                fixed_team_with_dose10,
                                fixed_team_with_ice,
