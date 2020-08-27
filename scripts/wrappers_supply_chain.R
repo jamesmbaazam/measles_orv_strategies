@@ -465,7 +465,7 @@ estim_campaign_metrics <- function(strategy_name,
   #' are expected to be wasted.
  
   
-   mt_ovwr <- ifelse(mobile_team_with_dose10, dose10_ovwr_mt, monodose_ovwr_mt) #this line determines which open vial wastage rate (ovwr) to use for the next line
+  mt_ovwr <- ifelse(mobile_team_with_dose10, dose10_ovwr_mt, monodose_ovwr_mt) #this line determines which open vial wastage rate (ovwr) to use for the next line
  
   
   team_days_mobile_team <-  calc_team_days(
