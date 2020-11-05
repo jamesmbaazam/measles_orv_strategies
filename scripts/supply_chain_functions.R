@@ -263,11 +263,17 @@ calc_icepack_tot_vol <- function(equipment_type # options: large = 0.6L, small =
 calc_freezing_time <- function(mf314_available,
                                large_icepacks_quantity,
                                small_icepacks_quantity) {
-  ceiling(
+  if(mf314_available < 0 )
+    {stop('Number of freezers cannot be below zero')} 
+  else if(mf314_available == 0){
+    ft <- Inf
+    }else{
+  ft <- ceiling(
     (1 / mf314_available) * ((large_icepacks_quantity / mf314_largepack_fr) + 
                                (small_icepacks_quantity / mf314_smallpack_fr)
-                             )
-    )
+    ))
+  }
+  return(ft)
 }
 
 # calc_teams_and_campaign_days() ----
