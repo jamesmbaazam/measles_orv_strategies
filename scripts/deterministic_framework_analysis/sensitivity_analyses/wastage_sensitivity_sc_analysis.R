@@ -11,8 +11,8 @@ library(purrr)
 library(dplyr)
 
 #calculate delays prior to campaign start
-campaign_delay_wastage_sensitivity <- sim_params_table_ovw_sensitivity %>% 
-#    slice_tail(n = 5) %>% 
+campaign_delay_ovw_sensitivity <- sim_params_table_ovw_sensitivity %>% 
+#   slice_tail(n = 50) %>% 
     rowwise() %>%
     do({
         with(
@@ -46,12 +46,24 @@ campaign_delay_wastage_sensitivity <- sim_params_table_ovw_sensitivity %>%
     ungroup() %>% 
     as_tibble()
 
+#' save the results
+saveRDS(campaign_delay_ovw_sensitivity, 
+        file = './model_output/deterministic_framework_analysis_output/sensitivity_analysis/wastage/campaign_delay_ovw_sensitivity.rds')
 
+## Remove some columns ==== 
+campaign_delay_ovw_sensitivity_trunc <- campaign_delay_ovw_sensitivity %>% 
+    select(-c(near_pop, far_pop, ft_vial_type, ft_equip_type, 
+              mt_vial_type, ft_doses_required, mt_doses_required, 
+              ft_RCW25, mt_RCW25, ft_vaxCarr, 
+              mt_vaxCarr, ft_icepacks_large, mt_icepacks_large, 
+              ft_icepacks_small, mt_icepacks_small, team_leaving_first
+              )
+           )
 
+#View(campaign_delay_ovw_sensitivity_trunc)
 
-
-campaign_metrics_wastage_sensitivity <- sim_params_table_ovw_sensitivity %>%
-#    slice_tail(n = 5) %>% 
+campaign_metrics_ovw_sensitivity <- sim_params_table_ovw_sensitivity %>%
+#    slice_tail(n = 50) %>% 
     rowwise() %>%
     do({
         with(
@@ -77,6 +89,8 @@ campaign_metrics_wastage_sensitivity <- sim_params_table_ovw_sensitivity %>%
                 mt_team_performance = sc_model_params$vax_rate[['mobile_team']],
                 dose10_ovwr_mt = dose10_ovw_mt,
                 monodose_ovwr_mt = monodose_ovw_mt,
+                dose10_ovwr_ft = dose10_ovw_ft,
+                monodose_ovwr_ft = dose10_ovw_ft,
                 browse = F
             )
         )
@@ -85,4 +99,40 @@ campaign_metrics_wastage_sensitivity <- sim_params_table_ovw_sensitivity %>%
     as_tibble()
 
 
-a <- bind_cols(campaign_metrics_wastage_sensitivity, select(sim_params_table_ovw_sensitivity, dose10_ovw_mt, monodose_ovw_mt))
+#' save the results
+saveRDS(campaign_metrics_ovw_sensitivity, 
+        file = './model_output/deterministic_framework_analysis_output/sensitivity_analysis/wastage/campaign_metrics_ovw_sensitivity.rds')
+#View(campaign_metrics_10_teams)
+
+
+campaign_metrics_ovw_sensitivity_trunc <- campaign_metrics_ovw_sensitivity %>% 
+                                            select(-c(strategy, 
+                                                    location_id, 
+                                                    mt_equip_type
+                                                    )
+                                                 )
+
+
+
+
+
+ovw_sensitivity_sc_analysis_full <- bind_cols(
+    campaign_delay_ovw_sensitivity_trunc,
+    select(sim_params_table_ovw_sensitivity, dose10_ovw_ft, dose10_ovw_mt, monodose_ovw_ft, monodose_ovw_mt),
+    campaign_metrics_ovw_sensitivity_trunc
+) 
+
+#View(ovw_sensitivity_sc_analysis_full)
+
+#' calculate the total operational time per strategy = time to start a strategy +
+#' time to complete a strategy across all locations
+#' 
+sc_analysis_ovw_sensitivity <- ovw_sensitivity_sc_analysis_full %>%
+    mutate(total_op_time = campaign_start + site_campaign_dur_constrained) %>%
+    as_tibble() 
+
+#View(sc_analysis_ovw_sensitivity)
+
+saveRDS(sc_analysis_ovw_sensitivity, 
+        file = "./model_output/deterministic_framework_analysis_output/sensitivity_analysis/wastage/sc_analysis_ovw_sensitivity.rds")
+
