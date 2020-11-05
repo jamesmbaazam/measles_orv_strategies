@@ -69,12 +69,20 @@ sim_params_table
 #wastage sensitivity analysis parameter table
 
 #grid of wastage values to test
-wastage_grid <- tibble(dose10_ovw_mt = seq(0, 100, length.out = 3), monodose_ovw_mt = seq(0, 100, length.out = 3))
+wastage_levels <- 5
+wastage_grid <- tibble(dose10_ovw_ft = seq(0, 100, length.out = wastage_levels), 
+                       monodose_ovw_ft = seq(0, 100, length.out = wastage_levels), 
+                       dose10_ovw_mt = seq(0, 100, length.out = wastage_levels), 
+                       monodose_ovw_mt = seq(0, 100, length.out = wastage_levels)
+                       )
 
 #key table for wastage sensitivity analysis
 key_table_wastage_sensitivity <- do.call("rbind", replicate(nrow(wastage_grid), key_table, simplify = FALSE)) %>% 
-    mutate(dose10_ovw_mt = rep(seq(0, 100, length.out = 3), each = nrow(key_table)),
-           monodose_ovw_mt = rep(seq(0, 100, length.out = 3), each = nrow(key_table)))
+    mutate(dose10_ovw_ft = rep(seq(0, 100, length.out = wastage_levels), each = nrow(key_table)),
+           monodose_ovw_ft = rep(seq(0, 100, length.out = wastage_levels), each = nrow(key_table)), 
+           dose10_ovw_mt = rep(seq(0, 100, length.out = wastage_levels), each = nrow(key_table)),
+           monodose_ovw_mt = rep(seq(0, 100, length.out = wastage_levels), each = nrow(key_table)), 
+           )
 
 sim_params_ovw_sensitivity <- left_join(key_table_wastage_sensitivity, strategy_subset_config, by = 'strategy')
     
