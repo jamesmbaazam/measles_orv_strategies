@@ -11,7 +11,7 @@ library(purrr)
 library(dplyr)
 
 #calculate delays prior to campaign start
-campaign_delay_results_10_teams <- sim_params_table %>%
+campaign_delay_results_msf_params <- sim_params_table %>%
   rowwise() %>%
   do({
     with(
@@ -46,11 +46,11 @@ campaign_delay_results_10_teams <- sim_params_table %>%
   as_tibble()
 
 #' save the results
-saveRDS(campaign_delay_results_10_teams, file = './model_output/deterministic_framework_analysis_output/campaign_delay_results_10_teams.rds')
+saveRDS(campaign_delay_results_msf_params, file = './model_output/deterministic_framework_analysis_output/baseline_msf_params/campaign_delay_results_msf_params.rds')
 
 
 ## Remove some columns ==== 
-campaign_delay_results_cropped_10_teams <- campaign_delay_results_10_teams %>% 
+campaign_delay_results_cropped_msf_params <- campaign_delay_results_msf_params %>% 
   select(-c(near_pop, far_pop, ft_vial_type, ft_equip_type, 
             mt_vial_type, ft_doses_required, mt_doses_required, 
             ft_RCW25, mt_RCW25, ft_vaxCarr, 
@@ -60,9 +60,9 @@ campaign_delay_results_cropped_10_teams <- campaign_delay_results_10_teams %>%
          )
 
 
-#View(campaign_delay_results_cropped_10_teams)
+#View(campaign_delay_results_cropped_msf_params)
 
-campaign_metrics_10_teams <- sim_params_table %>%
+campaign_metrics_msf_params <- sim_params_table %>%
   rowwise() %>%
   do({
     with(
@@ -99,13 +99,14 @@ campaign_metrics_10_teams <- sim_params_table %>%
 
 
 #' save the results
-saveRDS(campaign_metrics_10_teams, file = './model_output/deterministic_framework_analysis_output/campaign_metrics_10_teams.rds')
-#View(campaign_metrics_10_teams)
+saveRDS(campaign_metrics_msf_params, file = './model_output/deterministic_framework_analysis_output/baseline_msf_params/campaign_metrics_msf_params.rds')
+#View(campaign_metrics_msf_params)
 
 
-sc_analysis_10_teams_merged <- left_join(
-  campaign_delay_results_cropped_10_teams,
-  campaign_metrics_10_teams
+sc_analysis_msf_params_merged <- left_join(
+  campaign_delay_results_cropped_msf_params,
+  campaign_metrics_msf_params, 
+  by = c("strategy", "location_id", "mt_equip_type")
 ) 
 
 
