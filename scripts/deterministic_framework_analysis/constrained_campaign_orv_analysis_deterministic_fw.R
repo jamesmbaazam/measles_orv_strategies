@@ -1,6 +1,10 @@
 #global controls
 options(nwarnings = 10000) #print this many messages if they exist or occur
 
+#packages
+library(dplyr)
+library(purrr)
+
 #helper functions and parameters
 source('./scripts/parameters.R') #global parameter list
 source('./scripts/analyses_parameters.R') #specific parameter list for this analysis
