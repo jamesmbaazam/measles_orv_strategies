@@ -192,38 +192,41 @@ calc_dose_capacity <- function(vial_type,
 #' calculates number of doses needed based on the target population size; indicate
 #' if you need doses for the near or far people; the type of vial you need calcalations
 #' for; and the row numbers of the sites you want to analyse
+#'
+#' @param df the dataframe of added sites
+#' @param pop_type  one of c("near", "far")
+#' @param ovwastage open vial wastage
+#' @param buffer_size safety stock to cushion uncertainty
+#' @param is_dose10 if true, dose10, if false, monodose
 
 calc_doses_required <- function(df,
                                 pop_type,
                                 ovwastage,
                                 buffer_size,
-                                 is_dose10) { # df is the dataframe of added sites; site_row = row numbers to analyse; is.dose10, if false, means monodose; #pop_type = c(near, far), ovwastage = open vial wastage, buffer = safety stock to cushion uncertainty
-  # selected_sites <- df %>%
-  #   dplyr::slice(site_rows_selected)
-  selected_sites <- df 
+                                 is_dose10) { 
   if (pop_type == "near" & is_dose10 == T) {
-    dose_quant <- selected_sites %>%
+    dose_quant <- df %>%
       dplyr::summarise(sum(.$near_pop))
 
-    doses_required <- dose_quant * (1 + buffer_size / 100) * (1 + ovwastage / 100) # apply buffer and wastage cushion
+    doses_required <- dose_quant * (1 + buffer_size / 100) * (1 + ovwastage / 100) # Number of doses required to go to one location after apply buffer and wastage cushion
 
     return(ceiling(as.numeric(doses_required)))
   } else if (pop_type == "near" & is_dose10 == F) {
-    dose_quant <- selected_sites %>%
+    dose_quant <- df %>%
       dplyr::summarise(sum(.$near_pop))
 
     doses_required <- dose_quant * (1 + buffer_size / 100) * (1 + ovwastage / 100)
 
     return(as.numeric(doses_required))
   } else if (pop_type == "far" & is_dose10 == T) {
-    dose_quant <- selected_sites %>%
+    dose_quant <- df %>%
       dplyr::summarise(sum(.$far_pop))
 
     doses_required <- dose_quant * (1 + buffer_size / 100) * (1 + ovwastage / 100)
 
     return(as.numeric(ceiling(doses_required)))
   } else if (pop_type == "far" & is_dose10 == F) {
-    dose_quant <- selected_sites %>%
+    dose_quant <- df %>%
       dplyr::summarise(sum(.$far_pop))
 
     doses_required <- dose_quant * (1 + buffer_size / 100) * (1 + ovwastage / 100)
@@ -238,10 +241,12 @@ calc_doses_required <- function(df,
 
 # Ice pack quantity needed ----
 
-calc_icepack_tot_quant <- function(equipment_quantity # options: rcw25, vaxCarr
-                                   , icepacks_per_equipment) {
+calc_icepack_tot_quant <- function(equipment_quantity, 
+                                   icepacks_per_equipment # options: c("rcw25", "vaxCarr")
+                                   ) 
+  {
   return(equipment_quantity * icepacks_per_equipment)
-}
+  }
 
 
 # Ice pack volume needed ----
@@ -263,16 +268,17 @@ calc_icepack_tot_vol <- function(equipment_type # options: large = 0.6L, small =
 calc_freezing_time <- function(mf314_available,
                                large_icepacks_quantity,
                                small_icepacks_quantity) {
-  if(mf314_available < 0 )
-    {stop('Number of freezers cannot be below zero')} 
+  if(mf314_available < 0 ) {
+    stop('Number of freezers cannot be below zero')
+    } 
   else if(mf314_available == 0){
     ft <- Inf
-    }else{
-  ft <- ceiling(
-    (1 / mf314_available) * ((large_icepacks_quantity / mf314_largepack_fr) + 
-                               (small_icepacks_quantity / mf314_smallpack_fr)
-    ))
-  }
+    }
+  else
+      {
+        ft <- ceiling(
+    (1/mf314_available) * (large_icepacks_quantity/mf314_largepack_fr + small_icepacks_quantity/mf314_smallpack_fr))
+        }
   return(ft)
 }
 
