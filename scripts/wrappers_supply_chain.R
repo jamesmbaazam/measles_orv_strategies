@@ -541,22 +541,22 @@ ft_total_transport_capacity <- fixed_team_vaxCarr_vol + fixed_team_rcw25_vol
 #'
 #' @examples summarise_campaign_metrics(df)
 #' 
-summarise_campaign_metrics <- function(sc_analysis_res, browse = F){
-  if(browse) browser()
-  coverage_mean <- mean(sc_analysis_res$site_cov_total)
-  campaign_delay_total <- calc_compounded_delays(delays = sc_analysis_res$total_op_time,
-                                                 team_days = sc_analysis_res$total_op_time)
-  
-  campaign_summary <- data.frame(strategy = sc_analysis_res$strategy[1],
-                                 mt_equip = sc_analysis_res$mt_equip_type[1],
-                                 n_sites = length(sc_analysis_res$location_id),
-                                 n_fixed_teams = sc_analysis_res$fixed_teams[1],
-                                 n_mobile_teams = sc_analysis_res$mobile_teams[1],
-                                 average_coverage = coverage_mean,
-                                 campaign_duration = tail(campaign_delay_total, 1)
-  )
-  return(campaign_summary)
-}
+# summarise_campaign_metrics <- function(sc_analysis_res, browse = F){
+#   if(browse) browser()
+#   coverage_mean <- mean(sc_analysis_res$site_cov_total)
+#   campaign_delay_total <- calc_compounded_delays(delays = sc_analysis_res$total_op_time,
+#                                                  team_days = sc_analysis_res$total_op_time)
+#   
+#   campaign_summary <- data.frame(strategy = sc_analysis_res$strategy[1],
+#                                  mt_equip = sc_analysis_res$mt_equip_type[1],
+#                                  n_sites = length(sc_analysis_res$location_id),
+#                                  n_fixed_teams = sc_analysis_res$fixed_teams[1],
+#                                  n_mobile_teams = sc_analysis_res$mobile_teams[1],
+#                                  average_coverage = coverage_mean,
+#                                  campaign_duration = tail(campaign_delay_total, 1)
+#   )
+#   return(campaign_summary)
+# }
 
 #' analyse_team_days <- function(strategy_name,
 #'                               fixed_team_with_dose10,
