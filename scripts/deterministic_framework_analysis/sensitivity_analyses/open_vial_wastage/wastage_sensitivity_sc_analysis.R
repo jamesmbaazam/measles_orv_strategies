@@ -87,10 +87,10 @@ campaign_metrics_ovw_sensitivity <- sim_params_table_ovw_sensitivity %>%
                 site_campaign_dur_constraint = sc_model_params$site_campaign_dur_constraint,
                 ft_team_performance = sc_model_params$vax_rate[['fixed_team']],
                 mt_team_performance = sc_model_params$vax_rate[['mobile_team']],
-                dose10_ovwr_mt = dose10_ovw_mt,
-                monodose_ovwr_mt = monodose_ovw_mt,
-                dose10_ovwr_ft = dose10_ovw_ft,
-                monodose_ovwr_ft = dose10_ovw_ft,
+                dose10_ovwr_mt = sc_model_params$dose10_ovw_mobile_team,
+                monodose_ovwr_mt = sc_model_params$monodose_ovw_mobile_team,
+                dose10_ovwr_ft = sc_model_params$dose10_ovw_fixed_team,
+                monodose_ovwr_ft = sc_model_params$monodose_ovw_fixed_team,
                 browse = F
             )
         )
