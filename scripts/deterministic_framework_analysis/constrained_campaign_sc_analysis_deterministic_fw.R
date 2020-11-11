@@ -110,34 +110,20 @@ sc_analysis_msf_params_merged <- left_join(
 ) 
 
 
-#' calculate the total operational time per strategy = time to start a strategy +
-#' time to complete a strategy across all locations
-#' 
-sc_analysis_full_10_teams <- sc_analysis_10_teams_merged %>%
-  mutate(total_op_time = campaign_start + site_campaign_dur_constrained) %>%
-  as_tibble() 
+#' Supply chain outcomes: 1. Campaign duration (commencement delay + total time to complete campaign in all locations)
+#' 2. Average coverage = mean of the coverage from all locations.
+sc_analysis_outcomes_msf_params <- sc_analysis_msf_params_merged %>%
+  group_by(strategy, mt_equip_type) %>% 
+  summarise(strategy = strategy[1],
+            mt_equip_type = mt_equip_type[1],
+            n_locations = n_distinct(location_id),
+            n_fixed_teams = fixed_teams[1],
+            n_mobile_teams = mobile_teams[1],
+            average_coverage = mean(site_cov_total),
+            campaign_duration = campaign_start[1] + sum(site_campaign_dur_constrained)
+            ) 
 
-#View(sc_analysis_full_10_teams)
 
-saveRDS(sc_analysis_full_10_teams, file = "./model_output/deterministic_framework_analysis_output/sc_analysis_full_10_teams.rds")
+saveRDS(sc_analysis_outcomes_msf_params, file = "./model_output/deterministic_framework_analysis_output/baseline_msf_params/sc_analysis_outcomes_msf_params.rds")
 
-sc_results_summary_10_teams <- sc_analysis_full_10_teams %>%
-  group_split(strategy, mt_equip_type) %>%
-  map_df(function(dat) {
-    summarise_campaign_metrics(dat)
-  })
-
-#View(sc_results_summary_10_teams)
-saveRDS(sc_results_summary_10_teams, file = "./model_output/deterministic_framework_analysis_output/sc_results_summary_10_teams.rds")
-#' write the results to file
-#' full supply chain analysis
-#' write.xlsx(x = sc_analysis_full_10_teams, 
-#'            file = './model_output/sc_analysis_full_10_teams_iid_pops.xlsx'
-#'            )
-#' 
-#' #' summary of the full supply chain analysis
-#' write.xlsx(x = sc_results_summary_10_teams, 
-#'            file = './model_output/sc_results_summary_10_teams_iid_pops.xlsx'
-#'            )
-#' 
 
