@@ -77,7 +77,7 @@ analyse_prep_delay <- function(strategy_name,
   } else if (n_fixed_teams_per_site == 2 & n_teams_fixed %% 2 == 1) {
     floor(n_teams_fixed / 2) + 1
   } else if (n_fixed_teams_per_site == 1) {
-    1 * n_teams_fixed
+    n_teams_fixed
   } else {
     stop("Check inputs: n_fixed_teams_per_site must be 1 or 2")
   }
@@ -116,32 +116,26 @@ analyse_prep_delay <- function(strategy_name,
 
   ### Fixed post - number of doses ####
   n_doses_fixed_team <- calc_doses_required(
-    df = site_details
-    #  , site_rows_selected = site_row
-    , is_dose10 = fixed_team_with_dose10,
+    df = site_details,
+    is_dose10 = fixed_team_with_dose10,
     pop_type = "near",
     ovwastage = ifelse(fixed_team_with_dose10,
       sc_model_params$dose10_ovw_fixed_team,
       sc_model_params$monodose_ovw_fixed_team
-    ), buffer_size = sc_model_params$buffer_stock
+    ), 
+    buffer_size = sc_model_params$buffer_stock
   )
 
-  ### Fixed post - passive cold chain ####
-  #' Here, I am assuming that vaccine carriers are transported with ice but
-  #' without vaccines to the site.
-  #' The RCW25s are used to transport the vaccines to the site and then transferred
-  #' into the vax carrier for for administration.
+  ### Fixed post - Final number of passive cold chain required, based on the number of teams specified ####
+  RCW25_required_fixed_team <- fixed_teams_rcw25
 
-  RCW25_required_fixed_team <- 1 * fixed_teams_rcw25
-
-  vaxCarr_required_fixed_team <- 1 * fixed_teams_vaxCarr
+  vaxCarr_required_fixed_team <- fixed_teams_vaxCarr
 
 
   ### Mobile teams - number of doses ####
   n_doses_mobile_team <- calc_doses_required(
-    df = site_details
-    #  , site_rows_selected = site_row
-    , is_dose10 = mobile_team_with_dose10,
+    df = site_details, 
+    is_dose10 = mobile_team_with_dose10,
     pop_type = "far",
     ovwastage = ifelse(mobile_team_with_dose10,
       sc_model_params$dose10_ovw_mobile_team,
@@ -181,6 +175,7 @@ analyse_prep_delay <- function(strategy_name,
     ),
     icepacks_per_equipment = RCW25_icepack_needs
   )
+  
   vaxCarr_icepack_needs_fixed_team <- calc_icepack_tot_quant(
     equipment_quantity = ifelse(fixed_team_with_ice,
       vaxCarr_required_fixed_team,
