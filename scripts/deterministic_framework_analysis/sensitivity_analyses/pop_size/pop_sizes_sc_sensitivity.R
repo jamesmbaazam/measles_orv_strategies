@@ -2,7 +2,7 @@ options(nwarnings = 10000) #print this many messages if they exist or occur
 
 #helper scripts
 source("./scripts/wrappers_supply_chain.R")
-source("./scripts/deterministic_framework_analysis/sensitivity_analyses/pop_size/simulation_params_pop_size_sensitivity.R")
+source("./scripts/deterministic_framework_analysis/sensitivity_analyses/pop_size/sim_params_pop_size_equal_teams_sensitivity.R")
 
 
 #packages
