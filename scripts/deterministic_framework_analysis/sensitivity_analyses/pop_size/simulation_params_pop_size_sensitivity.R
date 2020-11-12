@@ -11,6 +11,7 @@ source('./scripts/strategy_list_complete.R')
 
 #resolve conflicts
 conflict_prefer('filter', 'dplyr')
+conflict_prefer('select', 'dplyr')
 
 
 ## we're only interested in a subset of scenarios and strategies for now
@@ -34,13 +35,13 @@ strategy_subset_config <- dplyr::filter(strategies, strategy %in% strategy_subse
 
 
 #Location characteristics
-near_pop_sizes <- rep(c(25, 50, 75), each = 50)*1000
+near_pop_sizes <- rep(seq(10, 50, 10), each = 50)*1000
 
-far_pop_sizes <- rev(rep(c(25, 50, 75), each = 50))*1000
+far_pop_sizes <- rev(rep(seq(10, 50, 10), each = 50))*1000
 
 site_pops_df <- tibble(near_pop = near_pop_sizes, 
                            far_pop = far_pop_sizes,
-                           location_id = as_factor(rep(1:5, times = 30))
+                           location_id = as_factor(rep(1:5, times = 50))
                            )
                            
 
@@ -64,12 +65,11 @@ sim_params_tmp <- left_join(key_table,
                             ) 
     
 
-sim_params_full <- do.call('rbind', replicate(3, sim_params_tmp, simplify = F))
+sim_params_full <- do.call('rbind', replicate(5, sim_params_tmp, simplify = F))
 
 sim_params_pop_size_sensitivity <- cbind(sim_params_full, 
-                          select(site_pops_df, -location_id)
-                          ) %>% 
-    as_tibble()
+                                         select(site_pops_df, -location_id)
+                                         ) %>% as_tibble() 
 
 sim_params_pop_size_sensitivity
 
