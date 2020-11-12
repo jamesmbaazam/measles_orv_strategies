@@ -16,7 +16,7 @@ conflict_prefer('summarise', 'dplyr')
 
 
 #'load data and rescale them to the actual numbers
-orv_near_dynamics <- readRDS('./model_output/deterministic_framework_analysis_output/orv_near_dynamics_proportions.rds') %>% 
+orv_near_dynamics <- readRDS('./model_output/deterministic_framework_analysis_output/baseline_msf_params/orv_near_dynamics_proportions.rds') %>% 
     mutate(S = S*site_pop_dist$near_pop[1],
            E = E*site_pop_dist$near_pop[1],
            I = I*site_pop_dist$near_pop[1],
@@ -24,7 +24,7 @@ orv_near_dynamics <- readRDS('./model_output/deterministic_framework_analysis_ou
            K = K*site_pop_dist$near_pop[1]
            )
 
-no_orv_near_dynamics <- readRDS('./model_output/deterministic_framework_analysis_output/no_orv_near_dynamics_proportions.rds') %>% 
+no_orv_near_dynamics <- readRDS('./model_output/deterministic_framework_analysis_output/baseline_msf_params/no_orv_near_dynamics_proportions.rds') %>% 
     mutate(S = S*site_pop_dist$near_pop[1],
            E = E*site_pop_dist$near_pop[1],
            I = I*site_pop_dist$near_pop[1],
@@ -32,7 +32,7 @@ no_orv_near_dynamics <- readRDS('./model_output/deterministic_framework_analysis
            K = K*site_pop_dist$near_pop[1]
            )
 
-orv_far_dynamics <- readRDS('./model_output/deterministic_framework_analysis_output/orv_far_dynamics_proportions.rds') %>% 
+orv_far_dynamics <- readRDS('./model_output/deterministic_framework_analysis_output/baseline_msf_params/orv_far_dynamics_proportions.rds') %>% 
     mutate(S = S*site_pop_dist$far_pop[1],
            E = E*site_pop_dist$far_pop[1],
            I = I*site_pop_dist$far_pop[1],
@@ -40,7 +40,7 @@ orv_far_dynamics <- readRDS('./model_output/deterministic_framework_analysis_out
            K = K*site_pop_dist$far_pop[1]
            )
 
-no_orv_far_dynamics <- readRDS('./model_output/deterministic_framework_analysis_output/no_orv_far_dynamics_proportions.rds') %>% 
+no_orv_far_dynamics <- readRDS('./model_output/deterministic_framework_analysis_output/baseline_msf_params/no_orv_far_dynamics_proportions.rds') %>% 
     mutate(S = S*site_pop_dist$far_pop[1],
            E = E*site_pop_dist$far_pop[1],
            I = I*site_pop_dist$far_pop[1],
@@ -102,25 +102,28 @@ cases_averted_df <- orv_outbreak_sizes_aggregated %>%
 
 cases_averted_df
 
-saveRDS(cases_averted_df, './model_output/deterministic_framework_analysis_output/cases_averted_deterministic_framework_analysis.rds')
+saveRDS(cases_averted_df, './model_output/deterministic_framework_analysis_output/baseline_msf_params/cases_averted_deterministic_framework_analysis.rds')
 
 
 #' Combine all simulations into a FINAL data.frame for post-processing
 
 #'load supply chain summary
 #'
-sc_results_summary_10_teams <- readRDS('./model_output/deterministic_framework_analysis_output/sc_results_summary_10_teams.rds') %>% 
-    as_tibble() %>% 
-    rename(mt_equip_type = mt_equip) %>% 
-    mutate(strategy = as_factor(gsub(pattern = '_parallel', replacement = '', .$strategy))) #shorten the strategy names
+sc_final_outcomes_msf_params <- readRDS('./model_output/deterministic_framework_analysis_output/baseline_msf_params/sc_final_outcomes_msf_params.rds') 
 
-sc_epi_analysis_summary_10_teams <- left_join(sc_results_summary_10_teams, 
-                                              cases_averted_df, 
-                                              by = c('strategy', 'mt_equip_type'
-                                              )
-)
+sc_analysis_msf_params_final_outcomes <- sc_final_outcomes_msf_params %>% 
+    mutate(strategy = as_factor(stringr::str_replace(strategy, 
+                                                     pattern = '_parallel', 
+                                                     replacement = '')
+                                )
+           ) #shorten the strategy names
 
-saveRDS(sc_epi_analysis_summary_10_teams, 
-        file = './model_output/deterministic_framework_analysis_output/sc_epi_analysis_summary_10_teams.rds'
-)
-View(sc_epi_analysis_summary_10_teams)
+msf_params_complete_analysis_final_outcomes <- left_join(sc_analysis_msf_params_final_outcomes, 
+                             cases_averted_df, 
+                             by = c('strategy', 'mt_equip_type'
+                                    )
+                             )
+
+saveRDS(msf_params_complete_analysis_final_outcomes, 
+        file = './model_output/deterministic_framework_analysis_output/baseline_msf_params/msf_params_complete_analysis_final_outcomes.rds')
+
