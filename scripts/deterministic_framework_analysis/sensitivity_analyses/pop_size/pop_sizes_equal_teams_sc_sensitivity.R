@@ -169,8 +169,8 @@ coverage_duration_plot_plain_shapes_beeswarm <- ggplot(data = sc_analysis_pop_si
                       fill = vial_type,
                       color = cold_chain
                   ),
-                  size = 8,
-                  cex = 10, 
+                  size = 4,
+                  cex = 5, 
                   stroke = 2
     ) +
     scale_y_continuous(breaks = seq(min(sc_analysis_pop_size_sensitivity_summary$average_coverage), 
