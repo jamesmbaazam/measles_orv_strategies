@@ -8,9 +8,6 @@ library(dplyr)
 library(extrafont)
 library(conflicted)
 
-# resolve conflicts
-conflict_prefer("select", "dplyr")
-conflict_prefer("filter", "dplyr")
 
 # set up for publication-ready plots
 # font_import() only do this one time - it takes a while
@@ -18,12 +15,12 @@ loadfonts(device = "win")
 windowsFonts(Arial = windowsFont("Arial"))
 
 # save plots to this directory
-plot_path <- "./figures/deterministic_framework_analysis_figures/"
+plot_path <- "./figures/deterministic_framework_analysis_figures/baseline_msf_params/"
 
 # load plotting data
-results_summary_model_output <- readRDS("./model_output/deterministic_framework_analysis_output/sc_epi_analysis_summary_10_teams.rds")
+msf_params_complete_analysis_outcomes <- readRDS("./model_output/deterministic_framework_analysis_output/baseline_msf_params/msf_params_complete_analysis_final_outcomes.rds")
 
-results_summary_df <- results_summary_model_output %>%
+msf_params_complete_analysis_outcomes_mod <- msf_params_complete_analysis_outcomes %>%
   mutate(
     cold_chain = as_factor(ifelse(str_detect(strategy, "_fcc"),
       "cc",
@@ -46,7 +43,7 @@ results_summary_df <- results_summary_model_output %>%
 #' Illustrator version - plain shapes
 
 set.seed(1234)
-coverage_duration_plot_plain_shapes <- ggplot(data = results_summary_df, 
+coverage_duration_plot_plain_shapes <- ggplot(data = msf_params_complete_analysis_outcomes_mod, 
                                           aes(x = campaign_duration, 
                                               y = average_coverage
                                               )
@@ -60,12 +57,12 @@ coverage_duration_plot_plain_shapes <- ggplot(data = results_summary_df,
               height = 0.006, 
               width = 0.25
               ) +
-  scale_y_continuous(breaks = seq(min(sc_epi_analysis_summary_10_teams$average_coverage), 
-                                  max(sc_epi_analysis_summary_10_teams$average_coverage), 
+  scale_y_continuous(breaks = seq(min(msf_params_complete_analysis_outcomes_mod$average_coverage), 
+                                  max(msf_params_complete_analysis_outcomes_mod$average_coverage), 
                                   0.02
   ),
-  labels = percent(seq(min(sc_epi_analysis_summary_10_teams$average_coverage), 
-                       max(sc_epi_analysis_summary_10_teams$average_coverage), 
+  labels = percent(seq(min(msf_params_complete_analysis_outcomes_mod$average_coverage), 
+                       max(msf_params_complete_analysis_outcomes_mod$average_coverage), 
                        0.02)
                    )
   ) +
@@ -144,7 +141,7 @@ plot(coverage_duration_plot_plain_shapes)
 #beeswarm plot, a better option than jitter plots
 library(ggbeeswarm)
 
-coverage_duration_plot_plain_shapes_beeswarm <- ggplot(data = results_summary_df, 
+coverage_duration_plot_plain_shapes_beeswarm <- ggplot(data = msf_params_complete_analysis_outcomes_mod, 
                                                        aes(x = campaign_duration, 
                                                            y = average_coverage
                                                        )) + 
@@ -157,21 +154,21 @@ coverage_duration_plot_plain_shapes_beeswarm <- ggplot(data = results_summary_df
                 cex = 4.5, 
                 stroke = 2
                 ) +
-  scale_y_continuous(breaks = seq(min(sc_epi_analysis_summary_10_teams$average_coverage), 
-                                  max(sc_epi_analysis_summary_10_teams$average_coverage), 
+  scale_y_continuous(breaks = seq(min(msf_params_complete_analysis_outcomes_mod$average_coverage), 
+                                  max(msf_params_complete_analysis_outcomes_mod$average_coverage), 
                                   length.out = 5),
-  labels = percent(seq(min(sc_epi_analysis_summary_10_teams$average_coverage), 
-                       max(sc_epi_analysis_summary_10_teams$average_coverage), 
+  labels = percent(seq(min(msf_params_complete_analysis_outcomes_mod$average_coverage), 
+                       max(msf_params_complete_analysis_outcomes_mod$average_coverage), 
                        length.out = 5)
                    )
   ) +
-  scale_x_continuous(breaks = seq(min(sc_epi_analysis_summary_10_teams$campaign_duration), 
-                                  max(sc_epi_analysis_summary_10_teams$campaign_duration), 
-                                  5
-  ),
-  labels = seq(min(sc_epi_analysis_summary_10_teams$campaign_duration), 
-                       max(sc_epi_analysis_summary_10_teams$campaign_duration), 
-                       5)
+  scale_x_continuous(breaks = seq(min(msf_params_complete_analysis_outcomes_mod$campaign_duration), 
+                                  max(msf_params_complete_analysis_outcomes_mod$campaign_duration), 
+                                  length.out = 5
+                                  ),
+  labels = seq(min(msf_params_complete_analysis_outcomes_mod$campaign_duration), 
+                       max(msf_params_complete_analysis_outcomes_mod$campaign_duration), 
+               length.out = 5)
   ) +
   scale_shape_manual(name = 'Mobile team equipment', 
                      values = c(21, 24), 
@@ -227,7 +224,7 @@ plot(coverage_duration_plot_plain_shapes_beeswarm)
 
 
 #' visualisations
-# coverage_duration_plot <- ggplot(data = results_summary_df,
+# coverage_duration_plot <- ggplot(data = msf_params_complete_analysis_outcomes_mod,
 #                                  aes(x = campaign_duration,
 #                                      y = average_coverage)
 # ) +
