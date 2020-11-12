@@ -46,7 +46,7 @@ campaign_delay_results_msf_params <- sim_params_table %>%
   as_tibble()
 
 #' save the results
-saveRDS(campaign_delay_results_msf_params, file = './model_output/deterministic_framework_analysis_output/baseline_msf_params/campaign_delay_results_msf_params.rds')
+# saveRDS(campaign_delay_results_msf_params, file = './model_output/deterministic_framework_analysis_output/baseline_msf_params/campaign_delay_results_msf_params.rds')
 
 
 ## Remove some columns ==== 
@@ -97,12 +97,12 @@ campaign_metrics_msf_params <- sim_params_table %>%
   ungroup() %>% 
   as_tibble()
 
+#' 
+#' #' save the results
+#' saveRDS(campaign_metrics_msf_params, file = './model_output/deterministic_framework_analysis_output/baseline_msf_params/campaign_metrics_msf_params.rds')
 
-#' save the results
-saveRDS(campaign_metrics_msf_params, file = './model_output/deterministic_framework_analysis_output/baseline_msf_params/campaign_metrics_msf_params.rds')
-#View(campaign_metrics_msf_params)
 
-
+#Combine the two supply chain analyses
 sc_analysis_msf_params_merged <- left_join(
   campaign_delay_results_cropped_msf_params,
   campaign_metrics_msf_params, 
@@ -110,7 +110,12 @@ sc_analysis_msf_params_merged <- left_join(
 ) 
 
 
-#' Supply chain outcomes: 1. Campaign duration (commencement delay + total time to complete campaign in all locations)
+saveRDS(sc_analysis_msf_params_merged, file = "./model_output/deterministic_framework_analysis_output/baseline_msf_params/sc_results_full_msf_params.rds")
+
+
+
+
+#' Supply chain outcomes (final): 1. Campaign duration (commencement delay + total time to complete campaign in all locations)
 #' 2. Average coverage = mean of the coverage from all locations.
 sc_analysis_outcomes_msf_params <- sc_analysis_msf_params_merged %>%
   group_by(strategy, mt_equip_type) %>% 
@@ -124,6 +129,6 @@ sc_analysis_outcomes_msf_params <- sc_analysis_msf_params_merged %>%
             ) 
 
 
-saveRDS(sc_analysis_outcomes_msf_params, file = "./model_output/deterministic_framework_analysis_output/baseline_msf_params/sc_analysis_outcomes_msf_params.rds")
+saveRDS(sc_analysis_outcomes_msf_params, file = "./model_output/deterministic_framework_analysis_output/baseline_msf_params/sc_final_outcomes_msf_params.rds")
 
 
