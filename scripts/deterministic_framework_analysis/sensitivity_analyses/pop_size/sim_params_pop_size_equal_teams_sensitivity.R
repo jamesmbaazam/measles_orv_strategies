@@ -67,10 +67,9 @@ sim_params_tmp <- left_join(key_table,
 
 sim_params_full <- do.call('rbind', replicate(5, sim_params_tmp, simplify = F))
 
-sim_params_pop_size_sensitivity <- cbind(sim_params_full, 
+sim_params_pop_size_equal_teams_sensitivity <- cbind(sim_params_full, 
                                          select(site_pops_df, -location_id)
                                          ) %>% as_tibble() 
 
-sim_params_pop_size_sensitivity
 
 
