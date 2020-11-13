@@ -9,9 +9,10 @@ source("./scripts/deterministic_framework_analysis/sensitivity_analyses/pop_size
 library(xlsx)
 library(purrr)
 library(dplyr)
+library(stringr)
 
 #calculate the delay before starting the campaign
-campaign_delay_pop_size_sensitivity <- sim_params_pop_size_sensitivity %>% 
+campaign_delay_pop_size_equal_teams_sensitivity <- sim_params_pop_size_equal_teams_sensitivity %>% 
     rowwise() %>%
     do({
         with(
@@ -49,7 +50,7 @@ campaign_delay_pop_size_sensitivity <- sim_params_pop_size_sensitivity %>%
 
 
 ## Remove some columns ==== 
-campaign_delay_pop_size_sensitivity_trunc <- campaign_delay_pop_size_sensitivity %>% 
+campaign_delay_pop_size_equal_teams_sensitivity_trunc <- campaign_delay_pop_size_equal_teams_sensitivity %>% 
     select(-c(near_pop, far_pop, ft_vial_type, ft_equip_type, 
               mt_vial_type, ft_doses_required, mt_doses_required, 
               ft_RCW25, mt_RCW25, ft_vaxCarr, 
@@ -60,7 +61,7 @@ campaign_delay_pop_size_sensitivity_trunc <- campaign_delay_pop_size_sensitivity
 
 
 #calculate expected coverage and the campaign duration per location
-campaign_metrics_pop_size_sensitivity <- sim_params_pop_size_sensitivity %>%
+campaign_metrics_pop_size_equal_teams_sensitivity <- sim_params_pop_size_equal_teams_sensitivity %>%
     rowwise() %>%
     do({
         with(
@@ -97,7 +98,7 @@ campaign_metrics_pop_size_sensitivity <- sim_params_pop_size_sensitivity %>%
 
 
 ## Remove some columns ==== 
-campaign_metrics_pop_size_sensitivity_trunc <- campaign_metrics_pop_size_sensitivity %>% 
+campaign_metrics_pop_size_equal_teams_sensitivity_trunc <- campaign_metrics_pop_size_equal_teams_sensitivity %>% 
     select(-c(strategy, 
               location_id, 
               mt_equip_type
@@ -108,15 +109,15 @@ campaign_metrics_pop_size_sensitivity_trunc <- campaign_metrics_pop_size_sensiti
 
 
 #Combine the results from the two analyses
-pop_size_sensitivity_sc_analysis_full <- bind_cols(
-    campaign_delay_pop_size_sensitivity_trunc,
-    campaign_metrics_pop_size_sensitivity_trunc
+pop_size_equal_teams_sensitivity_sc_analysis_full <- bind_cols(
+    campaign_delay_pop_size_equal_teams_sensitivity_trunc,
+    campaign_metrics_pop_size_equal_teams_sensitivity_trunc
     ) 
 
 
 #' Epi input: compounded delays
-sc_analysis_pop_size_sensitivity_w_cpd_delays <- pop_size_sensitivity_sc_analysis_full %>%
-    group_by(strategy, mt_equip_type, near_pop, far_pop) %>%
+sc_analysis_pop_size_equal_teams_sensitivity_w_cpd_delays <- pop_size_equal_teams_sensitivity_sc_analysis_full %>%
+    group_by(strategy, mt_equip_type, near_pop, far_pop, n_teams_fixed, n_teams_mobile) %>%
         mutate(
             mt_compounded_delay = calc_compounded_delays(
                    campaign_start,
@@ -132,8 +133,8 @@ sc_analysis_pop_size_sensitivity_w_cpd_delays <- pop_size_sensitivity_sc_analysi
 
 
 #Supply chain outcomes: 1. total operational time, 2. Average coverage
-sc_analysis_pop_size_sensitivity_summary <- sc_analysis_pop_size_sensitivity_w_cpd_delays %>%
-    group_by(strategy, mt_equip_type, near_pop, far_pop) %>%
+sc_analysis_pop_size_equal_teams_sensitivity_summary <- sc_analysis_pop_size_equal_teams_sensitivity_w_cpd_delays %>%
+    group_by(strategy, mt_equip_type, near_pop, far_pop, n_teams_fixed, n_teams_mobile) %>%
     summarise(n_locations = length(location_id),
               average_coverage = mean(site_cov_total),
               campaign_duration = sum(site_campaign_dur_constrained) + campaign_start[1]
@@ -157,97 +158,11 @@ sc_analysis_pop_size_sensitivity_summary <- sc_analysis_pop_size_sensitivity_w_c
 
 
 
-#A quick plot
-#beeswarm plot, a better option than jitter plots
-library(ggbeeswarm)
-
-coverage_duration_plot_plain_shapes_beeswarm <- ggplot(data = sc_analysis_pop_size_sensitivity_summary, 
-                                                       aes(x = campaign_duration, 
-                                                           y = average_coverage)) + 
-    geom_beeswarm(groupOnX = F,
-                  aes(shape = mt_equip_type, 
-                      fill = vial_type,
-                      color = cold_chain
-                  ),
-                  size = 4,
-                  cex = 5, 
-                  stroke = 2
-    ) +
-    scale_y_continuous(breaks = seq(min(sc_analysis_pop_size_sensitivity_summary$average_coverage), 
-                                    max(sc_analysis_pop_size_sensitivity_summary$average_coverage), 
-                                    length.out = 5),
-                       labels = percent(seq(min(sc_analysis_pop_size_sensitivity_summary$average_coverage), 
-                                            max(sc_analysis_pop_size_sensitivity_summary$average_coverage), 
-                                            length.out = 5)
-                       )
-    ) +
-    scale_x_continuous(breaks = seq(min(sc_analysis_pop_size_sensitivity_summary$campaign_duration), 
-                                    max(sc_analysis_pop_size_sensitivity_summary$campaign_duration), 
-                                    length.out = 5
-    ),
-    labels = seq(min(sc_analysis_pop_size_sensitivity_summary$campaign_duration), 
-                 max(sc_analysis_pop_size_sensitivity_summary$campaign_duration), 
-                 length.out = 5)
-    ) +
-    scale_shape_manual(name = 'Mobile team equipment', 
-                       values = c(21, 24), 
-                       labels = c('rcw25' = 'RCW25', 
-                                  'vaxCarr' = 'Vaccine carrier')
-    ) +
-    scale_color_manual(name = 'Cold chain option', 
-                       breaks = c('cc', 
-                                  'no_cc', 
-                                  'part_cc'),
-                       labels = c('Cold chain' , 
-                                  'Outside cold chain', 
-                                  'Partial cold chain' ),
-                       values = c('cc' = '#00AFBB', 
-                                  'no_cc' = '#FC4E07', 
-                                  'part_cc' = '#E7B800')
-    ) +
-    scale_fill_manual(name = 'Vial type',
-                      breaks = c('dose10', 
-                                 'monodose',
-                                 'dose10 + monodose'),
-                      values = c('dose10' = NA, 
-                                 'monodose' = NA,
-                                 'dose10 + monodose' = NA),
-                      labels = c('dose10' = '10-dose', 
-                                 'monodose' = 'Monodose',
-                                 'dose10 + monodose' = '10-dose & Monodose')
-    ) +
-    guides(shape = guide_legend(override.aes = list(size = 6, 
-                                                    stroke = 1.2
-    ), 
-    order = 1
-    ), 
-    fill = guide_legend(override.aes = list(size = 6, 
-                                            color = 'black', 
-                                            fill = 'white', 
-                                            shape = 22)
-    )
-    ) +
-    labs(
-        title = 'Strategy ranking by vaccination coverage and campaign duration (Equal team type allocation)',
-        x = "Campaign duration (days)",
-        y = "Vaccination coverage"
-        ) +
-    # ggpubr::font('xy.text', face = 'plain') +
-    # ggpubr::font('xy.title', face = 'plain') +
-    # ggpubr::theme_pubr(legend = 'right', 
-    #                    base_size = 16,
-    #                    border = T) + 
-    facet_wrap(near_pop ~ far_pop) +
-    NULL
-
-plot(coverage_duration_plot_plain_shapes_beeswarm)
-
-
  #Save the final analysis
-saveRDS(sc_analysis_pop_size_sensitivity_w_cpd_delays, 
-        file = "./model_output/deterministic_framework_analysis_output/sensitivity_analysis/pop_sizes/sc_analysis_pop_size_sensitivity_full.rds")
+saveRDS(sc_analysis_pop_size_equal_teams_sensitivity_w_cpd_delays, 
+        file = "./model_output/deterministic_framework_analysis_output/sensitivity_analysis/pop_sizes/sc_analysis_pop_size_equal_teams_sensitivity_full.rds")
 
 
-saveRDS(sc_analysis_pop_size_sensitivity_summary, 
-        file = "./model_output/deterministic_framework_analysis_output/sensitivity_analysis/pop_sizes/sc_analysis_pop_size_sensitivity_summary.rds")
+saveRDS(sc_analysis_pop_size_equal_teams_sensitivity_summary, 
+        file = "./model_output/deterministic_framework_analysis_output/sensitivity_analysis/pop_sizes/sc_analysis_pop_size_equal_teams_sensitivity_summary.rds")
 
