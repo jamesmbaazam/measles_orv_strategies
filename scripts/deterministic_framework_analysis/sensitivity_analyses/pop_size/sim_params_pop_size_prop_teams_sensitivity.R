@@ -42,9 +42,9 @@ near_pop_sizes <- rep(seq(10, 50, 10), each = 50)*1000
 
 far_pop_sizes <- rev(rep(seq(10, 50, 10), each = 50))*1000
 
-n_ft <- ceiling(near_pop_sizes/(near_pop_sizes + far_pop_sizes)*n_teams)
+n_ft <- round(near_pop_sizes/(near_pop_sizes + far_pop_sizes)*n_teams)
 
-n_mt <- ceiling(far_pop_sizes/(near_pop_sizes + far_pop_sizes)*n_teams)
+n_mt <- round(far_pop_sizes/(near_pop_sizes + far_pop_sizes)*n_teams)
 
 site_pops_df <- tibble(near_pop = near_pop_sizes, 
                        far_pop = far_pop_sizes, 
