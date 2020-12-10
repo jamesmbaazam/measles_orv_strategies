@@ -38,7 +38,6 @@ orv_model_params <- list(near_pop_R0 = seq(2, 18, 0.5)
                          , model_time = 365*5 #run model for 5 years
                          , LP = 7 #LP = Latent period
                          , IP = 7 #IP = Infectious period
-                         , immune_response_timing = 7
                          )
 
 
