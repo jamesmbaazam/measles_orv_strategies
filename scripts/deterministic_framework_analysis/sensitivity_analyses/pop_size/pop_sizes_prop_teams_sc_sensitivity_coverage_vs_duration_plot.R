@@ -3,6 +3,9 @@
 library(ggbeeswarm)
 library(scales)
 
+
+options("scipen" = 10000, "digits" = 4) #remove scientific notation in plots 
+
 #Read in the model output
 sc_analysis_pop_size_prop_teams_sensitivity_summary <- readRDS(file = "./model_output/deterministic_framework_analysis_output/sensitivity_analysis/pop_sizes/sc_analysis_pop_size_prop_teams_sensitivity_summary.rds")
 
@@ -15,7 +18,7 @@ coverage_duration_plot_plain_shapes_beeswarm <- ggplot(data = sc_analysis_pop_si
                       fill = vial_type,
                       color = cold_chain
                   ),
-                  size = 4,
+                  size = 2,
                   cex = 5, 
                   stroke = 2
     ) +
@@ -77,18 +80,10 @@ coverage_duration_plot_plain_shapes_beeswarm <- ggplot(data = sc_analysis_pop_si
         title = 'Strategy ranking by vaccination coverage and campaign duration (Proportional team type allocation)',
         x = "Campaign duration (days)",
         y = "Vaccination coverage"
-    ) +
-    # ggpubr::font('xy.text', face = 'plain') +
-    # ggpubr::font('xy.title', face = 'plain') +
-    # ggpubr::theme_pubr(legend = 'right', 
-    #                    base_size = 16,
-    #                    border = T) + 
-    #  facet_wrap(n_teams_fixed + near_pop ~ n_teams_mobile + far_pop) +
-    facet_grid(  ~ n_teams_fixed + near_pop + n_teams_mobile + far_pop, 
-                 scales="free", space="free"
-                 ) +
-    theme(strip.background = element_rect(colour="black", 
-                                          fill="#CCCCFF")
+    ) + 
+    facet_wrap(n_teams_fixed + near_pop ~ n_teams_mobile + far_pop) + 
+    theme(strip.background = element_rect(colour = "black", 
+                                          fill = "#CCCCFF")
           ) +
     NULL
 
