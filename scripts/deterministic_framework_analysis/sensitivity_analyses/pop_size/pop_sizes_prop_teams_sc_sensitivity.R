@@ -136,8 +136,10 @@ sc_analysis_pop_size_prop_teams_sensitivity_summary <- sc_analysis_pop_size_prop
     group_by(strategy, mt_equip_type, near_pop, far_pop, n_teams_fixed, n_teams_mobile) %>%
     summarise(n_locations = length(location_id),
               average_coverage = mean(site_cov_total),
-              campaign_duration = sum(site_campaign_dur_constrained) + campaign_start[1]
-              )%>%
+              campaign_duration = sum(site_campaign_dur_constrained) + campaign_start[1],
+              near_pop = sum(near_pop),
+              far_pop = sum(far_pop)
+              ) %>%
     mutate(
         cold_chain = as_factor(ifelse(stringr::str_detect(strategy, "_fcc"),
                                       "cc",
