@@ -31,7 +31,7 @@ conflict_prefer('filter', 'dplyr')
 plot_path <- './figures/deterministic_framework_analysis_figures/'
 
 #load plotting data
-cases_averted_results <- readRDS("./model_output/deterministic_framework_analysis_output/sc_epi_analysis_summary_10_teams.rds") 
+cases_averted_results <- readRDS("./model_output/deterministic_framework_analysis_output/baseline_msf_params/cases_averted_deterministic_framework_analysis.rds") 
 
 
 #create new columns and remove the old ones we don't need
