@@ -29,15 +29,17 @@ sc_model_params <- list(ambient_temp = c("below 40", "above 40")
                 , vax_rate = c(fixed_team = 450, mobile_team = 250)
                 , rcw25_ice_replacement_days = c(2, 3)
                 , site_campaign_dur_constraint = 10
+                , predeployment_delay = 21
                 )
 
 
-orv_model_params <- list(near_pop_R0 = seq(2, 18, 0.5)
-                         , far_pop_R0 = seq(2, 18, 0.5)
+orv_model_params <- list(near_pop_R0 = 12.8 #Ref = {Guerra, 2017; The basic reproduction number (R0) of measles: a systematic review (Lancet)]
+                         , far_pop_R0 = 12.8
                          , vaccine_efficacy = 0.84 #source = WHO measles vaccine position paper
-                         , model_time = 365*5 #run model for 5 years
-                         , LP = 7 #LP = Latent period
-                         , IP = 7 #IP = Infectious period
+                         , init_prop_immune = 0.7 #Source: 
+                         , model_time = 365 #run model for 1 year
+                         , LP = 10 #LP = Latent period #Ref = {Heymann, D. (ed.) 2004 Control of communicable diseases manual, p. 417, 18th edn}
+                         , IP = 8 #IP = Infectious period #Ref = {Heymann, D. (ed.) 2004 Control of communicable diseases manual, p. 417, 18th edn}
                          )
 
 
