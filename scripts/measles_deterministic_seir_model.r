@@ -128,7 +128,8 @@ run_orv_model <- function(strategy,
   
   scenario_table <- data.frame(strategy = rep(strategy, times = nrow(results_df)), 
                                location_id = rep(location_id, times = nrow(results_df)),
-                               mt_equip_type = rep(mt_equip_type, times = nrow(results_df))
+                               mt_equip_type = rep(mt_equip_type, times = nrow(results_df)),
+                               predeployment_delay = rep(predeployment_delay, times = nrow(results_df))
                                )
   
   sim_results <- cbind(scenario_table, results_df)
