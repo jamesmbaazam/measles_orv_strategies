@@ -390,13 +390,18 @@ calc_next_campaign_start <- function(ft_campaign_dur,
 
 # compound_delays(): ----
 #' Calculates the compounded delays from a sequential campaign based on the 
-#' strategy commencement delay and campaign durations from previous locations.
-calc_compounded_delays <- function(delays, team_days){
-  cpd_delays <- rep(NA, length(delays))
-  cpd_delays[1] <- delays[1] 
+#' a fixed deployment delay, the strategy commencement delay and campaign durations 
+#' from previous locations.
+#'
+#' @param predeployment_delay a fixed delay due to sensitization and team mobilization
+#' @param strategy_delay #the delay due to the strategy, for e.g., ice pack freezing for cold chain strategies
+#' @param team_days #the number of days needed by a team to achieve 100% coverage in one location. This can be allocated to more than one team to reduce the duration per team
+calc_compounded_delays <- function(predeployment_delay, strategy_delay, team_days){
+  cpd_delays <- rep(NA, length(team_days))
+  cpd_delays[1] <- predeployment_delay[1] + strategy_delay[1] 
   
-  for (i in 2: length(delays)) {
-    cpd_delays[i] <- delays[1] + sum(team_days[1:i-1]) 
+  for (i in 2: length(team_days)) {
+    cpd_delays[i] <- cpd_delays[1] + sum(team_days[1:i-1]) 
   }
   return(cpd_delays) 
 } 
