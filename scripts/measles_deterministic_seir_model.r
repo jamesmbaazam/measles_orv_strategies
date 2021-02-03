@@ -1,5 +1,5 @@
 # require(shiny)
-require(deSolve)
+library(deSolve)
 
 ######################################################
 # SEIR model
@@ -46,7 +46,7 @@ simod <- function(t, x, parms, coverage_correction = 0.9999, browse = F) {
   K <- x[5]
   #
   with(as.list(parms), {
-    Q <- ifelse(t < vax_day | t > vax_day + campaign_duration, 0, (-log(1 - coverage*coverage_correction) / campaign_duration))
+    Q <- ifelse(t < predeployment_delay + vax_day | t > predeployment_delay + vax_day + campaign_duration, 0, (-log(1 - coverage*coverage_correction) / campaign_duration))
     dS <- -B * S * I - vax_efficacy * Q * S
     dE <- B * S * I - r * E
     dI <- r * E - g * I
@@ -76,11 +76,13 @@ simod <- function(t, x, parms, coverage_correction = 0.9999, browse = F) {
 #' @param latent_period 
 #' @param I0 
 #' @param max_time 
+#' @param init_prop_immune #initial immune proportion, a number between 0 and 1
 #'
 #' @return
 #' @export
 #'
-#' @examples
+#' @examples  
+
 run_orv_model <- function(strategy, 
                           location_id, 
                           mt_equip_type, 
@@ -88,10 +90,12 @@ run_orv_model <- function(strategy,
                           latent_period,
                           infectious_period,
                           I0,
+                          init_prop_immune,
                           R0,
                           vax_efficacy,
                           scenario_coverage,
                           vax_day,
+                          predeployment_delay,
                           scenario_campaign_duration,
                           max_time,
                           browse = F){
@@ -99,10 +103,10 @@ run_orv_model <- function(strategy,
   if(browse) browser()
   
   #initial population
-  pop_init <- c(S = 1 - I0/target_pop_size, 
+  pop_init <- c(S = 1 - I0/target_pop_size - init_prop_immune, 
                 E = 0, 
                 I = I0/target_pop_size, 
-                R = 0, 
+                R = init_prop_immune, 
                 K = 0
                 )
   beta <- R0/infectious_period
@@ -116,6 +120,7 @@ run_orv_model <- function(strategy,
                   vax_efficacy = vax_efficacy, 
                   coverage = scenario_coverage, 
                   campaign_duration = scenario_campaign_duration, 
+                  predeployment_delay = predeployment_delay,
                   vax_day = vax_day
                   )
   
@@ -129,4 +134,54 @@ run_orv_model <- function(strategy,
   sim_results <- cbind(scenario_table, results_df)
 
   return(sim_results)
-  }
+}
+
+
+
+# no_orv_example_run <- run_orv_model(strategy = 'dummy', 
+#                                     location_id = 1,
+#                                     mt_equip_type = 'vaxCarr',
+#                                     target_pop_size = 50000,
+#                                     latent_period = 7,
+#                                     infectious_period = 7,
+#                                     I0 = 1,
+#                                     init_prop_immune = 0.7,
+#                                     R0 = 12,
+#                                     vax_efficacy = 0,
+#                                     scenario_coverage = 0,
+#                                     vax_day = 0,
+#                                     predeployment_delay = 0,
+#                                     scenario_campaign_duration = 0,
+#                                     max_time = 365,
+#                                     browse = F
+#                                     )
+# 
+# 
+# plot(no_orv_example_run$time, no_orv_example_run$S, type = 'b', col = 'blue', ylim = c(0, 1))
+# lines(no_orv_example_run$time, no_orv_example_run$E, type = 'b', col = 'purple')
+# lines(no_orv_example_run$time, no_orv_example_run$I, type = 'b', col = 'red')
+# lines(no_orv_example_run$time, no_orv_example_run$R, type = 'b', col = 'green')
+# 
+#                                     
+# orv_example_run <- run_orv_model(strategy = 'dummy',
+#                                  location_id = 1,
+#                                  mt_equip_type = 'vaxCarr',
+#                                  target_pop_size = 50000,
+#                                  latent_period = 7,
+#                                  infectious_period = 7,
+#                                  I0 = 10,
+#                                  init_prop_immune = 0.7,
+#                                  R0 = 12,
+#                                  vax_efficacy = 0.84,
+#                                  scenario_coverage = 0.7,
+#                                  vax_day = 2,
+#                                  predeployment_delay = 21,
+#                                  scenario_campaign_duration = 10,
+#                                  max_time = 365,
+#                                  browse = F 
+#                                  )
+# plot(orv_example_run$time, orv_example_run$R, type = 'b', col = 'green', ylim = c(0,1))
+# lines(orv_example_run$time, orv_example_run$S, type = 'b', col = 'blue')
+# lines(orv_example_run$time, orv_example_run$E, type = 'b', col = 'purple')
+# lines(orv_example_run$time, orv_example_run$I, type = 'b', col = 'red')
+                                    
