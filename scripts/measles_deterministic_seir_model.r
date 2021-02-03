@@ -46,7 +46,7 @@ simod <- function(t, x, parms, coverage_correction = 0.9999, browse = F) {
   K <- x[5]
   #
   with(as.list(parms), {
-    Q <- ifelse(t < predeployment_delay + vax_day | t > predeployment_delay + vax_day + campaign_duration, 0, (-log(1 - coverage*coverage_correction) / campaign_duration))
+    Q <- ifelse(t < vax_day | t > vax_day + campaign_duration, 0, (-log(1 - coverage*coverage_correction) / campaign_duration))
     dS <- -B * S * I - vax_efficacy * Q * S
     dE <- B * S * I - r * E
     dI <- r * E - g * I
