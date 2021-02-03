@@ -132,9 +132,9 @@ cases_averted_lollipop_plot_hacked <- cases_averted_df_cc_mod %>%
                                           'Part cold chain', 'Outside cold chain')
                    )
   ) +
-  scale_y_continuous(breaks = seq(-45, 20, 5),
-                     labels = seq(-45, 20, 5)
-  ) +
+  # scale_y_continuous(breaks = seq(min(cases_averted_df_cc_mod$cases_averted), max(cases_averted_df_cc_mod$cases_averted), 6),
+  #                    labels = seq(min(cases_averted_df_cc_mod$cases_averted), max(cases_averted_df_cc_mod$cases_averted), 6)
+  # ) +
   guides(shape = guide_legend(override.aes = list(size = 6, stroke = 1.2), 
                               order = 1
   ), 
