@@ -33,7 +33,8 @@ sc_model_params <- list(ambient_temp = c("below 40", "above 40")
                 )
 
 
-orv_model_params <- list(near_pop_R0 = 12.8 #Ref = {Guerra, 2017; The basic reproduction number (R0) of measles: a systematic review (Lancet)]
+orv_model_params <- list(Index_cases = 10 
+                         , near_pop_R0 = 12.8 #Ref = {Guerra, 2017; The basic reproduction number (R0) of measles: a systematic review (Lancet)]
                          , far_pop_R0 = 12.8
                          , vaccine_efficacy = 0.84 #source = WHO measles vaccine position paper
                          , init_prop_immune = 0.7 #Source: 
