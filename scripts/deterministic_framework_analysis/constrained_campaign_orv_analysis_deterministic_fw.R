@@ -56,12 +56,14 @@ orv_near_dynamics <- tibble()
 for (sc_result_row in 1: nrow(orv_model_inputs)) {
     near_orv_sim <- run_orv_model(
         strategy = orv_model_inputs[[sc_result_row, 'strategy']],
-        R0 = orv_model_params$near_pop_R0[21], # transmission coefficient
-        I0 = 1,
+        R0 = orv_model_params$near_pop_R0, # transmission coefficient
+        I0 = 10,
+        init_prop_immune = orv_model_params$init_prop_immune,
         max_time = orv_model_params$model_time, 
         target_pop_size = orv_model_inputs[[sc_result_row, 'near_pop']],
         mt_equip_type = orv_model_inputs[[sc_result_row, 'mt_equip_type']],
         vax_day = orv_model_inputs[[sc_result_row, 'ft_compounded_delay']],
+        predeployment_delay = sc_model_params$predeployment_delay,
         latent_period = orv_model_params$LP,
         infectious_period = orv_model_params$IP,
         scenario_campaign_duration = orv_model_inputs[[sc_result_row ,'ft_dur_constrained']], 
@@ -86,12 +88,14 @@ orv_far_dynamics <- tibble()
 for (sc_result_row in 1: nrow(orv_model_inputs)) {
   far_orv_sim <- run_orv_model(
     strategy = orv_model_inputs[[sc_result_row, 'strategy']],
-    R0 = orv_model_params$far_pop_R0[21], # transmission coefficient
-    I0 = 1,
+    R0 = orv_model_params$far_pop_R0, # transmission coefficient
+    I0 = 10,
+    init_prop_immune = orv_model_params$init_prop_immune,
     max_time = orv_model_params$model_time, 
     target_pop_size = orv_model_inputs[[sc_result_row, 'far_pop']],
     mt_equip_type = orv_model_inputs[[sc_result_row, 'mt_equip_type']],
     vax_day = orv_model_inputs[[sc_result_row, 'mt_compounded_delay']],
+    predeployment_delay = sc_model_params$predeployment_delay,
     latent_period = orv_model_params$LP,
     infectious_period = orv_model_params$IP,
     scenario_campaign_duration = orv_model_inputs[[sc_result_row ,'mt_dur_constrained']], 
@@ -120,12 +124,14 @@ no_orv_near_dynamics <- tibble()
 for (location in 1: nrow(site_pops_df)) {
     no_orv_near_sim <- run_orv_model(
         strategy = 'no_orv_near_pops',
-        R0 = orv_model_params$near_pop_R0[21], # transmission coefficient
-        I0 = 1,
+        R0 = orv_model_params$near_pop_R0, # transmission coefficient
+        I0 = 10,
+        init_prop_immune = orv_model_params$init_prop_immune,
         max_time = orv_model_params$model_time, 
         target_pop_size = site_pops_df[[location, 'near_pop']],
         mt_equip_type = 'none',
         vax_day = Inf,
+        predeployment_delay = 0,
         latent_period = orv_model_params$LP,
         infectious_period = orv_model_params$IP,
         scenario_campaign_duration = 0, 
@@ -151,12 +157,14 @@ no_orv_far_dynamics <- tibble()
 for (location in 1: nrow(site_pops_df)) {
     no_orv_far_sim <- run_orv_model(
         strategy = 'no_orv_far_pops',
-        R0 = orv_model_params$far_pop_R0[21], # transmission coefficient
-        I0 = 1,
+        R0 = orv_model_params$far_pop_R0, # transmission coefficient
+        I0 = 10,
+        init_prop_immune = orv_model_params$init_prop_immune,
         max_time = orv_model_params$model_time, 
         target_pop_size = site_pops_df[[location, 'far_pop']],
         mt_equip_type = 'none',
         vax_day = Inf,
+        predeployment_delay = 0,
         latent_period = orv_model_params$LP,
         infectious_period = orv_model_params$IP,
         scenario_campaign_duration = 0, 
