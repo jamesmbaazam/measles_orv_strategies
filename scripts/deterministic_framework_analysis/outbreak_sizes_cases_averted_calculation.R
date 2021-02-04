@@ -13,6 +13,7 @@ conflict_prefer('filter', 'dplyr') #anytime I call the function 'filter', I mean
 conflict_prefer('select', 'dplyr')
 conflict_prefer('merge', 'base')
 conflict_prefer('summarise', 'dplyr')
+conflict_prefer('mutate', 'dplyr')
 
 
 #'load data and rescale them to the actual numbers
@@ -53,15 +54,27 @@ no_orv_far_dynamics <- readRDS('./model_output/deterministic_framework_analysis_
 #' total outbreak size across all near locations (orv) ----
 #' near pop (orv) ====
 orv_near_dynamics_outbreak_size_df <- orv_near_dynamics %>% 
-    group_by(strategy, mt_equip_type) %>% 
+    group_by(strategy, mt_equip_type, predeployment_delay) %>% 
     filter(time == orv_model_params$model_time) %>% 
     summarise(orv_near_total_cases = sum(K))
 
 #' far pop (orv) ====
 orv_far_dynamics_outbreak_size_df <- orv_far_dynamics %>% 
-    group_by(strategy, mt_equip_type) %>% 
+    group_by(strategy, mt_equip_type, predeployment_delay) %>% 
     filter(time == orv_model_params$model_time) %>% 
     summarise(orv_far_total_cases = sum(K))
+
+#quick plot to inspect the outbreak sizes
+# ggplot() + geom_bar(data = orv_near_dynamics %>% 
+#                         group_by(strategy, mt_equip_type, predeployment_delay) %>% 
+#                         filter(time == orv_model_params$model_time), 
+#                     aes(x = location_id, y = K), 
+#                     color = 'black', 
+#                     fill = 'tomato3', 
+#                     stat = 'identity'
+#                     ) + 
+#     facet_wrap(strategy + mt_equip_type ~ predeployment_delay)
+
 
 #' total outbreak size across all near locations (baseline; no orv) ----
 #' near pop (no orv) ====
@@ -83,7 +96,10 @@ no_orv_far_dynamics_outbreak_size
 
 # calculate the total outbreak size across all locations, near and far
 orv_outbreak_sizes_aggregated <- left_join(orv_near_dynamics_outbreak_size_df, 
-                                           orv_far_dynamics_outbreak_size_df) %>% 
+                                           orv_far_dynamics_outbreak_size_df,
+                                           by = c("strategy", "mt_equip_type", 
+                                                  "predeployment_delay")
+                                           ) %>% 
     mutate(orv_total_cases = orv_near_total_cases + orv_far_total_cases)
 
 #' cases averted ====
@@ -91,14 +107,19 @@ orv_outbreak_sizes_aggregated <- left_join(orv_near_dynamics_outbreak_size_df,
 
 #' we use the 10-dose fcc with vaccine carrier as the baseline because it is what is 
 #' currently the practice
-baseline_outbreak_size <- orv_outbreak_sizes_aggregated %>% filter(strategy == 'dose10_fcc', 
-                                                                   mt_equip_type == 'vaxCarr') %>% 
-    .$orv_total_cases %>% as.numeric()
+baseline_outbreak_size <- orv_outbreak_sizes_aggregated %>% 
+    filter(strategy == 'dose10_fcc', 
+           mt_equip_type == 'vaxCarr') %>% 
+    pull(orv_total_cases) 
 
+#duplicate the baseline values, one per predeployment scenario
+baseline_outbreak_size_mod <- rep(baseline_outbreak_size, 
+                                  each = length(unique(orv_outbreak_sizes_aggregated$predeployment_delay)))
 
 
 cases_averted_df <- orv_outbreak_sizes_aggregated %>% 
-    mutate(cases_averted = baseline_outbreak_size - orv_total_cases)
+    ungroup() %>% 
+    mutate(cases_averted = baseline_outbreak_size_mod - orv_total_cases)
 
 cases_averted_df
 
