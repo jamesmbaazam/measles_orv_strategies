@@ -51,7 +51,7 @@ cases_averted_df <- cases_averted_results %>% mutate(
                                      )
         ))
     ) %>% 
-  select(strategy, mt_equip_type, cold_chain, vial_type, cases_averted)  
+  select(strategy, mt_equip_type, cold_chain, vial_type, predeployment_delay, cases_averted)  
 
 #' I want to rearrange the bars so I have to reduce the dimensions
 #' by combining some variables
@@ -161,6 +161,60 @@ cases_averted_lollipop_plot_hacked <- cases_averted_df_cc_mod %>%
   NULL
 
 plot(cases_averted_lollipop_plot_hacked)
+
+
+
+
+cases_averted_df_cc_mod %>% 
+  group_by(cold_chain) %>% 
+  ggplot(aes(group = cold_chain)) +
+  geom_point(aes(x = predeployment_delay, 
+                 y = cases_averted,
+                 color = cold_chain,
+                 shape = mt_equip_type,
+                 fill = vial_type 
+                 ),
+             size = 3
+             ) +
+  scale_shape_manual(name = 'Mobile team equipment',
+                     values = c(21, 24),
+                     labels = c('rcw25' = 'RCW25',
+                                'vaxCarr' = 'Vaccine carrier')
+  ) +
+  scale_color_manual(name = 'Cold chain option', 
+                     breaks = c('cc', 
+                                'no_cc', 
+                                'part_cc'),
+                     labels = c('Cold chain' , 
+                                'Outside cold chain', 
+                                'Partial cold chain' ),
+                     values = c('cc' = '#00AFBB', 
+                                'no_cc' = '#FC4E07', 
+                                'part_cc' = '#E7B800')
+  ) + 
+  scale_fill_manual(name = 'Vial type',
+                    breaks = c('dose10', 
+                               'monodose',
+                               'dose10 + monodose'),
+                    values = c('dose10' = NA, 
+                               'monodose' = NA,
+                               'dose10 + monodose' = NA),
+                    labels = c('dose10' = '10-dose', 
+                               'monodose' = 'Monodose',
+                               'dose10 + monodose' = '10-dose & Monodose')
+  )
+
+
+
+
+
+
+
+
+
+
+
+
 
 #save plot
 # ggsave(filename = 'cases_averted_lollipop_plot_hacked.eps', 
