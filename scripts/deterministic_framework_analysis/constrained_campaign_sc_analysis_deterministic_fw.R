@@ -29,8 +29,8 @@ campaign_delay_results_msf_params <- sim_params_table %>%
                                   ),
         fixed_team_equip_type = "both",
         mobile_team_equip_type = mt_equip_type,
-        n_teams_fixed = 10,#teams$n_ft[1], #10 fixed teams
-        n_teams_mobile = 10, #teams$n_mt[1], #10 mobile teams
+        n_teams_fixed = n_ft,
+        n_teams_mobile = n_mt, 
         n_fixed_teams_per_site = 2,
         rcw25_ice_replacement_days = sc_model_params$rcw25_ice_replacement_days[1],
         mf314 = sc_model_params$mf314_quant, 
@@ -79,8 +79,8 @@ campaign_metrics_msf_params <- sim_params_table %>%
           far_pop = far_pop
         ),
         mobile_team_equip_type = mt_equip_type,
-        n_teams_fixed = 10, #teams$n_ft[1],
-        n_teams_mobile = 10, #teams$n_mt[1],
+        n_teams_fixed = n_ft, 
+        n_teams_mobile = n_mt, 
         dose10_vial_volume = sc_model_params$dose10_vial_vol[1],
         monodose_vial_volume = sc_model_params$monodose_vial_vol[1],
         site_campaign_dur_constraint = sc_model_params$site_campaign_dur_constraint,
@@ -122,13 +122,15 @@ sc_analysis_outcomes_msf_params <- sc_analysis_msf_params_merged %>%
   summarise(strategy = strategy[1],
             mt_equip_type = mt_equip_type[1],
             n_locations = n_distinct(location_id),
-            n_fixed_teams = fixed_teams[1],
-            n_mobile_teams = mobile_teams[1],
+            n_fixed_teams = n_ft[1],
+            n_mobile_teams = n_mt[1],
             average_coverage = mean(site_cov_total),
             campaign_duration = campaign_start[1] + sum(site_campaign_dur_constrained)
             ) 
 
 
-saveRDS(sc_analysis_outcomes_msf_params, file = "./model_output/deterministic_framework_analysis_output/baseline_msf_params/sc_final_outcomes_msf_params.rds")
+saveRDS(sc_analysis_outcomes_msf_params, 
+        file = "./model_output/deterministic_framework_analysis_output/baseline_msf_params/sc_final_outcomes_msf_params.rds"
+        )
 
 
