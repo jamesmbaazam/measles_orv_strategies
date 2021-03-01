@@ -32,11 +32,8 @@ strategy_subset_config <- filter(strategies, strategy %in% strategy_subset)
 
 
 #Location characteristics
-#far_pop_sizes <- c(100000, 100000)
-#near_pop_sizes <- c(50000, 50000)
-#site_pop_dist <- expand.grid(near_pop = near_pop_sizes, far_pop = far_pop_sizes)
 
-teams <- expand.grid(n_ft = seq(10, 30, 10), n_mt = seq(10, 30, 10))
+n_teams <- 20  #total number of teams to be dispatched
 
 site_pop_dist <- data.frame(near_pop = rep(75000, 5), far_pop = rep(25000, 5))
 
@@ -58,7 +55,10 @@ key_table
 sim_params_tmp <- left_join(key_table, strategy_subset_config, by = 'strategy')
 
 sim_params_table <- left_join(sim_params_tmp, site_pops_df, by = "location_id") %>% 
-    mutate(location_id = as_factor(location_id)) %>% 
+    mutate(location_id = as_factor(location_id),
+           n_ft = near_pop/(near_pop + far_pop)*n_teams, # set number of fixed and mobile teams as a proportion of the near and far population sizes
+           n_mt = far_pop/(near_pop + far_pop)*n_teams
+           ) %>% 
     as_tibble()
 
 sim_params_table
