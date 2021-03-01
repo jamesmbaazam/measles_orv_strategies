@@ -104,6 +104,9 @@ orv_outbreak_sizes_aggregated <- left_join(orv_near_dynamics_outbreak_size_df,
 
 #' cases averted ====
 
+#the counterfactual is the no orv scenario
+counterfactual_outbreak_size <- no_orv_near_dynamics_outbreak_size + no_orv_far_dynamics_outbreak_size
+
 
 #' we use the 10-dose fcc with vaccine carrier as the baseline because it is what is 
 #' currently the practice
@@ -119,7 +122,11 @@ baseline_outbreak_size_mod <- rep(baseline_outbreak_size,
 
 cases_averted_df <- orv_outbreak_sizes_aggregated %>% 
     ungroup() %>% 
-    mutate(cases_averted = baseline_outbreak_size_mod - orv_total_cases)
+    mutate(counterfactual_outbreak_size = counterfactual_outbreak_size, 
+           baseline_outbreak_size = baseline_outbreak_size_mod, 
+           cases_averted = counterfactual_outbreak_size - orv_total_cases,
+           relative_cases_averted = cases_averted - baseline_outbreak_size_mod
+           )
 
 cases_averted_df
 
