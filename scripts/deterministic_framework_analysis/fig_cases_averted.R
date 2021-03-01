@@ -51,7 +51,7 @@ cases_averted_df <- cases_averted_results %>% mutate(
                                      )
         ))
     ) %>% 
-  select(strategy, mt_equip_type, cold_chain, vial_type, predeployment_delay, cases_averted)  
+  select(strategy, mt_equip_type, cold_chain, vial_type, predeployment_delay, cases_averted, relative_cases_averted)  
 
 #' I want to rearrange the bars so I have to reduce the dimensions
 #' by combining some variables
@@ -164,7 +164,7 @@ plot(cases_averted_lollipop_plot_hacked)
 
 
 
-
+#cases averted
 cases_averted_df_cc_mod %>% 
   group_by(cold_chain) %>% 
   ggplot(aes(group = cold_chain)) +
@@ -202,10 +202,63 @@ cases_averted_df_cc_mod %>%
                     labels = c('dose10' = '10-dose', 
                                'monodose' = 'Monodose',
                                'dose10 + monodose' = '10-dose & Monodose')
+  ) + guides(shape = guide_legend(override.aes = list(size = 6, stroke = 1.2), 
+                                  order = 1
+  ),
+  fill = guide_legend(override.aes = list(size = 6, 
+                                          color = 'black', 
+                                          fill = 'white', 
+                                          shape = 22)
   )
+  ) 
 
-
-
+#relative cases averted
+cases_averted_df_cc_mod %>% 
+  group_by(cold_chain) %>% 
+  ggplot(aes(group = cold_chain)) +
+  geom_point(aes(x = predeployment_delay, 
+                 y = relative_cases_averted,
+                 color = cold_chain,
+                 shape = mt_equip_type,
+                 fill = vial_type 
+  ),
+  size = 3
+  ) +
+  scale_shape_manual(name = 'Mobile team equipment',
+                     values = c(21, 24),
+                     labels = c('rcw25' = 'RCW25',
+                                'vaxCarr' = 'Vaccine carrier')
+  ) +
+  scale_color_manual(name = 'Cold chain option', 
+                     breaks = c('cc', 
+                                'no_cc', 
+                                'part_cc'),
+                     labels = c('Cold chain' , 
+                                'Outside cold chain', 
+                                'Partial cold chain' ),
+                     values = c('cc' = '#00AFBB', 
+                                'no_cc' = '#FC4E07', 
+                                'part_cc' = '#E7B800')
+  ) + 
+  scale_fill_manual(name = 'Vial type',
+                    breaks = c('dose10', 
+                               'monodose',
+                               'dose10 + monodose'),
+                    values = c('dose10' = NA, 
+                               'monodose' = NA,
+                               'dose10 + monodose' = NA),
+                    labels = c('dose10' = '10-dose', 
+                               'monodose' = 'Monodose',
+                               'dose10 + monodose' = '10-dose & Monodose')
+  ) + guides(shape = guide_legend(override.aes = list(size = 6, stroke = 1.2), 
+                                 order = 1
+  ),
+  fill = guide_legend(override.aes = list(size = 6, 
+                                          color = 'black', 
+                                          fill = 'white', 
+                                          shape = 22)
+  )
+  ) 
 
 
 
