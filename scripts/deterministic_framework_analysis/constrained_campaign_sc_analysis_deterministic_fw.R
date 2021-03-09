@@ -11,7 +11,7 @@ library(purrr)
 library(dplyr)
 
 #calculate delays prior to campaign start
-campaign_delay_results_msf_params <- sim_params_table %>%
+campaign_delay_results_baseline_analysis <- sim_params_table %>%
   rowwise() %>%
   do({
     with(
@@ -50,7 +50,7 @@ campaign_delay_results_msf_params <- sim_params_table %>%
 
 
 ## Remove some columns ==== 
-campaign_delay_results_cropped_msf_params <- campaign_delay_results_msf_params %>% 
+campaign_delay_results_reduced_baseline_analysis <- campaign_delay_results_baseline_analysis %>% 
   select(-c(near_pop, far_pop, ft_vial_type, ft_equip_type, 
             mt_vial_type, ft_doses_required, mt_doses_required, 
             ft_RCW25, mt_RCW25, ft_vaxCarr, 
@@ -62,7 +62,7 @@ campaign_delay_results_cropped_msf_params <- campaign_delay_results_msf_params %
 
 #View(campaign_delay_results_cropped_msf_params)
 
-campaign_metrics_msf_params <- sim_params_table %>%
+campaign_metrics_baseline_analysis <- sim_params_table %>%
   rowwise() %>%
   do({
     with(
@@ -103,21 +103,21 @@ campaign_metrics_msf_params <- sim_params_table %>%
 
 
 #Combine the two supply chain analyses
-sc_analysis_msf_params_merged <- left_join(
-  campaign_delay_results_cropped_msf_params,
-  campaign_metrics_msf_params, 
-  by = c("strategy", "location_id", "mt_equip_type")
+sc_baseline_analysis_results_full <- left_join(
+  campaign_delay_results_baseline_analysis,
+  campaign_metrics_baseline_analysis, 
+  by = c("strategy", "location_id", "mt_equip_type", 'near_pop', 'far_pop')
 ) 
 
 
-saveRDS(sc_analysis_msf_params_merged, file = "./model_output/deterministic_framework_analysis_output/baseline_msf_params/sc_results_full_msf_params.rds")
+saveRDS(sc_baseline_analysis_results_full, file = "./model_output/deterministic_framework_analysis_output/baseline_analysis/sc_baseline_analysis_results_full.rds")
 
 
 
 
 #' Supply chain outcomes (final): 1. Campaign duration (commencement delay + total time to complete campaign in all locations)
 #' 2. Average coverage = mean of the coverage from all locations.
-sc_analysis_outcomes_msf_params <- sc_analysis_msf_params_merged %>%
+sc_baseline_analysis_results_summarized <- sc_baseline_analysis_results_full %>%
   group_by(strategy, mt_equip_type) %>% 
   summarise(strategy = strategy[1],
             mt_equip_type = mt_equip_type[1],
@@ -129,8 +129,8 @@ sc_analysis_outcomes_msf_params <- sc_analysis_msf_params_merged %>%
             .groups = 'drop'
             ) 
 
-saveRDS(sc_analysis_outcomes_msf_params, 
-        file = "./model_output/deterministic_framework_analysis_output/baseline_msf_params/sc_final_outcomes_msf_params.rds"
+saveRDS(sc_baseline_analysis_results_summarized, 
+        file = "./model_output/deterministic_framework_analysis_output/baseline_analysis/sc_baseline_analysis_results_summarized.rds"
         )
 
 
