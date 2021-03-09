@@ -69,25 +69,25 @@ sim_params_table
 #wastage sensitivity analysis parameter table
 
 #grid of wastage values to test
-wastage_levels <- 5
-wastage_grid <- tibble(dose10_ovw_ft = seq(0, 100, length.out = wastage_levels), 
-                       monodose_ovw_ft = seq(0, 100, length.out = wastage_levels), 
-                       dose10_ovw_mt = seq(0, 100, length.out = wastage_levels), 
-                       monodose_ovw_mt = seq(0, 100, length.out = wastage_levels)
-                       )
+# wastage_levels <- 5
+# wastage_grid <- tibble(dose10_ovw_ft = seq(0, 100, length.out = wastage_levels), 
+#                        monodose_ovw_ft = seq(0, 100, length.out = wastage_levels), 
+#                        dose10_ovw_mt = seq(0, 100, length.out = wastage_levels), 
+#                        monodose_ovw_mt = seq(0, 100, length.out = wastage_levels)
+#                        )
 
 #key table for wastage sensitivity analysis
-key_table_wastage_sensitivity <- do.call("rbind", replicate(nrow(wastage_grid), key_table, simplify = FALSE)) %>% 
-    mutate(dose10_ovw_ft = rep(seq(0, 100, length.out = wastage_levels), each = nrow(key_table)),
-           monodose_ovw_ft = rep(seq(0, 100, length.out = wastage_levels), each = nrow(key_table)), 
-           dose10_ovw_mt = rep(seq(0, 100, length.out = wastage_levels), each = nrow(key_table)),
-           monodose_ovw_mt = rep(seq(0, 100, length.out = wastage_levels), each = nrow(key_table)), 
-           )
-
-sim_params_ovw_sensitivity <- left_join(key_table_wastage_sensitivity, strategy_subset_config, by = 'strategy')
-    
-sim_params_table_ovw_sensitivity <- left_join(sim_params_ovw_sensitivity, site_pops_df, by = "location_id") %>% 
-    mutate(location_id = as_factor(location_id)) %>% 
-    as_tibble()
-
-sim_params_table_ovw_sensitivity
+# key_table_wastage_sensitivity <- do.call("rbind", replicate(nrow(wastage_grid), key_table, simplify = FALSE)) %>% 
+#     mutate(dose10_ovw_ft = rep(seq(0, 100, length.out = wastage_levels), each = nrow(key_table)),
+#            monodose_ovw_ft = rep(seq(0, 100, length.out = wastage_levels), each = nrow(key_table)), 
+#            dose10_ovw_mt = rep(seq(0, 100, length.out = wastage_levels), each = nrow(key_table)),
+#            monodose_ovw_mt = rep(seq(0, 100, length.out = wastage_levels), each = nrow(key_table)), 
+#            )
+# 
+# sim_params_ovw_sensitivity <- left_join(key_table_wastage_sensitivity, strategy_subset_config, by = 'strategy')
+#     
+# sim_params_table_ovw_sensitivity <- left_join(sim_params_ovw_sensitivity, site_pops_df, by = "location_id") %>% 
+#     mutate(location_id = as_factor(location_id)) %>% 
+#     as_tibble()
+# 
+# sim_params_table_ovw_sensitivity
