@@ -13,7 +13,7 @@ source('./scripts/deterministic_framework_analysis/simulation_params.R')
 source('./scripts/measles_deterministic_seir_model.R')
 
 ## Supply chain data ----
-sc_results <- readRDS('./model_output/deterministic_framework_analysis_output/baseline_msf_params/sc_results_full_msf_params.rds')
+sc_results <- readRDS('./model_output/deterministic_framework_analysis_output/baseline_analysis/sc_baseline_analysis_results_full.rds')
 
 
 
@@ -23,8 +23,10 @@ predeployment_delay_scenarios <- seq(21, 84, 7)
 #modify the scenarios above to append to the supply chain results table for the ORV simulation
 predeployment_delay_scenarios_mod <- rep(predeployment_delay_scenarios, each = nrow(sc_results))
                                                       
-sc_results_mod <- do.call('rbind', replicate(length(predeployment_delay_scenarios), 
-                                             sc_results, simplify = F)
+sc_results_mod <- do.call('rbind', 
+                          replicate(length(predeployment_delay_scenarios), 
+                                             sc_results, simplify = F
+                                    )
                           ) %>% 
   mutate(predeployment_delay = predeployment_delay_scenarios_mod)
                           
@@ -96,7 +98,7 @@ for (sc_result_row in 1: nrow(orv_model_inputs)) {
 
 #' save the results to file
 saveRDS(orv_near_dynamics, 
-        './model_output/deterministic_framework_analysis_output/baseline_msf_params/orv_near_dynamics_proportions.rds'
+        './model_output/deterministic_framework_analysis_output/baseline_analysis/orv_near_dynamics_proportions.rds'
         )
 
 
@@ -128,7 +130,7 @@ for (sc_result_row in 1: nrow(orv_model_inputs)) {
 
 #' save the results to file
 saveRDS(orv_far_dynamics, 
-        './model_output/deterministic_framework_analysis_output/baseline_msf_params/orv_far_dynamics_proportions.rds'
+        './model_output/deterministic_framework_analysis_output/baseline_analysis/orv_far_dynamics_proportions.rds'
         )
 
 
@@ -164,7 +166,7 @@ for (location in 1: nrow(site_pops_df)) {
 
 #' save the results to file
 saveRDS(no_orv_near_dynamics, 
-        './model_output/deterministic_framework_analysis_output/baseline_msf_params/no_orv_near_dynamics_proportions.rds'
+        './model_output/deterministic_framework_analysis_output/baseline_analysis/no_orv_near_dynamics_proportions.rds'
         )
 
 
@@ -197,6 +199,6 @@ for (location in 1: nrow(site_pops_df)) {
 
 #' save the results to file
 saveRDS(no_orv_far_dynamics, 
-        './model_output/deterministic_framework_analysis_output/baseline_msf_params/no_orv_far_dynamics_proportions.rds'
+        './model_output/deterministic_framework_analysis_output/baseline_analysis/no_orv_far_dynamics_proportions.rds'
         )
 
