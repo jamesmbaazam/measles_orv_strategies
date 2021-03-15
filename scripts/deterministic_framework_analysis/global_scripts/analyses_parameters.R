@@ -8,7 +8,7 @@ library(dplyr)
 # pre-requisite scripts
 #######################################
 
-source('./scripts/supply_chain_functions.R')
+source('./scripts/deterministic_framework_analysis/global_scripts/supply_chain_functions.R')
 
 
 
@@ -33,11 +33,11 @@ sc_model_params <- list(ambient_temp = c("below 40", "above 40")
                 )
 
 
-orv_model_params <- list(Index_cases = 10 
+orv_model_params <- list(index_cases = 10 
                          , near_pop_R0 = 12.8 #Ref = {Guerra, 2017; The basic reproduction number (R0) of measles: a systematic review (Lancet)]
                          , far_pop_R0 = 12.8
                          , vaccine_efficacy = 0.84 #source = WHO measles vaccine position paper
-                         , init_prop_immune = 0.8 #Source(s): 10.1186/s12889-019-7500-z; 10.1093/aje/kwy114/5033615 (estimate is 83.2 (CI: 74.7 - 87.7))
+                         , init_prop_immune = 0.75 #Source(s): 10.1186/s12889-019-7500-z; 10.1093/aje/kwy114/5033615 (estimate is 83.2 (CI: 74.7 - 87.7))
                          , model_time = 365 #run model for 1 year
                          , LP = 10 #LP = Latent period #Ref = {Heymann, D. (ed.) 2004 Control of communicable diseases manual, p. 417, 18th edn}
                          , IP = 8 #IP = Infectious period #Ref = {Heymann, D. (ed.) 2004 Control of communicable diseases manual, p. 417, 18th edn}

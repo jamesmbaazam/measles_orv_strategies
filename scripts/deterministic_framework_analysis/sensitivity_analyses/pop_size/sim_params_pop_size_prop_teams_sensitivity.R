@@ -5,9 +5,9 @@ library(forcats)
 
 
 #load pre-requisite scripts
-source('./scripts/deterministic_framework_analysis/scenarios.R')
-source('./scripts/analyses_parameters.R')
-source('./scripts/strategy_list_complete.R')
+source('./scripts/deterministic_framework_analysis/global_scripts/scenarios.R')
+source('./scripts/deterministic_framework_analysis/global_scripts/analyses_parameters.R')
+source('./scripts/deterministic_framework_analysis/global_scripts/strategy_list_complete.R')
 
 #resolve conflicts
 conflict_prefer('filter', 'dplyr')
@@ -38,9 +38,11 @@ strategy_subset_config <- dplyr::filter(strategies, strategy %in% strategy_subse
 
 n_teams <- 20
 
-near_pop_sizes <- rep(seq(10, 50, 10), each = 50)*1000
+target_pop_proportions <- c(1, 2, 2.5, 3, 4)/sum(range(c(1, 2, 2.5, 3, 4)))
 
-far_pop_sizes <- rev(rep(seq(10, 50, 10), each = 50))*1000
+near_pop_sizes <- rep(target_pop_proportions, each = 50)*100000
+
+far_pop_sizes <- rev(near_pop_sizes)
 
 n_ft <- round(near_pop_sizes/(near_pop_sizes + far_pop_sizes)*n_teams)
 

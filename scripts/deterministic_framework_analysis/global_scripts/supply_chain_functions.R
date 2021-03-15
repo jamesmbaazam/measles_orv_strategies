@@ -5,7 +5,7 @@
 #' vaccine carrier ice packs and 1, 2, or 3 days for the RCW25s
 
 
-source('./scripts/parameters.R')
+source('./scripts/deterministic_framework_analysis/global_scripts/parameters.R')
 
 compute_rcw25_icepacks <- function(amb_temp, replacement_days) { # replacement_days = c(1, 2, 3)
   if (amb_temp == "below 40" & (replacement_days == 1 | replacement_days == 2)) {

@@ -1,8 +1,8 @@
 
 #packages
-source('./scripts/analyses_parameters.R')
-source('./scripts/parameters.R')
-source('./scripts/supply_chain_functions.R')
+source('./scripts/deterministic_framework_analysis/global_scripts/analyses_parameters.R')
+source('./scripts/deterministic_framework_analysis/global_scripts/parameters.R')
+source('./scripts/deterministic_framework_analysis/global_scripts/supply_chain_functions.R')
 
 
 #NB: Create code sections by following a comment with 4 or more dashes (----), 

@@ -1,8 +1,8 @@
 options(nwarnings = 10000) #print this many messages if they exist or occur
 
 #helper scripts
-source("./scripts/wrappers_supply_chain.R")
-source("./scripts/deterministic_framework_analysis/simulation_params.R")
+source("./scripts/deterministic_framework_analysis/global_scripts/wrappers_supply_chain.R")
+source("./scripts/deterministic_framework_analysis/main_analysis/simulation_params_main_analysis.R")
 
 
 #packages
@@ -11,7 +11,7 @@ library(purrr)
 library(dplyr)
 
 #calculate delays prior to campaign start
-campaign_delay_results_baseline_analysis <- sim_params_table %>%
+campaign_delay_results_main_analysis <- sim_params_table %>%
   rowwise() %>%
   do({
     with(
@@ -46,11 +46,11 @@ campaign_delay_results_baseline_analysis <- sim_params_table %>%
   as_tibble()
 
 #' save the results
-# saveRDS(campaign_delay_results_msf_params, file = './model_output/deterministic_framework_analysis_output/baseline_msf_params/campaign_delay_results_msf_params.rds')
+# saveRDS(campaign_delay_results_msf_params, file = './model_output/deterministic_framework_analysis_output/main_analysis/campaign_delay_results_msf_params.rds')
 
 
 ## Remove some columns ==== 
-campaign_delay_results_reduced_baseline_analysis <- campaign_delay_results_baseline_analysis %>% 
+campaign_delay_results_reduced_main_analysis <- campaign_delay_results_main_analysis %>% 
   select(-c(near_pop, far_pop, ft_vial_type, ft_equip_type, 
             mt_vial_type, ft_doses_required, mt_doses_required, 
             ft_RCW25, mt_RCW25, ft_vaxCarr, 
@@ -62,7 +62,7 @@ campaign_delay_results_reduced_baseline_analysis <- campaign_delay_results_basel
 
 #View(campaign_delay_results_cropped_msf_params)
 
-campaign_metrics_baseline_analysis <- sim_params_table %>%
+campaign_metrics_main_analysis <- sim_params_table %>%
   rowwise() %>%
   do({
     with(
@@ -99,25 +99,25 @@ campaign_metrics_baseline_analysis <- sim_params_table %>%
 
 #' 
 #' #' save the results
-#' saveRDS(campaign_metrics_msf_params, file = './model_output/deterministic_framework_analysis_output/baseline_msf_params/campaign_metrics_msf_params.rds')
+#' saveRDS(campaign_metrics_msf_params, file = './model_output/deterministic_framework_analysis_output/main_analysis/campaign_metrics_msf_params.rds')
 
 
 #Combine the two supply chain analyses
-sc_baseline_analysis_results_full <- left_join(
-  campaign_delay_results_baseline_analysis,
-  campaign_metrics_baseline_analysis, 
+sc_main_analysis_results_full <- left_join(
+  campaign_delay_results_main_analysis,
+  campaign_metrics_main_analysis, 
   by = c("strategy", "location_id", "mt_equip_type", 'near_pop', 'far_pop')
 ) 
 
 
-saveRDS(sc_baseline_analysis_results_full, file = "./model_output/deterministic_framework_analysis_output/baseline_analysis/sc_baseline_analysis_results_full.rds")
+saveRDS(sc_main_analysis_results_full, file = "./model_output/deterministic_framework_analysis_output/main_analysis/sc_main_analysis_results_full.rds")
 
 
 
 
 #' Supply chain outcomes (final): 1. Campaign duration (commencement delay + total time to complete campaign in all locations)
 #' 2. Average coverage = mean of the coverage from all locations.
-sc_baseline_analysis_results_summarized <- sc_baseline_analysis_results_full %>%
+sc_main_analysis_results_summarized <- sc_main_analysis_results_full %>%
   group_by(strategy, mt_equip_type) %>% 
   summarise(strategy = strategy[1],
             mt_equip_type = mt_equip_type[1],
@@ -129,8 +129,8 @@ sc_baseline_analysis_results_summarized <- sc_baseline_analysis_results_full %>%
             .groups = 'drop'
             ) 
 
-saveRDS(sc_baseline_analysis_results_summarized, 
-        file = "./model_output/deterministic_framework_analysis_output/baseline_analysis/sc_baseline_analysis_results_summarized.rds"
+saveRDS(sc_main_analysis_results_summarized, 
+        file = "./model_output/deterministic_framework_analysis_output/main_analysis/sc_main_analysis_results_summarized.rds"
         )
 
 

@@ -6,14 +6,14 @@ library(dplyr)
 library(purrr)
 
 #helper functions and parameters
-source('./scripts/parameters.R') #global parameter list
-source('./scripts/analyses_parameters.R') #specific parameter list for this analysis
-source('./scripts/deterministic_framework_analysis/scenarios.R') 
-source('./scripts/deterministic_framework_analysis/simulation_params.R')
-source('./scripts/measles_deterministic_seir_model.R')
+source('./scripts/deterministic_framework_analysis/global_scripts/parameters.R') #global parameter list
+source('./scripts/deterministic_framework_analysis/global_scripts/analyses_parameters.R') #specific parameter list for this analysis
+source('./scripts/deterministic_framework_analysis/global_scripts/scenarios.R') 
+source('./scripts/deterministic_framework_analysis/main_analysis/simulation_params_main_analysis.R')
+source('./scripts/deterministic_framework_analysis/global_scripts/measles_deterministic_seir_model.R')
 
 ## Supply chain data ----
-sc_results <- readRDS('./model_output/deterministic_framework_analysis_output/baseline_analysis/sc_baseline_analysis_results_full.rds')
+sc_main_analysis_results <- readRDS('./model_output/deterministic_framework_analysis_output/main_analysis/sc_main_analysis_results_full.rds')
 
 
 
@@ -21,18 +21,18 @@ sc_results <- readRDS('./model_output/deterministic_framework_analysis_output/ba
 predeployment_delay_scenarios <- seq(21, 84, 7)
 
 #modify the scenarios above to append to the supply chain results table for the ORV simulation
-predeployment_delay_scenarios_mod <- rep(predeployment_delay_scenarios, each = nrow(sc_results))
+predeployment_delay_scenarios_mod <- rep(predeployment_delay_scenarios, each = nrow(sc_main_analysis_results))
                                                       
-sc_results_mod <- do.call('rbind', 
+sc_main_analysis_results_mod <- do.call('rbind', 
                           replicate(length(predeployment_delay_scenarios), 
-                                             sc_results, simplify = F
+                                             sc_main_analysis_results, simplify = F
                                     )
                           ) %>% 
   mutate(predeployment_delay = predeployment_delay_scenarios_mod)
                           
                           
 #' calculate the compounded delays
-sc_results_full <- sc_results_mod %>%
+sc_main_analysis_results_full <- sc_main_analysis_results_mod %>%
     group_by(strategy, mt_equip_type, predeployment_delay) %>%
         mutate(mt_compounded_delay = calc_compounded_delays(
           strategy_delay = campaign_start,
@@ -50,7 +50,7 @@ sc_results_full <- sc_results_mod %>%
 
 
 #' orv_model_inputs; remove unwanted supply chain results ----
-orv_model_inputs <- sc_results_full %>% 
+orv_model_inputs <- sc_main_analysis_results_full %>% 
     select(c(strategy, 
              location_id,
              mt_equip_type,
@@ -78,7 +78,7 @@ for (sc_result_row in 1: nrow(orv_model_inputs)) {
     near_orv_sim <- run_orv_model(
         strategy = orv_model_inputs[[sc_result_row, 'strategy']],
         R0 = orv_model_params$near_pop_R0, # transmission coefficient
-        I0 = orv_model_params$Index_cases,
+        I0 = orv_model_params$index_cases,
         init_prop_immune = orv_model_params$init_prop_immune,
         max_time = orv_model_params$model_time, 
         target_pop_size = orv_model_inputs[[sc_result_row, 'near_pop']],
@@ -98,7 +98,7 @@ for (sc_result_row in 1: nrow(orv_model_inputs)) {
 
 #' save the results to file
 saveRDS(orv_near_dynamics, 
-        './model_output/deterministic_framework_analysis_output/baseline_analysis/orv_near_dynamics_proportions.rds'
+        './model_output/deterministic_framework_analysis_output/main_analysis/orv_near_dynamics_proportions.rds'
         )
 
 
@@ -110,7 +110,7 @@ for (sc_result_row in 1: nrow(orv_model_inputs)) {
   far_orv_sim <- run_orv_model(
     strategy = orv_model_inputs[[sc_result_row, 'strategy']],
     R0 = orv_model_params$far_pop_R0, # transmission coefficient
-    I0 = orv_model_params$Index_cases,
+    I0 = orv_model_params$index_cases,
     init_prop_immune = orv_model_params$init_prop_immune,
     max_time = orv_model_params$model_time, 
     target_pop_size = orv_model_inputs[[sc_result_row, 'far_pop']],
@@ -130,7 +130,7 @@ for (sc_result_row in 1: nrow(orv_model_inputs)) {
 
 #' save the results to file
 saveRDS(orv_far_dynamics, 
-        './model_output/deterministic_framework_analysis_output/baseline_analysis/orv_far_dynamics_proportions.rds'
+        './model_output/deterministic_framework_analysis_output/main_analysis/orv_far_dynamics_proportions.rds'
         )
 
 
@@ -146,7 +146,7 @@ for (location in 1: nrow(site_pops_df)) {
     no_orv_near_sim <- run_orv_model(
         strategy = 'no_orv_near_pops',
         R0 = orv_model_params$near_pop_R0, # transmission coefficient
-        I0 = orv_model_params$Index_cases,
+        I0 = orv_model_params$index_cases,
         init_prop_immune = orv_model_params$init_prop_immune,
         max_time = orv_model_params$model_time, 
         target_pop_size = site_pops_df[[location, 'near_pop']],
@@ -166,7 +166,7 @@ for (location in 1: nrow(site_pops_df)) {
 
 #' save the results to file
 saveRDS(no_orv_near_dynamics, 
-        './model_output/deterministic_framework_analysis_output/baseline_analysis/no_orv_near_dynamics_proportions.rds'
+        './model_output/deterministic_framework_analysis_output/main_analysis/no_orv_near_dynamics_proportions.rds'
         )
 
 
@@ -179,7 +179,7 @@ for (location in 1: nrow(site_pops_df)) {
     no_orv_far_sim <- run_orv_model(
         strategy = 'no_orv_far_pops',
         R0 = orv_model_params$far_pop_R0, # transmission coefficient
-        I0 = orv_model_params$Index_cases,
+        I0 = orv_model_params$index_cases,
         init_prop_immune = orv_model_params$init_prop_immune,
         max_time = orv_model_params$model_time, 
         target_pop_size = site_pops_df[[location, 'far_pop']],
@@ -199,6 +199,6 @@ for (location in 1: nrow(site_pops_df)) {
 
 #' save the results to file
 saveRDS(no_orv_far_dynamics, 
-        './model_output/deterministic_framework_analysis_output/baseline_analysis/no_orv_far_dynamics_proportions.rds'
+        './model_output/deterministic_framework_analysis_output/main_analysis/no_orv_far_dynamics_proportions.rds'
         )
 

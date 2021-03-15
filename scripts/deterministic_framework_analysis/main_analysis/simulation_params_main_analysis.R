@@ -5,9 +5,9 @@ library(forcats)
 
 
 #load pre-requisite scripts
-source('./scripts/deterministic_framework_analysis/scenarios.R')
-source('./scripts/analyses_parameters.R')
-source('./scripts/strategy_list_complete.R')
+source('./scripts/deterministic_framework_analysis/global_scripts/scenarios.R')
+source('./scripts/deterministic_framework_analysis/global_scripts/analyses_parameters.R')
+source('./scripts/deterministic_framework_analysis/global_scripts/strategy_list_complete.R')
 
 #resolve conflicts
 conflict_prefer('filter', 'dplyr')

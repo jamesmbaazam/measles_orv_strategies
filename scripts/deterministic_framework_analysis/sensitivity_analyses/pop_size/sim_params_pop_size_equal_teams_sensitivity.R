@@ -5,9 +5,9 @@ library(forcats)
 
 
 #load pre-requisite scripts
-source('./scripts/deterministic_framework_analysis/scenarios.R')
-source('./scripts/analyses_parameters.R')
-source('./scripts/strategy_list_complete.R')
+source('./scripts/deterministic_framework_analysis/global_scripts/scenarios.R')
+source('./scripts/deterministic_framework_analysis/global_scripts/analyses_parameters.R')
+source('./scripts/deterministic_framework_analysis/global_scripts/strategy_list_complete.R')
 
 #resolve conflicts
 conflict_prefer('filter', 'dplyr')
@@ -35,15 +35,25 @@ strategy_subset_config <- dplyr::filter(strategies, strategy %in% strategy_subse
 
 
 #Location characteristics
-near_pop_sizes <- rep(seq(10, 50, 10), each = 50)*1000
 
-far_pop_sizes <- rev(rep(seq(10, 50, 10), each = 50))*1000
+n_teams <- 20
+
+target_pop_proportions <- c(1, 2, 2.5, 3, 4)/sum(range(c(1, 2, 2.5, 3, 4)))
+
+near_pop_sizes <- rep(target_pop_proportions, each = 50)*100000
+
+far_pop_sizes <- rev(near_pop_sizes)
+
+n_ft <- rep(0.5*n_teams, times = length(near_pop_sizes))
+
+n_mt <- rep(0.5*n_teams, times = length(far_pop_sizes))
 
 site_pops_df <- tibble(near_pop = near_pop_sizes, 
-                           far_pop = far_pop_sizes,
-                           location_id = as_factor(rep(1:5, times = 50))
-                           )
-                           
+                       far_pop = far_pop_sizes, 
+                       location_id = as_factor(rep(1:5, times = 50)),
+                       n_teams_fixed = n_ft,
+                       n_teams_mobile = n_mt
+)
 
 
 #key table
