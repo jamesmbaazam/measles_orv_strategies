@@ -30,8 +30,8 @@ campaign_delay_pop_size_equal_teams_sensitivity <- sim_params_pop_size_equal_tea
                 ),
                 fixed_team_equip_type = "both",
                 mobile_team_equip_type = mt_equip_type,
-                n_teams_fixed = n_ft,
-                n_teams_mobile = n_mt, 
+                n_teams_fixed = n_teams_fixed,
+                n_teams_mobile = n_teams_mobile, 
                 n_fixed_teams_per_site = 2,
                 rcw25_ice_replacement_days = sc_model_params$rcw25_ice_replacement_days[1],
                 mf314 = sc_model_params$mf314_quant, 
@@ -78,8 +78,8 @@ campaign_metrics_pop_size_equal_teams_sensitivity <- sim_params_pop_size_equal_t
                     far_pop = far_pop
                 ),
                 mobile_team_equip_type = mt_equip_type,
-                n_teams_fixed = n_ft,
-                n_teams_mobile = n_mt, 
+                n_teams_fixed = n_teams_fixed,
+                n_teams_mobile = n_teams_mobile, 
                 dose10_vial_volume = sc_model_params$dose10_vial_vol[1],
                 monodose_vial_volume = sc_model_params$monodose_vial_vol[1],
                 site_campaign_dur_constraint = sc_model_params$site_campaign_dur_constraint,
@@ -112,7 +112,12 @@ campaign_metrics_pop_size_equal_teams_sensitivity_trunc <- campaign_metrics_pop_
 pop_size_equal_teams_sensitivity_sc_analysis_full <- bind_cols(
     campaign_delay_pop_size_equal_teams_sensitivity_trunc,
     campaign_metrics_pop_size_equal_teams_sensitivity_trunc
-    ) 
+    ) %>% 
+    mutate(
+        predeployment_delay = rep(21, times = nrow(campaign_delay_pop_size_equal_teams_sensitivity_trunc
+        )
+        )
+    )
 
 
 #' Epi input: compounded delays
@@ -120,10 +125,12 @@ sc_analysis_pop_size_equal_teams_sensitivity_w_cpd_delays <- pop_size_equal_team
     group_by(strategy, mt_equip_type, near_pop, far_pop, n_teams_fixed, n_teams_mobile) %>%
         mutate(
             mt_compounded_delay = calc_compounded_delays(
+                predeployment_delay,
                    campaign_start,
                    mt_dur_constrained
                ),
                ft_compounded_delay = calc_compounded_delays(
+                   predeployment_delay,
                    campaign_start,
                    ft_dur_constrained
                ), 
@@ -139,7 +146,8 @@ sc_analysis_pop_size_equal_teams_sensitivity_summary <- sc_analysis_pop_size_equ
               average_coverage = mean(site_cov_total),
               campaign_duration = sum(site_campaign_dur_constrained) + campaign_start[1],
               near_pop = sum(near_pop),
-              far_pop = sum(far_pop)
+              far_pop = sum(far_pop),
+              .groups = 'drop'
               ) %>%
     mutate(
         cold_chain = as_factor(ifelse(str_detect(strategy, "_fcc"),

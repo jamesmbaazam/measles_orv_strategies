@@ -1,15 +1,16 @@
-#A quick plot
+
 #beeswarm plot, a better option than jitter plots
 library(ggbeeswarm)
 library(scales)
 
+
 options("scipen" = 10000, "digits" = 4) #remove scientific notation in plots 
 
-#Read in the model output data
-sc_analysis_pop_size_equal_teams_sensitivity_summary <- readRDS(file = "./model_output/deterministic_framework_analysis_output/sensitivity_analysis/pop_sizes/sc_analysis_pop_size_equal_teams_sensitivity_summary.rds")
+#Read in the model output
+sc_analysis_pop_size_prop_teams_sensitivity_summary <- readRDS(file = "./model_output/deterministic_framework_analysis_output/sensitivity_analysis/pop_sizes/sc_analysis_pop_size_prop_teams_sensitivity_summary.rds")
 
 
-coverage_duration_plot_plain_shapes_beeswarm <- ggplot(data = sc_analysis_pop_size_equal_teams_sensitivity_summary, 
+coverage_vs_duration_prop_team_alloc_plot <- ggplot(data = sc_analysis_pop_size_prop_teams_sensitivity_summary, 
                                                        aes(x = campaign_duration, 
                                                            y = average_coverage)) + 
     geom_beeswarm(groupOnX = T,
@@ -21,20 +22,20 @@ coverage_duration_plot_plain_shapes_beeswarm <- ggplot(data = sc_analysis_pop_si
                   cex = 5, 
                   stroke = 2
     ) +
-    scale_y_continuous(breaks = seq(min(sc_analysis_pop_size_equal_teams_sensitivity_summary$average_coverage), 
-                                    max(sc_analysis_pop_size_equal_teams_sensitivity_summary$average_coverage), 
+    scale_y_continuous(breaks = seq(min(sc_analysis_pop_size_prop_teams_sensitivity_summary$average_coverage), 
+                                    max(sc_analysis_pop_size_prop_teams_sensitivity_summary$average_coverage), 
                                     length.out = 5),
-                       labels = percent(seq(min(sc_analysis_pop_size_equal_teams_sensitivity_summary$average_coverage), 
-                                            max(sc_analysis_pop_size_equal_teams_sensitivity_summary$average_coverage), 
-                                            length.out = 5)
+                       labels = scales::percent(seq(min(sc_analysis_pop_size_prop_teams_sensitivity_summary$average_coverage), 
+                                                    max(sc_analysis_pop_size_prop_teams_sensitivity_summary$average_coverage), 
+                                                    length.out = 5)
                        )
     ) +
-    scale_x_continuous(breaks = seq(min(sc_analysis_pop_size_equal_teams_sensitivity_summary$campaign_duration), 
-                                    max(sc_analysis_pop_size_equal_teams_sensitivity_summary$campaign_duration), 
+    scale_x_continuous(breaks = seq(min(sc_analysis_pop_size_prop_teams_sensitivity_summary$campaign_duration), 
+                                    max(sc_analysis_pop_size_prop_teams_sensitivity_summary$campaign_duration), 
                                     length.out = 5
     ),
-    labels = seq(min(sc_analysis_pop_size_equal_teams_sensitivity_summary$campaign_duration), 
-                 max(sc_analysis_pop_size_equal_teams_sensitivity_summary$campaign_duration), 
+    labels = seq(min(sc_analysis_pop_size_prop_teams_sensitivity_summary$campaign_duration), 
+                 max(sc_analysis_pop_size_prop_teams_sensitivity_summary$campaign_duration), 
                  length.out = 5)
     ) +
     scale_shape_manual(name = 'Mobile team equipment', 
@@ -76,14 +77,22 @@ coverage_duration_plot_plain_shapes_beeswarm <- ggplot(data = sc_analysis_pop_si
     )
     ) +
     labs(
-        title = 'Strategy ranking by vaccination coverage and campaign duration (equal team type allocation)',
+       # title = 'Strategy ranking by vaccination coverage and campaign duration (Proportional team type allocation)',
         x = "Campaign duration (days)",
         y = "Vaccination coverage"
-    ) +
-    facet_wrap(n_teams_fixed + near_pop ~ n_teams_mobile + far_pop) + 
+    ) + 
+    facet_wrap(n_teams_fixed + n_teams_mobile ~ near_pop + far_pop) + 
     theme(strip.background = element_rect(colour = "black", 
                                           fill = "#CCCCFF")
-    ) +
+          ) +
     NULL
 
-plot(coverage_duration_plot_plain_shapes_beeswarm)
+plot(coverage_vs_duration_prop_team_alloc_plot)
+
+#save plot
+ggsave(plot = coverage_vs_duration_prop_team_alloc_plot,
+       filename = './figures/deterministic_framework_analysis_figures/sensitivity_analysis/pop_sizes/coverage_vs_duration_prop_team_allocation_varying_pop_sensitivity_plot.jpg',
+       width = 23.76,
+       height = 17.86,
+       units = 'cm'
+)

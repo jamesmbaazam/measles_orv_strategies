@@ -1,7 +1,7 @@
 options(nwarnings = 10000) #print this many messages if they exist or occur
 
 #helper scripts
-source("./scripts/wrappers_supply_chain.R")
+source("./scripts/deterministic_framework_analysis/global_scripts/wrappers_supply_chain.R")
 source("./scripts/deterministic_framework_analysis/sensitivity_analyses/pop_size/sim_params_pop_size_prop_teams_sensitivity.R")
 
 
@@ -111,7 +111,12 @@ campaign_metrics_pop_size_prop_teams_sensitivity_trunc <- campaign_metrics_pop_s
 pop_size_prop_teams_sensitivity_sc_analysis_full <- bind_cols(
     campaign_delay_pop_size_prop_teams_sensitivity_trunc,
     campaign_metrics_pop_size_prop_teams_sensitivity_trunc
-    ) 
+    ) %>% 
+    mutate(
+        predeployment_delay = rep(21, times = nrow(campaign_delay_pop_size_prop_teams_sensitivity_trunc
+                                                   )
+                                  )
+        )
 
 
 #' Epi input: compounded delays
@@ -119,10 +124,12 @@ sc_analysis_pop_size_prop_teams_sensitivity_w_cpd_delays <- pop_size_prop_teams_
     group_by(strategy, mt_equip_type, near_pop, far_pop, n_teams_fixed, n_teams_mobile) %>%
         mutate(
             mt_compounded_delay = calc_compounded_delays(
+                predeployment_delay,
                    campaign_start,
                    mt_dur_constrained
                ),
                ft_compounded_delay = calc_compounded_delays(
+                   predeployment_delay,
                    campaign_start,
                    ft_dur_constrained
                ), 
@@ -138,7 +145,8 @@ sc_analysis_pop_size_prop_teams_sensitivity_summary <- sc_analysis_pop_size_prop
               average_coverage = mean(site_cov_total),
               campaign_duration = sum(site_campaign_dur_constrained) + campaign_start[1],
               near_pop = sum(near_pop),
-              far_pop = sum(far_pop)
+              far_pop = sum(far_pop),
+              .groups = 'drop'
               ) %>%
     mutate(
         cold_chain = as_factor(ifelse(stringr::str_detect(strategy, "_fcc"),
