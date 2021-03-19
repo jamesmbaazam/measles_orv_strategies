@@ -5,7 +5,7 @@ library(stringr)
 library(forcats)
 library(dplyr)
 library(tidyr)
-library(ggalt) #the geom_lollipop function comes from this package
+#library(ggalt) #the geom_lollipop function comes from this package
 library(extrafont)
 library(conflicted)
 
@@ -15,8 +15,8 @@ conflict_prefer('filter', 'dplyr')
 
 #set up for publication-ready plots
 #font_import() only do this one time - it takes a while
- loadfonts(device = "win")
- windowsFonts(Arial = windowsFont("Arial"))
+# loadfonts(device = "win")
+ #windowsFonts(Arial = windowsFont("Arial"))
 # 
 # theme_set(theme_bw(base_size = 18,
 #                    base_family = 'Arial'
