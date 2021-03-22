@@ -158,10 +158,9 @@ relative_cases_averted_lollipop_plot <- cases_averted_df_cc_mod %>%
   ) +
   labs(x = 'Strategy', 
        y = 'Cases averted (thousands)',
-       fill = 'Vial type') + 
-  ggpubr::font('xy.text', face = 'plain') +
-  ggpubr::font('xy.title', face = 'plain') +
-  ggpubr::theme_pubr(legend = 'right', base_size = 16) +
+       fill = 'Vial type'
+       ) + 
+  theme_minimal(base_size = 16) +
   NULL
 
 plot(relative_cases_averted_lollipop_plot)
@@ -260,9 +259,7 @@ cases_averted_lollipop_plot <- cases_averted_df_cc_mod %>%
   labs(x = 'Strategy', 
        y = 'Cases averted (thousands)',
        fill = 'Vial type') + 
-  ggpubr::font('xy.text', face = 'plain') +
-  ggpubr::font('xy.title', face = 'plain') +
-  ggpubr::theme_pubr(legend = 'right', base_size = 16) +
+  theme_minimal(base_size = 18) +
   NULL
 
 plot(cases_averted_lollipop_plot)

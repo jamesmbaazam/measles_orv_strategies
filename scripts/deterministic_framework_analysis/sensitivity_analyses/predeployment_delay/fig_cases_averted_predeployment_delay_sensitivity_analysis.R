@@ -136,7 +136,8 @@ cases_averted_predeployment_delay_sensitivity_analysis_plot <- cases_averted_df_
     ) +
     labs(x = 'Pre-deployment delay',
          y = 'Cases averted (thousands)'
-         )
+         ) +
+    theme_minimal()
 
 
 plot(cases_averted_predeployment_delay_sensitivity_analysis_plot)

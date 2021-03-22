@@ -80,10 +80,8 @@ coverage_vs_duration_equal_team_alloc_plot <- ggplot(data = sc_analysis_pop_size
         x = "Campaign duration (days)",
         y = "Vaccination coverage"
     ) +
-    facet_wrap(n_teams_fixed + near_pop ~ n_teams_mobile + far_pop) + 
-    theme(strip.background = element_rect(colour = "black", 
-                                          fill = "#CCCCFF")
-    ) +
+    facet_wrap(n_teams_fixed + near_pop ~ n_teams_mobile + far_pop) +
+    theme_minimal(base_size = 16) +
     NULL
 
 plot(coverage_vs_duration_equal_team_alloc_plot)

@@ -117,12 +117,8 @@ coverage_duration_plot_plain_shapes_beeswarm <- ggplot(data = main_analysis_outc
   labs( # title = 'Ranking of scenarios by vaccination coverage and campaign duration',
     x = "Campaign duration (days)",
     y = "Vaccination coverage"
-  ) +
-  ggpubr::font('xy.text', face = 'plain') +
-  ggpubr::font('xy.title', face = 'plain') +
-  ggpubr::theme_pubr(legend = 'right', 
-                     base_size = 16,
-                     border = T) +
+  ) + 
+  theme_minimal(base_size = 16) +
   NULL
 
 plot(coverage_duration_plot_plain_shapes_beeswarm)
