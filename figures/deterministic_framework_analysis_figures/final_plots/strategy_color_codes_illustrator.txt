@@ -1,0 +1,10 @@
+light blue A1CDD4
+deep blue 63ACB7
+
+light gold F0E1A9
+deep gold D9B529
+
+light orange F0B9A3
+deep orange DA5018
+
+Grey 757A7A
