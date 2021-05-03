@@ -1,42 +1,183 @@
-# Stochastic version
-# SIRstep<-function(S,I,beta,births,migration,mortalityrate){
-# 	#browser()
-# 	It<-rbinom(1,S,1-exp(-beta*I^.95))+rpois(1,migration)
-# 	St<-S-It-floor(mortalityrate*S)+floor(births)
-# 	return(list(S=St,I=It))
-# 	}
-# Deterministic version
-# SIRstep<-function(S,I,beta,births,migration,mortalityrate){
-# 	#browser()
-# 	It<-min(S,S*(1-exp(-beta*I^.95)))+migration
-# 	St<-S-It-mortalityrate*S+births
-# 	return(list(S=St,I=It))
-# 	}
 
-SIRstep <- function(S, I, Beta, births, migration, mortalityrate) {
-  # browser()
-  It <- min(S, Beta * S * I^.95) + migration
-  St <- S + births - It - mortalityrate * S
-  return(list(S = St, I = It))
+
+
+#' # init_pop: a function that initializes the target population
+#' @param target_pop_size 
+#' @param initPropImmune 
+#' @param I0 
+#'
+#' @return 
+#' @export
+#'
+#' @examples init_pop(10000, 0.3, 1)
+init_pop <- function(target_pop_size, initPropImmune, I0) {
+  immune <- floor(target_pop_size * initPropImmune)
+  data.frame(
+    S = target_pop_size - immune,
+    I = I0,
+    R = immune
+  )
 }
-SIRrun <- function(S.init, I.init, beta, years, births, migration, mortalityrate) {
-  # beta is specified as a vector of values for each "biweek",
-  beta <- rep(beta, years)
-  Susc <- S.init
-  Infect <- I.init
-  timesteps <- 26 * years
-  for (i in 1:timesteps) {
-    out <- SIRstep(Susc[i], Infect[i], beta[i], births, migration, mortalityrate)
-    Susc <- c(Susc, out$S)
-    Infect <- c(Infect, out$I)
-    # cat(out$I,".\n")
-    if (!is.finite(out$I)) {
-      break
+
+#' infect: a function that infects a proportion of the susceptible population
+#'
+#' @param births number of births per time period
+#' @param migration positive integer number of migrations 
+#' @param mortality_rate the number of natural deaths
+#' @param run_type the dynamic way to run the function
+#' @param browse if true, the browser will be opened for debugging purposes
+#' @param beta 
+#' @param target_pop 
+#' @param rec_duration 
+#'
+#' @return a list with the current state of the system
+#' @export 
+#'
+#' @examples infect(target_pop = init_pop(1000, 0.15, 1), beta = 0.012, births = 20, migration = 20, rec_duration = 7,mortality_rate = 0.2,run_type = 'det')
+#' 
+infect <- function(target_pop, 
+                   beta, 
+                   births, 
+                   migration,
+                   rec_duration,
+                   mortality_rate, 
+                   run_type = "det", 
+                   browse = F
+                   ) {
+  
+  if (browse) browser()
+  
+  pop_size <- sum(target_pop)
+  
+  switch(run_type,
+    "det" = {
+      It <- min(target_pop$S, beta * target_pop$S * target_pop$I) + migration
+    },
+    "stoc" = {
+      infection_prob <- 1 - exp(-beta * target_pop$I)
+      It <- rbinom(1, target_pop$S, infection_prob) + rpois(1, migration)
     }
-    # if(out$I==0){break}
+  )
+  pop_forward_step <- data.frame(
+    S = target_pop$S + births - It - mortality_rate * target_pop$S,
+    I = target_pop$I +  (1/rec_duration)*It,
+    R = target_pop$R + (1/rec_duration)*It
+  ) 
+  return(pop_forward_step)
+}
+
+
+#' Title
+#'
+#' @param births 
+#' @param migration 
+#' @param mortality_rate 
+#' @param vax_eff 
+#' @param vax_rate 
+#' @param n_team_type 
+#' @param run_type 
+#' @param browse 
+#' @param target_pop 
+#'
+#' @return
+#' @export
+#'
+#' @examples vaccinate(target_pop = init_pop(1000, 0.15, 1), births = 20, migration = 20, mortality_rate = 0.2, vax_eff = 0.95, vax_rate = 250, n_team_type = 1)
+vaccinate <- function(target_pop, 
+                      births, 
+                      migration, 
+                      mortality_rate, 
+                      vax_eff, 
+                      vax_rate,
+                      n_team_type, 
+                      run_type = "det", 
+                      browse = F
+                      ) {
+  
+  if (browse) browser()
+  
+  switch(run_type,
+         "det" = {
+           Rt <- min(target_pop$S, vax_rate*n_team_type*vax_eff) + migration
+         },
+         "stoc" = {
+           Rt <- rbinom(1, vax_rate*n_team_type, vax_eff) + rpois(1, migration)
+         }
+  )
+  pop_forward_step <- data.frame(
+  S = target_pop$S + births - Rt - mortality_rate * target_pop$S,
+  I = target_pop$I,
+  R = target_pop$R + Rt
+  )
+  return(pop_forward_step)
+}
+
+
+
+#' Title
+#'
+#' @param beta 
+#' @param births 
+#' @param migration 
+#' @param mortality_rate 
+#' @param target_pop 
+#' @param run_time 
+#' @param rec_dur 
+#' @param vax_day 
+#' @param vax_efficacy 
+#' @param orv_duration 
+#' @param n_team_type 
+#' @param team_performance 
+#' @param infect_run_type 
+#' @param vax_run_type 
+#'
+#' @return
+#' @export
+#'
+#' @examples run_simulation(target_pop = init_pop(1000, 0.15, 1), beta = 0.012, run_time = 365, births = 20, migration = 20, mortality_rate = 0.1)
+run_simulation <- function(target_pop,
+                           beta,
+                           run_time,
+                           births,
+                           migration,
+                           mortality_rate,
+                           rec_dur,
+                           vax_day,
+                           vax_efficacy,
+                           orv_duration,
+                           n_team_type,
+                           team_performance,
+                           infect_run_type = "det",
+                           vax_run_type = "det",
+                           browse = F) {
+
+
+  #beta <- rep(beta, run_time)
+  Susc <- target_pop$S
+  Infected <- target_pop$I
+  Rec <- target_pop$R
+
+  # running parameters
+  # timesteps <- 26 * run_time #26 biweeks in a year
+
+  # day before campaign
+  
+  if(browse) browser()
+  simResults <- data.frame(time = 0, S = Susc, I = Infected, R = Rec)
+
+  for (time in 1:run_time) {
+    if (!is.na(vax_day) & time < vax_day + 1 | time > vax_day + 1 + round(orv_duration / n_team_type)) {
+      infected_pop <- infect(target_pop = simResults[time, -1], beta = beta, births = births, migration = migration, rec_duration = rec_dur, mortality_rate = mortality_rate, run_type = infect_run_type)
+      simResults <- rbind(simResults, data.frame(time = time, infected_pop))
+    } else if (!is.na(vaxDay) & time >= vaxDay + 1 & time <= vaxDay + 1 + round(orv_duration / n_team_type)) {
+      vaccinated_pop <- vaccinate(target_pop = simResults[time, -1], births = births, migration = migration, mortality_rate = mortality_rate, vax_eff = vax_efficacy, vax_rate = team_performance, n_team_type = n_team_type, run_type = vax_run_type)
+      simResults <- rbind(simResults, data.frame(time = time, vaccinated_pop))
+    } else if (is.na(vaxDay)) {
+      infected_pop <- infect(target_pop = simResults[time, -1], beta = beta, births = births, migration = migration, rec_duration = rec_dur, mortality_rate = mortality_rate, run_type = infect_run_type)
+      simResults <- rbind(simResults, data.frame(time = time, infected_pop))
+    }
   }
-  # browser()
-  return(list(S = Susc, I = Infect))
+  return(simResults)
 }
 
 # beta<-source("/Users/mattferrari/Documents/Current Projects/MSF Measles/Measles_Dynamics_ms/Seasonality/MCMC(new)/niamey/niamey_beta.q")$value

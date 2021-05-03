@@ -24,8 +24,8 @@ source('scripts/plotting_functions.R')
 #'STRATEGY-SPECIFIC CAMPAIGN DELAY ANALYSIS 
 #'TODO: change the for loop to an lapply function for efficiency
 ##########################################################################
-strategy_names_subset <- c("dose10_fcc_asap", "monodose_fcc_asap", "monodose_occ_asap")
-strategy_names_subset_plot_labels <- c('10-dose FCC', '1-dose FCC', '1-dose OCC')
+strategy_names_subset <- c("dose10_fcc_asap", "dose10_occ_asap", "monodose_fcc_asap", "monodose_occ_asap")
+strategy_names_subset_plot_labels <- c('10-dose FCC', '10-dose OCC', '1-dose FCC', '1-dose OCC')
 
 #Location characteristics
 far_pop_sizes <- rep(2500, times = 5)
@@ -57,6 +57,7 @@ delay_results_rcw25 <- vector('list', length = length(strategy_names_subset))
             , rcw25_ice_replacement_days = 2
             , n_teams_fixed = 1
             , n_teams_mobile = 1
+            , browse = F
         )
     }
     
