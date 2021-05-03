@@ -6,9 +6,9 @@ library(ggthemes)
 library(ggplot2)
 
 # scripts
-source("scripts/Parameters.R")
-source('scripts/analyses_parameters.R')
-source("scripts/Supply_chain_functions.R")
+source("scripts/deterministic_framework_analysis/global_scripts/parameters.R")
+source('scripts/deterministic_framework_analysis/global_scripts/analyses_parameters.R')
+source("scripts/deterministic_framework_analysis/global_scripts/supply_chain_functions.R")
 
 
 
