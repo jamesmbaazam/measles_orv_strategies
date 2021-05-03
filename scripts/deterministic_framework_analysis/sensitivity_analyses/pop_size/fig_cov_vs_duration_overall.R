@@ -76,16 +76,16 @@ geom_point(data = team_alloc_sensitivity_results,
     scale_linetype_discrete(labels = c('Proportional', 'Equal')) +
     labs(x = 'Near population size (out of 500 000)', 
          y = 'Average vaccination coverage',
-         linetype = 'Team allocation scheme'
+         linetype = 'Team allocation'
          ) +
-    theme_minimal()
+    theme_minimal(base_size = 16)
 
 
 plot(average_coverage_team_allocation_plot)
 
 
 ggsave(plot = average_coverage_team_allocation_plot, 
-       filename = './figures/deterministic_framework_analysis_figures/sensitivity_analysis/pop_sizes/average_coverage_team_allocation_plot.jpg', 
+       filename = './figures/deterministic_framework_analysis_figures/sensitivity_analysis/pop_sizes/average_coverage_team_allocation_plot.tiff', 
        width = 23.76, 
        height = 17.86, 
        units = 'cm'
