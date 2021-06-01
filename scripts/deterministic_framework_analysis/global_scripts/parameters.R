@@ -19,13 +19,20 @@ monodose_vial_vol <- 21.09
 dose10_vial_vol <- c(2.1, 3)
 
 
-# active cold chain
+#' Active cold chain 
+#' Freezers
 mf314_largepack_capacity <- 323 # large pack refers to 0.6L icepacks
 mf314_smallpack_capacity <- 450 # small pack refers to 0.4L icepacks
 
 mf314_largepack_fr <- 54 #fr = freezing rate per day for large icepacks
 mf314_smallpack_fr <- 81 #fr = freezing rate per day for large icepacks
 
+
+
+#' Refrigerators
+
+mk304_monodose_capacity <- 4979
+mk304_dose10_capacity <- 49787
 
 # Passive cold chain gross volume in cm3 
 rcw25_grossVol <- 43735.296 # convert to litres
