@@ -35,6 +35,38 @@ compute_vaxCarr_icepacks <- function(amb_temp, ...) {
   }
 }
 
+
+
+calc_freezer_needs <- function(freezer_icepack_capacity, num_of_icepacks){
+  
+  return(num_of_icepacks/freezer_icepack_capacity)
+  
+}
+
+
+calc_refrigerator_needs <- function(refrigerator_capacity_net, num_of_doses){
+  
+  return(refrigerator_capacity_net/num_of_doses)
+  
+}
+
+
+calc_teamtype_needs <- function(pop_size, expected_team_performance, campaign_duration){
+  
+  params <- c(pop_size, expected_team_performance, campaign_duration)
+  
+  if(expected_team_performance <=0 | campaign_duration <= 0){
+    stop('Inputs cannot be 0')
+    }else{
+  teams_required <- pop_size/(expected_team_performance*campaign_duration)
+    }
+  
+  return(ceiling(teams_required))
+  
+}
+
+
+
 #function to convert specified near and far populations into a data frame
 
 make_site_data <- function(near_pop_size, far_pop_size){
