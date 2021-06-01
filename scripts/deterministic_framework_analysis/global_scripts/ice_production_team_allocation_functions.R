@@ -14,9 +14,26 @@ source("scripts/deterministic_framework_analysis/global_scripts/supply_chain_fun
 
 # calc_daily_icepack_needs() ----
 
+#' Title
+#'
+#' @param campaign_duration 
+#' @param fixed_teams_per_vax_unit #' How many fixed post will be set up at a vaccination site. This is usually 1 or 2 and not more.
+#' @param mobile_teams_per_site 
+#' @param ambient_temperature 
+#' @param rcw25_ice_replacement_days 
+#' @param mobile_team_equip_type 
+#' @param num_of_freezers 
+#' @param small_icepacks_fr 
+#' @param large_icepacks_fr 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 calc_daily_icepack_needs <- function(campaign_duration,
-                                     fixed_teams_on_site, # c(1, 2)
-                                     mobile_teams_per_site,
+                                     n_fixed_teams,
+                                     n_mobile_teams,
+                                     fixed_teams_per_vax_unit, # c(1, 2)
                                      ambient_temperature,
                                      rcw25_ice_replacement_days,
                                      mobile_team_equip_type = 'vaxCarr', #options = c('vaxCarr', 'rcw25', 'both')
@@ -24,13 +41,13 @@ calc_daily_icepack_needs <- function(campaign_duration,
                                      small_icepacks_fr, #MF314 freezing rate for small icepacks
                                      large_icepacks_fr #MF314 freezing rate for large icepacks
                                      ) {
-  if (fixed_teams_on_site > 2 | fixed_teams_on_site < 0) {
+  if (fixed_teams_per_vax_unit > 2 | fixed_teams_per_vax_unit < 0) {
     stop("Fixed teams per site cannot be greater than 2 or negative")
   }
 
     per_ft_vaxCarr <- 1
-    per_ft_rcw25 <- ifelse(fixed_teams_on_site == 0, 0, 1)
-    per_mt_vaxCarr <- ifelse(mobile_teams_per_site == 0, 0, 1)
+    per_ft_rcw25 <- ifelse(fixed_teams_per_vax_unit == 0, 0, 1)
+  
     per_mt_rcw25 <- if (mobile_team_equip_type == "rcw25") {
       1
     } else if (mobile_team_equip_type == "both") {
@@ -41,9 +58,25 @@ calc_daily_icepack_needs <- function(campaign_duration,
       stop("unknown mobile team equipment type")
     }      
     
-  rcw25_icepacks <- compute_rcw25_icepacks(amb_temp = ambient_temperature, replacement_days = rcw25_ice_replacement_days)
+  rcw25_icepacks <- compute_rcw25_icepacks(amb_temp = ambient_temperature, 
+                                           replacement_days = rcw25_ice_replacement_days
+                                           )
+  
   vaxCarr_icepacks <- compute_vaxCarr_icepacks(amb_temp = ambient_temperature)
-  per_replacement_large_packs <- ifelse(fixed_teams_on_site == 0, 0, rcw25_icepacks)
+  
+  
+  
+  rcw25_needed <- sum(n_fixed_teams*per_ft_rcw25, n_mobile_teams*per_mt_rcw25)
+  
+  vaxCarr_needed <- sum(n_fixed_teams*per_ft_vaxCarr, n_mobile_teams*per_mt_vaxCarr)
+
+  
+  
+  per_replacement_large_packs <- ifelse(fixed_teams_per_vax_unit == 0, 
+                                        0, 
+                                        rcw25_icepacks
+                                        ) * fixed_teams_per_vax_unit * fixed_teams
+  
   per_replacement_small_packs <- vaxCarr_icepacks * mobile_teams_per_site
 
   daily_small_packs_need <- rep(vaxCarr_icepacks, times = campaign_duration)
@@ -55,7 +88,7 @@ calc_daily_icepack_needs <- function(campaign_duration,
   #final processing
   
   #vaccine carrier icepacks
-  small_icepacks_ft <- daily_small_packs_need * per_ft_vaxCarr * fixed_teams_on_site
+  small_icepacks_ft <- daily_small_packs_need * per_ft_vaxCarr * fixed_teams_per_vax_unit
   small_icepacks_mt <- daily_small_packs_need * per_mt_vaxCarr * mobile_teams_per_site
   
   #rcw25 icepacks
@@ -85,7 +118,7 @@ calc_daily_icepack_needs <- function(campaign_duration,
 # calc_team_equipment_needs() ----
 
 calc_team_equipment_needs <- function(campaign_duration,
-                                     fixed_teams_on_site, # c(1, 2)
+                                     fixed_teams_per_vax_unit, # c(1, 2)
                                      mobile_teams_per_site,
                                      ambient_temperature,
                                      rcw25_ice_replacement_days,
@@ -94,12 +127,12 @@ calc_team_equipment_needs <- function(campaign_duration,
                                      small_icepacks_fr, #MF314 freezing rate for small icepacks
                                      large_icepacks_fr #MF314 freezing rate for large icepacks
 ) {
-    if (fixed_teams_on_site > 2 | fixed_teams_on_site < 0) {
+    if (fixed_teams_per_vax_unit > 2 | fixed_teams_per_vax_unit < 0) {
         stop("Fixed teams per site cannot be greater than 2 or negative")
     }
     
     per_ft_vaxCarr <- 1
-    per_ft_rcw25 <- ifelse(fixed_teams_on_site == 0, 0, 1)
+    per_ft_rcw25 <- ifelse(fixed_teams_per_vax_unit == 0, 0, 1)
     per_mt_vaxCarr <- ifelse(mobile_teams_per_site == 0, 0, 1)
     per_mt_rcw25 <- if (mobile_team_equip_type == "rcw25") {
         1
@@ -115,11 +148,11 @@ calc_team_equipment_needs <- function(campaign_duration,
     # output
     
     
-    team_equipment <- tibble(fixed_teams_on_site = fixed_teams_on_site,
+    team_equipment <- tibble(fixed_teams_per_vax_unit = fixed_teams_per_vax_unit,
                              mobile_teams_on_site = mobile_teams_per_site,
                              rcw25_required_ft = per_ft_rcw25,
                              rcw25_required_mt = per_mt_rcw25,
-                             vaxCarr_required_ft = per_ft_vaxCarr * fixed_teams_on_site,
+                             vaxCarr_required_ft = per_ft_vaxCarr * fixed_teams_per_vax_unit,
                              vaxCarr_required_mt = per_mt_vaxCarr * mobile_teams_per_site
     )
     
@@ -129,7 +162,7 @@ calc_team_equipment_needs <- function(campaign_duration,
 
 # calc_icepack_production() ----
 calc_icepack_production <- function(campaign_duration,
-                                    fixed_teams_on_site, # c(1, 2)
+                                    fixed_teams_per_vax_unit, # c(1, 2)
                                     mobile_teams_per_site,
                                     ambient_temperature,
                                     rcw25_ice_replacement_days,
@@ -141,12 +174,12 @@ calc_icepack_production <- function(campaign_duration,
                                     icepack_fr_small,
                                     num_of_teams
                                     ) {
-    if (fixed_teams_on_site > 2 | fixed_teams_on_site < 0) {
+    if (fixed_teams_per_vax_unit > 2 | fixed_teams_per_vax_unit < 0) {
         stop("Fixed teams per site cannot be greater than 2 or negative")
     }
     
     per_ft_vaxCarr <- 1
-    per_ft_rcw25 <- ifelse(fixed_teams_on_site == 0, 0, 1)
+    per_ft_rcw25 <- ifelse(fixed_teams_per_vax_unit == 0, 0, 1)
     per_mt_vaxCarr <- ifelse(mobile_teams_per_site == 0, 0, 1)
     per_mt_rcw25 <- if (mobile_team_equip_type == "rcw25") {
         1
@@ -168,8 +201,8 @@ calc_icepack_production <- function(campaign_duration,
                                       vaxCarr_ready = floor(small_icepacks/vaxCarr_icepacks),
                                       large_icepacks = 0.5 * num_of_freezers * campaign_day * large_icepacks_fr,
                                       rcw25_ready = floor(large_icepacks/rcw25_icepacks),
-                                      ft_possible = fixed_teams_on_site * rcw25_ready, #I use the number of rcw25's as a proxy to determine the number of fixed teams since they require rcw25s and vax carriers
-                                      mt_possible = (vaxCarr_ready * fixed_teams_on_site) - rcw25_ready, #I assume the remaining vaccine carriers will be used by the mobile teams
+                                      ft_possible = fixed_teams_per_vax_unit * rcw25_ready, #I use the number of rcw25's as a proxy to determine the number of fixed teams since they require rcw25s and vax carriers
+                                      mt_possible = (vaxCarr_ready * fixed_teams_per_vax_unit) - rcw25_ready, #I assume the remaining vaccine carriers will be used by the mobile teams
                                     #  ice_surplus = 0.5*(mf314_largepack_capacity + mf314_smallpack_capacity) - cumsum(large_icepacks + small_icepacks)
     )
     
@@ -179,11 +212,11 @@ calc_icepack_production <- function(campaign_duration,
 
 
 
-#trail runs
+#trial runs
 msf_appendix23_reproduced <- calc_daily_icepack_needs(
-  campaign_duration = 4,
-  fixed_teams_on_site = 2,
-  mobile_teams_per_site = 0,
+  campaign_duration = 10,
+  fixed_teams_per_vax_unit = 2,
+  mobile_teams_per_site = ,
   ambient_temperature = "above 40",
   rcw25_ice_replacement_days = 3,
   num_of_freezers = sc_model_params$mf314_quant,
@@ -195,7 +228,7 @@ glimpse(msf_appendix23_reproduced)
 
 ice_and_team_allocation <- calc_icepack_production(
     campaign_duration = 10,
-    fixed_teams_on_site = 2,
+    fixed_teams_per_vax_unit = 2,
     mobile_teams_per_site = 0,
     ambient_temperature = "below 40",
     rcw25_ice_replacement_days = 2,
@@ -208,7 +241,7 @@ ice_and_team_allocation
 
 # calc_team_equipment_needs(
 #     campaign_duration = 4,
-#     fixed_teams_on_site = 2,
+#     fixed_teams_per_vax_unit = 2,
 #     mobile_teams_per_site = 0,
 #     ambient_temperature = "above 40",
 #     rcw25_ice_replacement_days = 3,
@@ -281,7 +314,7 @@ ice_and_team_allocation
 
 #complex function
 # calc_daily_icepack_needs <- function(campaign_duration,
-#                                      fixed_teams_on_site, # c(1, 2)
+#                                      fixed_teams_per_vax_unit, # c(1, 2)
 #                                      mobile_teams_per_site,
 #                                      ambient_temperature,
 #                                      rcw25_ice_replacement_days,
@@ -290,12 +323,12 @@ ice_and_team_allocation
 #                                      small_icepacks_fr, #MF314 freezing rate for small icepacks
 #                                      large_icepacks_fr #MF314 freezing rate for large icepacks
 # ) {
-#     if (fixed_teams_on_site > 2 | fixed_teams_on_site < 0) {
+#     if (fixed_teams_per_vax_unit > 2 | fixed_teams_per_vax_unit < 0) {
 #         stop("Fixed teams per site cannot be greater than 2 or negative")
 #     }
 #     
 #     per_ft_vaxCarr <- 1
-#     per_ft_rcw25 <- ifelse(fixed_teams_on_site == 0, 0, 1)
+#     per_ft_rcw25 <- ifelse(fixed_teams_per_vax_unit == 0, 0, 1)
 #     per_mt_vaxCarr <- ifelse(mobile_teams_per_site == 0, 0, 1)
 #     per_mt_rcw25 <- if (mobile_team_equip_type == "rcw25") {
 #         1
@@ -309,7 +342,7 @@ ice_and_team_allocation
 #     
 #     rcw25_icepacks <- compute_rcw25_icepacks(amb_temp = ambient_temperature, replacement_days = rcw25_ice_replacement_days)
 #     vaxCarr_icepacks <- compute_vaxCarr_icepacks(amb_temp = ambient_temperature)
-#     per_replacement_large_packs <- ifelse(fixed_teams_on_site == 0, 0, rcw25_icepacks)
+#     per_replacement_large_packs <- ifelse(fixed_teams_per_vax_unit == 0, 0, rcw25_icepacks)
 #     per_replacement_small_packs <- vaxCarr_icepacks * mobile_teams_per_site
 #     
 #     daily_small_packs_need <- rep(vaxCarr_icepacks, times = campaign_duration)
@@ -321,7 +354,7 @@ ice_and_team_allocation
 #     # output
 #     icepack_needs <- tibble(
 #         campaign_day = 1:campaign_duration,
-#         small_icepacks_ft = daily_small_packs_need * per_ft_vaxCarr * fixed_teams_on_site,
+#         small_icepacks_ft = daily_small_packs_need * per_ft_vaxCarr * fixed_teams_per_vax_unit,
 #         small_icepacks_mt = daily_small_packs_need * per_mt_vaxCarr * mobile_teams_per_site,
 #         small_icepacks_mt_total = cumsum(small_icepacks_mt),
 #         small_icepacks_ft_total = cumsum(small_icepacks_ft),
@@ -337,11 +370,11 @@ ice_and_team_allocation
 #         days_to_freeze_all_ice = calc_freezing_time(mf314_available = num_of_freezers, large_icepacks_quantity = large_icepacks_overall_total, small_icepacks_quantity = small_icepacks_overall_total)
 #     )
 #     
-#     team_equipment <- tibble(fixed_teams_on_site = fixed_teams_on_site,
+#     team_equipment <- tibble(fixed_teams_per_vax_unit = fixed_teams_per_vax_unit,
 #                              mobile_teams_on_site = mobile_teams_per_site,
 #                              rcw25_required_ft = per_ft_rcw25,
 #                              rcw25_required_mt = per_mt_rcw25,
-#                              vaxCarr_required_ft = per_ft_vaxCarr * fixed_teams_on_site,
+#                              vaxCarr_required_ft = per_ft_vaxCarr * fixed_teams_per_vax_unit,
 #                              vaxCarr_required_mt = per_mt_vaxCarr * mobile_teams_per_site
 #     )
 #     
