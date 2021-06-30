@@ -271,21 +271,22 @@ saveRDS(cases_averted_df,
 
 #'load supply chain summary
 #'
-sc_final_outcomes_msf_params <- readRDS('./model_output/deterministic_framework_analysis_output/main_analysis/sc_final_outcomes_msf_params.rds') 
+sc_main_analysis_aggregated <- readRDS('./model_output/deterministic_framework_analysis_output/main_analysis/sc_main_analysis_results_summarized.rds') 
 
-sc_analysis_msf_params_final_outcomes <- sc_final_outcomes_msf_params %>% 
+sc_main_analysis_aggregated_mod <- sc_main_analysis_aggregated %>% 
     mutate(strategy = as_factor(stringr::str_replace(strategy, 
                                                      pattern = '_parallel', 
                                                      replacement = '')
                                 )
            ) #shorten the strategy names
 
-msf_params_complete_analysis_final_outcomes <- left_join(sc_analysis_msf_params_final_outcomes, 
+#Combine the supply chain summary results with the epidemiological results (cases averted at different pre-deployment delays)
+main_analysis_final_outcomes <- left_join(sc_main_analysis_aggregated_mod, 
                              cases_averted_df, 
                              by = c('strategy', 'mt_equip_type'
                                     )
                              )
 
-saveRDS(msf_params_complete_analysis_final_outcomes, 
-        file = './model_output/deterministic_framework_analysis_output/main_analysis/msf_params_complete_analysis_final_outcomes.rds')
+saveRDS(main_analysis_final_outcomes, 
+        file = './model_output/deterministic_framework_analysis_output/main_analysis/main_analysis_final_outcomes.rds')
 
