@@ -113,6 +113,7 @@ run_orv_model <- function(strategy,
   
   #initial population
   pop_init <- c(S = 1 - I0/target_pop_size - init_prop_immune, 
+                S_f = 0,
                 E = 0, 
                 I = I0/target_pop_size, 
                 R = init_prop_immune, 
@@ -147,8 +148,12 @@ run_orv_model <- function(strategy,
 }
 
 
+#######################################
+#' Example run for checks
+#########################################
 
-# no_orv_example_run <- run_orv_model(strategy = 'dummy', 
+
+# example_run <- run_orv_model(strategy = 'dummy',
 #                                     location_id = 1,
 #                                     mt_equip_type = 'vaxCarr',
 #                                     target_pop_size = 50000,
@@ -157,21 +162,31 @@ run_orv_model <- function(strategy,
 #                                     I0 = 1,
 #                                     init_prop_immune = 0.7,
 #                                     R0 = 12,
-#                                     vax_efficacy = 0,
-#                                     scenario_coverage = 0,
-#                                     vax_day = 0,
-#                                     predeployment_delay = 0,
-#                                     scenario_campaign_duration = 0,
+#                                     vax_efficacy = 0.5,
+#                                     scenario_coverage = 0.6,
+#                                     vax_day = 50,
+#                                     predeployment_delay = 3,
+#                                     scenario_campaign_duration = 10,
 #                                     max_time = 365,
 #                                     browse = F
 #                                     )
+
+
+#Transform the output and plot
+# output_wide <- example_run %>% pivot_longer(cols = S:K, names_to = 'state', values_to = 'pop')
+# 
+# output_checks <- example_run %>% mutate(s_total = (S + S_f)*1E4, total_pop = round(S + S_f + E + I + R, 2))
+# output_checks %>% View()
 # 
 # 
-# plot(no_orv_example_run$time, no_orv_example_run$S, type = 'b', col = 'blue', ylim = c(0, 1))
-# lines(no_orv_example_run$time, no_orv_example_run$E, type = 'b', col = 'purple')
-# lines(no_orv_example_run$time, no_orv_example_run$I, type = 'b', col = 'red')
-# lines(no_orv_example_run$time, no_orv_example_run$R, type = 'b', col = 'green')
+# example_dynamics <- output_wide %>% 
+#     ggplot(aes(x = time, y = pop)) + 
+#     geom_line(aes(color = state), size = 1.5) 
 # 
+# 
+# print(example_dynamics)
+
+
 #                                     
 # orv_example_run <- run_orv_model(strategy = 'dummy',
 #                                  location_id = 1,
