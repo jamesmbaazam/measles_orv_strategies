@@ -40,25 +40,31 @@ library(deSolve)
 #' @export
 #'
 #' @examples
+
+#A corrected version of the model above to track those who fail to sero-convert
+
 simod <- function(t, x, parms, coverage_correction = 0.9999, browse = F) {
-  if(browse) browser()
-  S <- x[1]
-  E <- x[2]
-  I <- x[3]
-  R <- x[4]
-  K <- x[5]
-  #
-  with(as.list(parms), {
-    Q <- ifelse(t < vax_day | t > vax_day + campaign_duration, 0, (-log(1 - coverage*coverage_correction) / campaign_duration))
-    dS <- -B * S * I - vax_efficacy * Q * S
-    dE <- B * S * I - r * E
-    dI <- r * E - g * I
-    dR <- g * I + vax_efficacy * Q * S
-    dK <- r * E
-    res <- c(dS, dE, dI, dR, dK)
-    list(res)
-  })
+    if(browse) browser()
+    S <- x[1]
+    S_f <- x[2]
+    E <- x[3]
+    I <- x[4]
+    R <- x[5]
+    K <- x[6]
+    #
+    with(as.list(parms), {
+        Q <- ifelse(t < vax_day | t > vax_day + campaign_duration, 0, (-log(1 - coverage*coverage_correction) / campaign_duration))
+        dS <- - B * S * I - vax_efficacy * Q * S - (1 - vax_efficacy) * Q * S #corrected line
+        dS_f <- (1 - vax_efficacy) * Q * S  -  B * S_f * I #Those who fail to sero-convert are subject to the force of infection
+        dE <- B * S * I + B * S_f * I - r * E
+        dI <- r * E - g * I
+        dR <- g * I + vax_efficacy * Q * S
+        dK <- r * E
+        res <- c(dS, dS_f, dE, dI, dR, dK)
+        list(res)
+    })
 }
+
 
 
 
