@@ -133,7 +133,8 @@ relative_cases_averted_lollipop_plot <- cases_averted_df_cc_mod %>%
   ) +
   scale_y_continuous(breaks = seq(-9, 2, 1),
                      labels = seq(-9, 2, 1)
-                     ) +
+                     ) + 
+    geom_hline(yintercept = 0, size = 1.2) +
   guides(shape = guide_legend(override.aes = list(size = 6, stroke = 1.2)
                               ), 
          fill = guide_legend(override.aes = list(size = 6, 
