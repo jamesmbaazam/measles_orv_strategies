@@ -38,3 +38,8 @@ Below, I outline how the flow of the simulation framework
 ## This repo _SHOULDN'T_ contain:
 1. Large files, for e.g., videos, audios, large data files (> 100 mb)
 2. Microsoft office files, unless completely necessary because these filetypes will not be tracked
+ 
+ 
+ ## How to run analyses.
+ 
+ You can either source the script run_full_main_analysis.R or run the individual scripts in the order that they appear in "scripts\deterministic_framework_analysis\main_analysis\run_full_main_analysis.R".
