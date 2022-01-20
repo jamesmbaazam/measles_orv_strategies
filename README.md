@@ -3,7 +3,7 @@ This project is about assessing various measles outbreak response vaccination st
 
 # Requirements
 ## Directories
-1. app - contains the R scripts to run the shiny app
+1. app - contains the R scripts to run the shiny app (no longer being developed)
 2. data - stores input data in csv format
 3. figures - figures from analysis
 4. model_output - stores the simulation output for further wrangling and visualizations 
