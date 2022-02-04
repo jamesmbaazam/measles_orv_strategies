@@ -166,7 +166,12 @@ ggsave(plot = relative_cases_averted_lollipop_plot,
        height = 17.86,
        units = 'cm'
        )
-
+ggsave(plot = relative_cases_averted_lollipop_plot,
+       filename = './figures/deterministic_framework_analysis_figures/main_analysis/fig5_relative_cases_averted_main_analysis_lollipop_plot_corrigendum.eps',
+       width = 23.76,
+       height = 17.86,
+       units = 'cm'
+)
 #' Cases averted (here, the reference is the no orv counterfactual)
 # cases_averted_lollipop_plot <- cases_averted_df_cc_mod %>% 
 #   arrange(cases_averted, .by_group = T) %>% 
