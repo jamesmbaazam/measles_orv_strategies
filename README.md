@@ -1,5 +1,5 @@
 # Project overview
-This project is about assessing various measles outbreak response vaccination strategies. The assessments will be done based on the logistical (cold chain) needs in terms of ice packs, freezing times for ice packs, and passive cold chain requirements for vaccination teams.
+Code for evaluating a measles outbreak response vaccination outsize cold chain. The associated peer reviewed paper can be found [here](https://www.sciencedirect.com/science/article/pii/S0264410X21011014).
 
 # Requirements
 ## Directories
